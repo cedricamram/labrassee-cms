@@ -97,7 +97,10 @@ function todayMontrealISO(): string {
 export const getExpoActuelle = cache(async (): Promise<ArtisteMurs | null> => {
   const today = todayMontrealISO()
   const select = encodeURIComponent(
-    'id,nom_artiste,nom_complet,courriel,cellulaire,instagram,site_web,facebook,bio,titre_expo,technique,nb_oeuvres,dimensions_notes,photo_artiste_path,photos_oeuvres_paths,date_install,date_vernissage,date_decrochage,statut,token_depot',
+    // Sécurité : ne plus demander les colonnes PII non utilisées côté public
+    // (nom_complet, cellulaire, token_depot) — révoquées en lecture anon. On
+    // garde courriel : c'est le mailto volontaire de la page expo (artiste signé).
+    'id,nom_artiste,courriel,instagram,site_web,facebook,bio,titre_expo,technique,nb_oeuvres,dimensions_notes,photo_artiste_path,photos_oeuvres_paths,date_install,date_vernissage,date_decrochage,statut',
   )
   const path =
     `/rest/v1/artistes_murs?select=${select}` +
@@ -141,7 +144,8 @@ export const getOeuvresArtiste = cache(async (artisteId: string): Promise<Oeuvre
 export const getProchaineExpo = cache(async (): Promise<ArtisteMurs | null> => {
   const today = todayMontrealISO()
   const select = encodeURIComponent(
-    'id,nom_artiste,nom_complet,courriel,instagram,site_web,facebook,bio,titre_expo,technique,date_install,date_vernissage,date_decrochage,statut',
+    // Sécurité : nom_complet retiré (PII non utilisée, révoquée en lecture anon).
+    'id,nom_artiste,courriel,instagram,site_web,facebook,bio,titre_expo,technique,date_install,date_vernissage,date_decrochage,statut',
   )
   const path =
     `/rest/v1/artistes_murs?select=${select}` +
