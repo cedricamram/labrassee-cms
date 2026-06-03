@@ -45,6 +45,9 @@ export type ConcertPublic = {
   titre_show: string | null
   type_show: string
   fb_event_url: string | null
+  cover_image_url: string | null
+  cover_safe_url: string | null
+  description_publique: string | null
 }
 
 export type FicheArtiste = {
@@ -146,7 +149,7 @@ export const getArtisteParToken = cache(
 
     // 2. Concerts à venir (statut confirme, date >= aujourd'hui)
     const selectConcert = encodeURIComponent(
-      'id,date_show,heure_debut,titre_show,type_show,fb_event_url',
+      'id,date_show,heure_debut,titre_show,type_show,fb_event_url,cover_image_url,cover_safe_url,description_publique',
     )
     const pathAvenir =
       `/rest/v1/concerts?select=${selectConcert}` +

@@ -507,6 +507,25 @@ const ConcertHeure = styled.div`
   letter-spacing: 1px;
 `
 
+/* Affiche de l'événement (ex. montage duo) — ratio naturel, jamais recadré. */
+const ConcertCover = styled.img`
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  margin-bottom: 10px;
+`
+
+/* Texte de présentation fourni pour CETTE soirée. */
+const ConcertDesc = styled.p`
+  font-family: var(--font-din);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 6px 0 0;
+  white-space: pre-line;
+`
+
 const Vide = styled.p`
   font-family: var(--font-din);
   font-size: 14px;
@@ -752,10 +771,16 @@ const ArtistePage = ({ fiche }) => {
                       target={c.fb_event_url ? '_blank' : undefined}
                       rel={c.fb_event_url ? 'noopener noreferrer' : undefined}
                     >
+                      {c.cover_image_url && (
+                        <ConcertCover src={c.cover_image_url} alt={c.titre_show || ''} loading="lazy" />
+                      )}
                       <ConcertDate>{formatDate(c.date_show)}</ConcertDate>
                       {c.titre_show && <ConcertTitre>{c.titre_show}</ConcertTitre>}
                       {c.heure_debut && (
                         <ConcertHeure>{formatHeure(c.heure_debut)}</ConcertHeure>
+                      )}
+                      {c.description_publique && (
+                        <ConcertDesc>{c.description_publique}</ConcertDesc>
                       )}
                     </ConcertCard>
                   ))}
