@@ -133,6 +133,7 @@ const Bio = styled.div`
   line-height: 1.7;
   margin-bottom: 22px;
   font-size: 15px;
+  white-space: pre-line;
   font-style: ${(props) => (props.$empty ? 'italic' : 'normal')};
   opacity: ${(props) => (props.$empty ? 0.55 : 1)};
 `
@@ -314,9 +315,15 @@ export default function SceneArtisteModal({ show, onClose }) {
   const a = show.artiste
   if (!a) return null
 
+  // Priorité image : cover montage spécifique à l'événement (cover_image_url,
+  // ex. le montage duo Christine + Marie) > photo artiste de l'EPK > 1re photo HD.
   const photo =
+    show.coverImage ||
     photoUrl(a.photo_artiste_path) ||
     (a.photos_hd_paths && a.photos_hd_paths[0] && photoUrl(a.photos_hd_paths[0]))
+  // Le descriptif de la soirée (description_publique) prime sur la bio générique
+  // de l'artiste : c'est le texte rédigé pour cet événement précis.
+  const description = show.description_publique || a.bio
   const galerie = (a.photos_hd_paths || []).slice(1, 13)
 
   const liens = []
@@ -368,7 +375,7 @@ export default function SceneArtisteModal({ show, onClose }) {
             </Permanence>
           )}
 
-          <Bio $empty={!a.bio}>{a.bio || "Bio en cours d'écriture."}</Bio>
+          <Bio $empty={!description}>{description || "Bio en cours d'écriture."}</Bio>
 
           {liens.length > 0 && (
             <GrilleLiens>
