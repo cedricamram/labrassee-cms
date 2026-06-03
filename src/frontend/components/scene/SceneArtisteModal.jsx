@@ -138,35 +138,6 @@ const Bio = styled.div`
   opacity: ${(props) => (props.$empty ? 0.55 : 1)};
 `
 
-const GrilleLiens = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
-  margin-bottom: 22px;
-`
-
-const LienBtn = styled.a`
-  color: #ffffff;
-  text-decoration: none;
-  font-family: var(--font-din);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: var(--color-brand);
-    background: rgba(247, 209, 53, 0.12);
-  }
-`
-
 const PiedActions = styled.div`
   display: flex;
   gap: 10px;
@@ -185,6 +156,31 @@ const BtnPrimaire = styled.button`
   padding: 12px 22px;
   border-radius: 999px;
   cursor: pointer;
+`
+
+/* Lien vers la fiche complète de l'artiste (/scene/[token]). La modale reste
+   centrée sur l'événement ; les détails artiste (bio longue, galerie, liens
+   streaming) vivent sur sa page dédiée. */
+const BtnArtiste = styled.a`
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-family: var(--font-din);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 12px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
 `
 
 const Galerie = styled.div`
@@ -326,21 +322,9 @@ export default function SceneArtisteModal({ show, onClose }) {
   const description = show.description_publique || a.bio
   const galerie = (a.photos_hd_paths || []).slice(1, 13)
 
-  const liens = []
-  if (a.spotify_url)
-    liens.push({ href: a.spotify_url, label: '🎧 Écouter sur Spotify' })
-  if (a.bandcamp_url) liens.push({ href: a.bandcamp_url, label: '💿 Bandcamp' })
-  if (a.soundcloud_url) liens.push({ href: a.soundcloud_url, label: '🔊 SoundCloud' })
-  if (a.youtube_url) liens.push({ href: a.youtube_url, label: '📺 YouTube' })
-  if (a.vimeo_url) liens.push({ href: a.vimeo_url, label: '🎬 Vimeo' })
-  if (a.site_web) liens.push({ href: a.site_web, label: '🌐 Site web' })
-  if (a.instagram) {
-    const ig = a.instagram.startsWith('http')
-      ? a.instagram
-      : 'https://instagram.com/' + a.instagram.replace('@', '')
-    liens.push({ href: ig, label: '📷 Instagram' })
-  }
-  if (a.facebook) liens.push({ href: a.facebook, label: '👍 Facebook' })
+  // Lien vers la fiche complète de l'artiste (bio, galerie, liens streaming).
+  // Disponible seulement si l'artiste a un token de dépôt public.
+  const artisteUrl = a.token_depot ? `/scene/${a.token_depot}` : null
 
   return (
     <Backdrop onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -358,7 +342,7 @@ export default function SceneArtisteModal({ show, onClose }) {
             {a.genre || show.type_show || 'Concert'}
             {a.nb_personnes_scene ? ` · ${a.nb_personnes_scene} sur scène` : ''}
           </Meta>
-          <NomArtiste>{a.nom_artiste}</NomArtiste>
+          <NomArtiste>{show.titre_show || a.nom_artiste}</NomArtiste>
 
           <ShowInfo>
             📅 <strong>{formatDateLong(show.date_show)}</strong> · show{' '}
@@ -377,22 +361,17 @@ export default function SceneArtisteModal({ show, onClose }) {
 
           <Bio $empty={!description}>{description || "Bio en cours d'écriture."}</Bio>
 
-          {liens.length > 0 && (
-            <GrilleLiens>
-              {liens.map((l, i) => (
-                <LienBtn key={i} href={l.href} target="_blank" rel="noopener noreferrer">
-                  {l.label}
-                </LienBtn>
-              ))}
-            </GrilleLiens>
-          )}
-
           <Encart>
             🪑 <strong>Aucune réservation possible</strong> — premier arrivé, mieux
             placé. Arrive 30-45 min avant pour les meilleures places.
           </Encart>
 
           <PiedActions>
+            {artisteUrl && (
+              <BtnArtiste href={artisteUrl}>
+                En savoir plus sur l&apos;artiste →
+              </BtnArtiste>
+            )}
             <BtnPrimaire
               type="button"
               onClick={(e) => {

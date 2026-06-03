@@ -234,7 +234,7 @@ export const getUpcomingShowDetails = cache(
   async (limit = 40): Promise<SurlasceneShowDetail[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      '*,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
+      '*,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
