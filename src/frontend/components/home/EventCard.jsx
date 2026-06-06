@@ -81,8 +81,9 @@ const DayBadge = styled.div`
   position: absolute;
   top: 12px;
   left: 12px;
-  background: var(--color-brand);
-  color: var(--color-dark);
+  /* Jaune = à venir / aujourd'hui ; gris discret = événement passé ("HIER"). */
+  background: ${(p) => (p.$past ? 'rgba(255, 255, 255, 0.14)' : 'var(--color-brand)')};
+  color: ${(p) => (p.$past ? 'rgba(255, 255, 255, 0.82)' : 'var(--color-dark)')};
   font-size: 12px;
   font-weight: 300;
   padding: 6px 12px;
@@ -229,27 +230,44 @@ const EventCard = ({ event, index }) => {
     return formattedDate;
   };
 
-  // Fonction pour obtenir le badge du jour si l'événement est cette semaine.
-  // Tout est calculé sur des dates civiles YYYY-MM-DD ancrées à midi UTC, donc
-  // le résultat est identique côté serveur et côté client (pas d'hydration warn).
+  // Badge du jour. Tout est calculé sur des dates civiles YYYY-MM-DD ancrées à
+  // midi UTC → résultat identique serveur/client (pas d'hydration warning).
+  //
+  // Règle (corrigée 2026-06-05) : on ne crie « CE JEUDI » en jaune que pour
+  // aujourd'hui et les jours À VENIR de la semaine. Un événement DÉJÀ PASSÉ
+  // (l'event d'hier qu'on garde tronqué à gauche) ne doit pas se faire passer
+  // pour un événement à venir → badge gris « HIER » / « TERMINÉ ».
   const getDayBadge = (dateString) => {
     const eventYMD = String(dateString).slice(0, 10);
+    const todayYMD = todayMontrealYMD();
+    const days = ['DIMANCHE', 'LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI'];
 
-    // Lundi → dimanche de la semaine courante (en heure Montréal).
-    const today = toCalendarDate(todayMontrealYMD());
+    // Aujourd'hui → « CE [JOUR] » (jaune).
+    if (eventYMD === todayYMD) {
+      return { prefix: 'CE', day: days[toCalendarDate(eventYMD).getUTCDay()], past: false };
+    }
+
+    // Passé → badge gris, jamais « CE ».
+    if (eventYMD < todayYMD) {
+      const veille = toCalendarDate(todayYMD);
+      veille.setUTCDate(veille.getUTCDate() - 1);
+      const estHier = eventYMD === veille.toISOString().slice(0, 10);
+      return { prefix: null, day: estHier ? 'HIER' : 'TERMINÉ', past: true };
+    }
+
+    // Futur : « CE [JOUR] » uniquement dans la semaine courante (lundi → dimanche),
+    // sinon pas de badge (la date complète sous la carte suffit).
+    const today = toCalendarDate(todayYMD);
     const dayOfWeek = today.getUTCDay(); // 0 = dimanche … 6 = samedi
     const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     const startOfWeek = new Date(today);
     startOfWeek.setUTCDate(today.getUTCDate() + mondayOffset);
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
-
     const isoOf = (d) => d.toISOString().slice(0, 10);
 
-    // Comparaison lexicale sûre sur des chaînes YYYY-MM-DD.
-    if (eventYMD >= isoOf(startOfWeek) && eventYMD <= isoOf(endOfWeek)) {
-      const days = ['DIMANCHE', 'LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI'];
-      return { prefix: 'CE', day: days[toCalendarDate(eventYMD).getUTCDay()] };
+    if (eventYMD <= isoOf(endOfWeek)) {
+      return { prefix: 'CE', day: days[toCalendarDate(eventYMD).getUTCDay()], past: false };
     }
 
     return null;
@@ -301,8 +319,12 @@ const EventCard = ({ event, index }) => {
         <FallbackPoster />
       )}
 
-      {/* Badge du jour pour les événements de la semaine en cours */}
-      {dayBadge && <DayBadge>{dayBadge.prefix} <strong>{dayBadge.day}</strong></DayBadge>}
+      {/* Badge du jour : « CE [JOUR] » (jaune) à venir, « HIER » (gris) si passé */}
+      {dayBadge && (
+        <DayBadge $past={dayBadge.past}>
+          {dayBadge.prefix ? <>{dayBadge.prefix} <strong>{dayBadge.day}</strong></> : <strong>{dayBadge.day}</strong>}
+        </DayBadge>
+      )}
 
       {/* Badge genre musical (Jazz, Jam, Karaoké, Vernissage…) */}
       {event.genre && <GenreBadge>{event.genre}</GenreBadge>}
