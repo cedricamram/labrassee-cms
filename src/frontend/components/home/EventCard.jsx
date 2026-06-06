@@ -81,7 +81,7 @@ const DayBadge = styled.div`
   position: absolute;
   top: 12px;
   left: 12px;
-  /* Jaune = à venir / aujourd'hui ; gris discret = événement passé ("HIER"). */
+  /* Jaune = à venir / aujourd'hui ; gris discret = événement passé ("C’ÉTAIT HIER"). */
   background: ${(p) => (p.$past ? 'rgba(255, 255, 255, 0.14)' : 'var(--color-brand)')};
   color: ${(p) => (p.$past ? 'rgba(255, 255, 255, 0.82)' : 'var(--color-dark)')};
   font-size: 12px;
@@ -236,7 +236,7 @@ const EventCard = ({ event, index }) => {
   // Règle (corrigée 2026-06-05) : on ne crie « CE JEUDI » en jaune que pour
   // aujourd'hui et les jours À VENIR de la semaine. Un événement DÉJÀ PASSÉ
   // (l'event d'hier qu'on garde tronqué à gauche) ne doit pas se faire passer
-  // pour un événement à venir → badge gris « HIER » / « TERMINÉ ».
+  // pour un événement à venir → badge gris « C’ÉTAIT HIER » / « TERMINÉ ».
   const getDayBadge = (dateString) => {
     const eventYMD = String(dateString).slice(0, 10);
     const todayYMD = todayMontrealYMD();
@@ -252,7 +252,7 @@ const EventCard = ({ event, index }) => {
       const veille = toCalendarDate(todayYMD);
       veille.setUTCDate(veille.getUTCDate() - 1);
       const estHier = eventYMD === veille.toISOString().slice(0, 10);
-      return { prefix: null, day: estHier ? 'HIER' : 'TERMINÉ', past: true };
+      return { prefix: null, day: estHier ? 'C’ÉTAIT HIER' : 'TERMINÉ', past: true };
     }
 
     // Futur : « CE [JOUR] » uniquement dans la semaine courante (lundi → dimanche),
