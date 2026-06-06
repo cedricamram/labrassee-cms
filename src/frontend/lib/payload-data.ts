@@ -130,12 +130,20 @@ const toMediaURL = (media: number | Media | null | undefined, size?: MediaSizeKe
   return normalizeMediaURL(rawURL)
 }
 
+// "Aujourd'hui" en date civile Montréal. Évite le bug UTC : sur Vercel (serveur
+// en UTC), new Date().getDate() renvoyait la date UTC, ce qui décalait d'un jour
+// le découpage passé/futur des events Payload en soirée Montréal — incohérent
+// avec Surlascène (todayMontrealISO). On force America/Toronto comme partout.
 const todayISO = () => {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Toronto',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+  const parts = fmt.formatToParts(new Date())
+  const get = (t: string) => parts.find((p) => p.type === t)?.value || ''
+  return `${get('year')}-${get('month')}-${get('day')}`
 }
 
 const formatEvent = (event: Event): FrontendEvent => {
