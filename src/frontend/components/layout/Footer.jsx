@@ -169,6 +169,29 @@ const CreditEmail = styled.a`
   }
 `;
 
+const IacoubaCredit = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+`;
+
+const IacoubaLogo = styled.img`
+  height: 16px;
+  display: block;
+
+  @media (max-width: 480px) {
+    height: 14px;
+  }
+`;
+
 const Footer = ({ businessInfo: providedBusinessInfo }) => {
   const businessInfo = providedBusinessInfo || fallbackBusinessInfo;
   const slogan = businessInfo?.slogan?.trim() || 'BIENVENUE CHEZ TOI!'
@@ -264,6 +287,16 @@ const Footer = ({ businessInfo: providedBusinessInfo }) => {
           <CreditName>Joshué Collin</CreditName>
           <br />
           <CreditEmail href="mailto:pro@joshuep.com">pro@joshuep.com</CreditEmail>
+          <br />
+          <IacoubaCredit
+            href="https://iacouba.ca"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="IAcouba — outils et automatisation"
+          >
+            <CreditText>Outils &amp; automatisation par</CreditText>
+            <IacoubaLogo src="/iacouba-lockup-contenu.svg" alt="IAcouba" />
+          </IacoubaCredit>
         </Credits>
       </FooterContainer>
     </FooterSection>
