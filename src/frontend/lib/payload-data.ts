@@ -233,7 +233,9 @@ function formatHeureFromMinutes(min: number): string {
  *
  * Pour CHAQUE jour individuel :
  *   - On cherche les events programmés ce jour précis (date_show égale)
- *   - Si event(s) → fermeture = début du PLUS TARD + 2h30
+ *   - Si event(s) → fermeture = début du PLUS TARD + 2h30, sans jamais
+ *     descendre sous 19h00 (un événement du matin, comme un accrochage
+ *     Sur nos murs à 10h00, ne raccourcit pas la journée)
  *   - Sinon → fermeture 19h00 par défaut
  *
  * Ouverture : 9h00 (statique).
@@ -279,8 +281,11 @@ async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']>
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-` +
         String(d.getDate()).padStart(2, '0')
       const latestMin = latestStartParJour.get(iso)
+      const FERMETURE_DEFAUT_MIN = 19 * 60
       const close =
-        latestMin !== undefined ? formatHeureFromMinutes(latestMin + 150) : '19h00'
+        latestMin !== undefined
+          ? formatHeureFromMinutes(Math.max(latestMin + 150, FERMETURE_DEFAUT_MIN))
+          : '19h00'
       const jourLabel = JOURS_FR_LONG[d.getDay()]
       const dateLabel = `${d.getDate()} ${MOIS_FR_LONG[d.getMonth()]}`
       result.push({
