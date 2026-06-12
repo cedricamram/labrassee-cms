@@ -294,7 +294,7 @@ const Footer = ({ businessInfo: providedBusinessInfo }) => {
             rel="noopener noreferrer"
             aria-label="IAcouba — outils et automatisation"
           >
-            <CreditText>Outils &amp; automatisation par</CreditText>
+            <CreditText>Propulsé par</CreditText>
             <IacoubaLogo src="/iacouba-lockup-contenu.svg" alt="IAcouba" />
           </IacoubaCredit>
         </Credits>
