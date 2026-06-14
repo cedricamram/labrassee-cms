@@ -20,7 +20,9 @@ export default async function FrontendLayout(props: { children: React.ReactNode 
     <html lang="fr" className="app-loading">
       <head>
         <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
-        <link href="/images/brand/full_logo_white.svg" rel="icon" type="image/svg+xml" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/images/brand/icon-cafe-512.png?v=2" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/images/brand/icon-cafe-32.png?v=2" />
+        <link rel="apple-touch-icon" href="/images/brand/icon-cafe-180.png?v=2" />
         <link rel="stylesheet" href="https://use.typekit.net/ovt4lgv.css" />
         <link
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
