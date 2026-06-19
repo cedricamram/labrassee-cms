@@ -226,12 +226,17 @@ const VideoGrid = styled.div`
   gap: 14px;
 `
 
-/* Cadre vidéo générique (paysage 16/9) */
+/* Cadre vidéo : s'adapte à l'orientation RÉELLE de la vidéo (portrait ou paysage)
+   pour ne jamais rogner le visage de l'artiste. Défaut 16/9 tant que les
+   métadonnées ne sont pas chargées ; les vidéos portrait sont bornées en largeur
+   et centrées pour garder une taille raisonnable dans la grille. */
 const VideoFrameWrap = styled.div`
   position: relative;
   border-radius: 10px;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
+  width: 100%;
+  aspect-ratio: ${(p) => p.$ratio || '16 / 9'};
+  ${(p) => p.$portrait && 'max-width: 340px; margin-inline: auto;'}
   background: #1a1810;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
   cursor: pointer;
@@ -239,7 +244,7 @@ const VideoFrameWrap = styled.div`
   video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
   }
 `
@@ -566,6 +571,13 @@ const RetourLien = styled.a`
 const VideoFrame = ({ src, caption, ribbon }) => {
   const ref = React.useRef(/** @type {HTMLVideoElement | null} */ (null))
   const [active, setActive] = useState(false)
+  const [ratio, setRatio] = useState(/** @type {number | null} */ (null))
+
+  /** Mémorise le ratio réel de la vidéo pour adapter le cadre (anti-rognage du visage). */
+  const handleMeta = () => {
+    const v = ref.current
+    if (v && v.videoWidth && v.videoHeight) setRatio(v.videoWidth / v.videoHeight)
+  }
 
   /** Lance la lecture muette au survol. */
   const handleEnter = () => {
@@ -595,9 +607,15 @@ const VideoFrame = ({ src, caption, ribbon }) => {
   }
 
   return (
-    <VideoFrameWrap onMouseEnter={handleEnter} onMouseLeave={handleLeave} onClick={handleClick}>
+    <VideoFrameWrap
+      $ratio={ratio || undefined}
+      $portrait={ratio != null && ratio < 0.95}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      onClick={handleClick}
+    >
       {ribbon}
-      <video ref={ref} src={src} playsInline loop preload="metadata" />
+      <video ref={ref} src={src} playsInline loop preload="metadata" onLoadedMetadata={handleMeta} />
       <PlayOverlay $hidden={active}>
         <div className="btn" />
       </PlayOverlay>
