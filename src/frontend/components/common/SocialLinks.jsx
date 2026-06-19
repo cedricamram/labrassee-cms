@@ -60,18 +60,18 @@ const SocialLinks = ({ businessInfo }) => {
       name: 'FACEBOOK',
       icon: 'fab fa-facebook',
       color: '#359df8',
-      link: source.social.facebook
+      link: source.social?.facebook || fallbackBusinessInfo.social.facebook
     },
     {
       name: 'INSTAGRAM',
       icon: 'fab fa-instagram',
       color: '#f14179',
-      link: source.social.instagram
+      link: source.social?.instagram || fallbackBusinessInfo.social.instagram
     },
     {
       name: 'ONLYFANS',
       icon: 'onlyfans',
-      link: source.social.onlyfans
+      link: source.social?.onlyfans || fallbackBusinessInfo.social.onlyfans
     }
   ];
 
