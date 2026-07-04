@@ -367,14 +367,12 @@ export const getCalendrierMois = cache(
 
         // Jours ouverts selon le mois :
         // - Juillet (7) + août (8)       : VEN + SAM uniquement (été)
-        // - Sept (9) → déc (12)           : RIEN → permanents prioritaires
         // - Reste de l'année              : LUN, MAR, JEU, VEN, SAM (mer + dim fermés)
+        // Sept-déc réouvert à tous le 2026-07-04 (go Cédric) : les permanents
+        // ont réservé en priorité, leurs dates sont bookées donc auto-exclues.
         const moisHum = mois + 1
-        const isPermanentsMonth =
-          moisHum === 9 || moisHum === 10 || moisHum === 11 || moisHum === 12
-        const joursOuverts = isPermanentsMonth
-          ? new Set<number>()
-          : (moisHum === 7 || moisHum === 8)
+        const joursOuverts =
+          moisHum === 7 || moisHum === 8
             ? new Set([5, 6])
             : new Set([1, 2, 4, 5, 6])
 
