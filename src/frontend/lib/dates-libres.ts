@@ -166,10 +166,7 @@ export type MoisCalendrier = {
   mois: number                    // 1..12
   libelle: string                 // 'Juin 2026'
   jours: JourCalendrier[]         // 35 ou 42 cases (5 ou 6 sem × 7 jours)
-  // Mois "permanents prioritaires" (septembre, octobre, novembre) : on grise
-  // tout le mois et on affiche un message « restez à l'affût ». Pas de candidature
-  // ponctuelle acceptée sur cette période — réservé aux permanences.
-  permanentsPriority?: boolean
+  // (permanentsPriority supprimé le 2026-07-04 — sept-déc réouvert à tous)
 }
 
 const MOIS_LONG_LOCAL = [
@@ -401,7 +398,7 @@ export const getCalendrierMois = cache(
           // (la signature concerne le contrat artistique, pas l'occupation
           // physique : si l'expo est accrochée, le mur est pris).
           statut = 'bookee_expo'
-        } else if (dow === 0 && !isPermanentsMonth && iso >= preavisISO) {
+        } else if (dow === 0 && iso >= preavisISO) {
           // Dimanche libre : on garde l'apparence jaune dans tous les cas
           // mais seul·e·s les dim "ancres" (rotation 4 sem) sont cliquables.
           // Les autres dim libres = visibles mais non interactifs (l'expo
@@ -431,10 +428,8 @@ export const getCalendrierMois = cache(
         jours.push({ iso, dow, jourMois: dayNumInMonth, statut, eventTitre, vernissageRole })
       }
 
-      const moisNum = mois + 1
-      const permanentsPriority =
-        moisNum === 9 || moisNum === 10 || moisNum === 11 || moisNum === 12
-      result.push({ cleMois, annee, mois: moisNum, libelle, jours, permanentsPriority })
+      // permanentsPriority retiré le 2026-07-04 : sept-déc est réouvert à tous.
+      result.push({ cleMois, annee, mois: mois + 1, libelle, jours })
     }
     return result
   },
