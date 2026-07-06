@@ -380,9 +380,10 @@ const JOURS_HEAD = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM']
 
 const DEPOT_SCENE_URL = 'https://labrassee-surlascene-depot.vercel.app/?candidature=scene'
 const DEPOT_MURS_URL = 'https://labrassee-murs-depot.vercel.app/?candidature=murs'
+const DEPOT_PAGES_URL = 'https://labrassee-pages-depot.vercel.app/?candidature=pages'
 
 function urlDepot(type, iso) {
-  const base = type === 'murs' ? DEPOT_MURS_URL : DEPOT_SCENE_URL
+  const base = type === 'murs' ? DEPOT_MURS_URL : type === 'pages' ? DEPOT_PAGES_URL : DEPOT_SCENE_URL
   return iso ? `${base}&date=${encodeURIComponent(iso)}` : base
 }
 

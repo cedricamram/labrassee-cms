@@ -327,7 +327,9 @@ export default function ProposerCards() {
           </Liste>
           <Actions>
             <BtnPrimaire
-              href="mailto:envrac@labrassee.com?subject=Proposition%20de%205%20%C3%A0%207%20litt%C3%A9raire%20%E2%80%94%20Sur%20nos%20pages"
+              href="https://labrassee-pages-depot.vercel.app/?candidature=pages"
+              target="_blank"
+              rel="noopener noreferrer"
               className="cursor-event"
             >
               Proposer mon 5 à 7
