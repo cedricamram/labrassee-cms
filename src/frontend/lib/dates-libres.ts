@@ -146,6 +146,8 @@ export type StatutJour =
   | 'bookee_perm'       // récurrence éditoriale confirmée (impro lundi, etc.) — vert SANS tag
   | 'reservee_expo'     // dim expo statut='planifie' (rond orange, distinct des concerts carrés)
   | 'bookee_expo'       // dim expo statut='confirme' (rond vert)
+  | 'reservee_pages'    // dim rencontre d'auteur·rice statut='planifie' (rond bleu creux)
+  | 'bookee_pages'      // dim rencontre d'auteur·rice statut='confirme' (rond bleu plein)
   | 'ferme'             // soir non scène (mer + dim) ou hors préavis (< 7 jours)
   | 'passee'            // date dans le passé
   | 'horsmois'          // padding début/fin du mois pour avoir grille 7 colonnes
@@ -387,6 +389,11 @@ export const getCalendrierMois = cache(
           if (concert.type === 'vernissage' || concert.type === 'accrochage' || concert.type === 'decrochage') {
             statut = concert.statut === 'confirme' ? 'bookee_expo' : 'reservee_expo'
             vernissageRole = concert.type === 'vernissage' ? 'vernissage' : 'accrochage'
+          } else if (concert.type === 'auteur' || concert.type === 'litteraire') {
+            // Rencontre d'auteur·rice (5 à 7 dominical, « Sur nos pages ») → rond bleu.
+            // N'existe que si une ligne concerts porte type_show='auteur' : zéro
+            // impact tant qu'aucune rencontre n'est saisie. Réf. categorie-jour.js.
+            statut = concert.statut === 'confirme' ? 'bookee_pages' : 'reservee_pages'
           } else {
             statut = concert.statut === 'confirme' ? 'bookee' : 'reservee'
           }

@@ -399,6 +399,9 @@ function tagPour(statut, vernissageRole) {
       return vernissageRole === 'accrochage' ? 'acc.' : 'vern.'
     case 'bookee_expo':
       return vernissageRole === 'accrochage' ? 'acc.' : 'vern.'
+    case 'reservee_pages':
+    case 'bookee_pages':
+      return '5à7'
     case 'ferme': return null
     case 'passee': return null
     default: return null
