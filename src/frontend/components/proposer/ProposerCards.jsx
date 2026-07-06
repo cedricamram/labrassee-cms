@@ -12,10 +12,10 @@ const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 28px;
 
-  @media (max-width: 900px) {
+  @media (max-width: 1000px) {
     grid-template-columns: 1fr;
   }
 `
@@ -258,7 +258,7 @@ export default function ProposerCards() {
             </Item>
             <Item>
               <span>
-                Promo Facebook + Instagram + newsletter + TV intérieure assurée
+                Promo Facebook + Instagram + infolettre + TV intérieure assurée
                 par la maison
               </span>
             </Item>
@@ -277,6 +277,66 @@ export default function ProposerCards() {
               className="cursor-event"
             >
               Conditions complètes
+            </BtnSecondaire>
+          </Actions>
+        </Carte>
+
+        {/* Carte PAGES */}
+        <Carte>
+          <Emoji>📚</Emoji>
+          <Eyebrow>Surnospages</Eyebrow>
+          <Titre>Sur nos pages</Titre>
+          <Sous>Rencontres d'auteur·rice · 5 à 7</Sous>
+          <Pitch>
+            Un dimanche en fin de journée, La Brassée ouvre son 5 à 7 aux
+            écrivain·es qui veulent rencontrer leurs lecteur·rices autour d'un
+            verre. Une lecture, un échange, une signature — dans l'ambiance
+            feutrée du café. Tu viens raconter, on s'occupe de remplir la salle.
+          </Pitch>
+          <Liste>
+            <Item>
+              <span>
+                <strong>Dimanche, de 17 h à 19 h</strong> — lecture, échange avec
+                le public, signature
+              </span>
+            </Item>
+            <Item>
+              <span>
+                <strong>Vente de livres 100 % à toi</strong> — aucune commission,
+                hors caisse : c'est ta logistique ou celle de ton éditeur
+              </span>
+            </Item>
+            <Item>
+              <span>
+                <strong>Aucun cachet</strong> — notre revenu, ce sont les
+                consommations des gens venus te rencontrer
+              </span>
+            </Item>
+            <Item>
+              <span>
+                Besoins légers assurés : micro voix, table + chaise, projection
+                au besoin
+              </span>
+            </Item>
+            <Item>
+              <span>
+                Promo Facebook + Instagram + infolettre + TV intérieure assurée
+                par la maison
+              </span>
+            </Item>
+          </Liste>
+          <Actions>
+            <BtnPrimaire
+              href="mailto:envrac@labrassee.com?subject=Proposition%20de%205%20%C3%A0%207%20litt%C3%A9raire%20%E2%80%94%20Sur%20nos%20pages"
+              className="cursor-event"
+            >
+              Proposer mon 5 à 7
+            </BtnPrimaire>
+            <BtnSecondaire
+              href="#calendrier"
+              className="cursor-event"
+            >
+              Vois les dimanches
             </BtnSecondaire>
           </Actions>
         </Carte>
