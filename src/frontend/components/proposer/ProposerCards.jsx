@@ -4,8 +4,32 @@ import React from 'react'
 import styled from 'styled-components'
 
 const Section = styled.section`
-  padding: 80px 24px 100px;
+  padding: 48px 24px 40px;
   background: var(--color-dark);
+`
+
+const Intro = styled.div`
+  max-width: 1200px;
+  margin: 0 auto 24px;
+  text-align: center;
+
+  h2 {
+    font-family: var(--font-din);
+    font-weight: 200;
+    font-size: clamp(24px, 3vw, 34px);
+    color: #ffffff;
+    margin: 0 0 6px;
+    letter-spacing: -0.5px;
+  }
+  p {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 14px;
+    margin: 0;
+  }
+  a {
+    color: var(--color-brand);
+    text-decoration: none;
+  }
 `
 
 const Container = styled.div`
@@ -13,9 +37,9 @@ const Container = styled.div`
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
+  gap: 18px;
 
-  @media (max-width: 1000px) {
+  @media (max-width: 820px) {
     grid-template-columns: 1fr;
   }
 `
@@ -27,39 +51,50 @@ const Carte = styled.article`
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 28px;
-  padding: 44px 36px 36px;
+  border-radius: 22px;
+  padding: 24px 22px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 10px;
   transition: transform 0.3s ease, border-color 0.3s ease;
 
   &:hover {
-    transform: translateY(-4px);
+    transform: translateY(-3px);
     border-color: rgba(247, 209, 53, 0.4);
   }
 `
 
+const Entete = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+`
+
 const Emoji = styled.div`
-  font-size: 56px;
+  font-size: 40px;
   line-height: 1;
+  flex-shrink: 0;
+`
+
+const Titres = styled.div`
+  min-width: 0;
 `
 
 const Eyebrow = styled.div`
   color: var(--color-brand);
   font-family: var(--font-din);
   text-transform: uppercase;
-  letter-spacing: 4px;
-  font-size: 11px;
+  letter-spacing: 3px;
+  font-size: 10px;
 `
 
 const Titre = styled.h2`
   font-family: var(--font-din);
   font-weight: 200;
-  font-size: clamp(36px, 4vw, 52px);
-  letter-spacing: -1px;
+  font-size: clamp(24px, 2.4vw, 30px);
+  letter-spacing: -0.5px;
   color: #ffffff;
-  margin: 0;
+  margin: 2px 0 0;
   line-height: 1;
 `
 
@@ -67,42 +102,16 @@ const Sous = styled.div`
   color: rgba(205, 196, 157, 0.85);
   font-family: var(--font-din);
   text-transform: uppercase;
-  letter-spacing: 3px;
-  font-size: 12px;
-  margin-top: -4px;
+  letter-spacing: 2px;
+  font-size: 10px;
+  margin-top: 3px;
 `
 
-const Pitch = styled.p`
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 15px;
-  line-height: 1.7;
-  margin: 8px 0 0;
-`
-
-const Liste = styled.ul`
-  list-style: none;
-  padding: 0;
-  margin: 8px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`
-
-const Item = styled.li`
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 14px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-
-  &::before {
-    content: '·';
-    color: var(--color-brand);
-    font-weight: 700;
-    font-size: 22px;
-    line-height: 1;
-    flex-shrink: 0;
-  }
+const Accroche = styled.p`
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 13.5px;
+  line-height: 1.55;
+  margin: 2px 0 0;
 
   strong {
     color: var(--color-brand);
@@ -113,8 +122,9 @@ const Item = styled.li`
 const Actions = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 6px;
 `
 
 const BtnPrimaire = styled.a`
@@ -122,9 +132,9 @@ const BtnPrimaire = styled.a`
   color: var(--color-dark);
   font-family: var(--font-din);
   text-transform: uppercase;
-  letter-spacing: 3px;
-  font-size: 12px;
-  padding: 14px 24px;
+  letter-spacing: 2px;
+  font-size: 11px;
+  padding: 11px 18px;
   border-radius: 999px;
   text-decoration: none;
   border: 1px solid var(--color-brand);
@@ -141,9 +151,9 @@ const BtnSecondaire = styled.a`
   color: var(--color-brand);
   font-family: var(--font-din);
   text-transform: uppercase;
-  letter-spacing: 3px;
-  font-size: 12px;
-  padding: 14px 24px;
+  letter-spacing: 2px;
+  font-size: 11px;
+  padding: 11px 18px;
   border-radius: 999px;
   text-decoration: none;
   border: 1px solid rgba(247, 209, 53, 0.3);
@@ -158,49 +168,27 @@ const BtnSecondaire = styled.a`
 export default function ProposerCards() {
   return (
     <Section id="cartes">
+      <Intro>
+        <h2>Trois façons de te faire voir</h2>
+        <p>
+          Choisis ta porte, puis repère ta date sur le <a href="#calendrier">calendrier</a> juste en dessous.
+        </p>
+      </Intro>
       <Container>
         {/* Carte SCÈNE */}
         <Carte>
-          <Emoji>🎤</Emoji>
-          <Eyebrow>Surlascène</Eyebrow>
-          <Titre>Sur la scène</Titre>
-          <Sous>Musique · poésie · cabaret</Sous>
-          <Pitch>
-            Cinq soirs par semaine, La Brassée ouvre sa scène à des artistes qui
-            veulent jouer pour de vrai. Sans billetterie, sans cachet figé. La
-            salle écoute, met au chapeau, et la maison ajoute 10 % sur les
-            factures du soir — 100 % pour les artistes.
-          </Pitch>
-          <Liste>
-            <Item>
-              <span>
-                <strong>Soundcheck dès 18 h 30</strong>, show à 19 h 30, format 2 ×
-                45 min avec pause
-              </span>
-            </Item>
-            <Item>
-              <span>
-                <strong>Chapeau + majoration 10 %</strong> sur les factures du soir
-                — intégralement reversé aux artistes
-              </span>
-            </Item>
-            <Item>
-              <span>
-                <strong>30 $ de consommation offerte</strong> par artiste (plafond
-                120 $/soirée)
-              </span>
-            </Item>
-            <Item>
-              <span>
-                Captation audio + vidéo stéréo sur clé USB en option (40 $)
-              </span>
-            </Item>
-            <Item>
-              <span>
-                Un·e artiste peut revenir <strong>max 3 fois par année</strong>
-              </span>
-            </Item>
-          </Liste>
+          <Entete>
+            <Emoji>🎤</Emoji>
+            <Titres>
+              <Eyebrow>Surlascène</Eyebrow>
+              <Titre>Sur la scène</Titre>
+              <Sous>Musique · poésie · cabaret</Sous>
+            </Titres>
+          </Entete>
+          <Accroche>
+            Cinq soirs par semaine, la scène est à qui veut la prendre. Chapeau au
+            public et <strong>10 % de la maison</strong> pour les artistes.
+          </Accroche>
           <Actions>
             <BtnPrimaire
               href="https://labrassee-surlascene-depot.vercel.app/?candidature=scene"
@@ -210,59 +198,26 @@ export default function ProposerCards() {
             >
               Proposer ma perfo
             </BtnPrimaire>
-            <BtnSecondaire
-              href="/proposer/equipement"
-              className="cursor-event"
-            >
-              Découvre notre équipement
+            <BtnSecondaire href="/proposer/equipement" className="cursor-event">
+              L'équipement
             </BtnSecondaire>
           </Actions>
         </Carte>
 
         {/* Carte MURS */}
         <Carte>
-          <Emoji>🖼️</Emoji>
-          <Eyebrow>Surnosmurs</Eyebrow>
-          <Titre>Sur nos murs</Titre>
-          <Sous>Expos · galerie</Sous>
-          <Pitch>
-            La Brassée accueille un·e nouvel·le artiste sur ses murs toutes les
-            quatre semaines. Installation le dimanche matin, vernissage 5 à 7 le
-            dimanche suivant, décrochage quatre semaines après. Tu accroches,
-            tu fais l'événement, tu repars avec tes ventes.
-          </Pitch>
-          <Liste>
-            <Item>
-              <span>
-                <strong>4 semaines d'expo</strong>, installation et décrochage
-                dimanche matin en autonomie
-              </span>
-            </Item>
-            <Item>
-              <span>
-                <strong>Vernissage 5 à 7 le dimanche J+7</strong> (présence
-                artiste obligatoire)
-              </span>
-            </Item>
-            <Item>
-              <span>
-                Matériel d'accrochage fourni (cimaises + cordon + crochets) —
-                <strong> ne pas dégrader les murs</strong>
-              </span>
-            </Item>
-            <Item>
-              <span>
-                <strong>10 % de commission</strong> La Brassée sur les ventes
-                d'œuvres
-              </span>
-            </Item>
-            <Item>
-              <span>
-                Promo Facebook + Instagram + infolettre + TV intérieure assurée
-                par la maison
-              </span>
-            </Item>
-          </Liste>
+          <Entete>
+            <Emoji>🖼️</Emoji>
+            <Titres>
+              <Eyebrow>Surnosmurs</Eyebrow>
+              <Titre>Sur nos murs</Titre>
+              <Sous>Expos · galerie</Sous>
+            </Titres>
+          </Entete>
+          <Accroche>
+            <strong>4 semaines d'expo</strong>, un vernissage 5 à 7, tes œuvres
+            devant nos habitués. Tu repars avec tes ventes.
+          </Accroche>
           <Actions>
             <BtnPrimaire
               href="https://labrassee-murs-depot.vercel.app/?candidature=murs"
@@ -272,59 +227,26 @@ export default function ProposerCards() {
             >
               Proposer mon expo
             </BtnPrimaire>
-            <BtnSecondaire
-              href="/proposer/expo"
-              className="cursor-event"
-            >
-              Conditions complètes
+            <BtnSecondaire href="/proposer/expo" className="cursor-event">
+              Conditions
             </BtnSecondaire>
           </Actions>
         </Carte>
 
         {/* Carte PAGES */}
         <Carte>
-          <Emoji>📚</Emoji>
-          <Eyebrow>Surnospages</Eyebrow>
-          <Titre>Sur nos pages</Titre>
-          <Sous>Rencontres d'auteur·rice · 5 à 7</Sous>
-          <Pitch>
-            Un dimanche en fin de journée, La Brassée ouvre son 5 à 7 aux
-            écrivain·es qui veulent rencontrer leurs lecteur·rices autour d'un
-            verre. Une lecture, un échange, une signature — dans l'ambiance
-            feutrée du café. Tu viens raconter, on s'occupe de remplir la salle.
-          </Pitch>
-          <Liste>
-            <Item>
-              <span>
-                <strong>Dimanche, de 17 h à 19 h</strong> — lecture, échange avec
-                le public, signature
-              </span>
-            </Item>
-            <Item>
-              <span>
-                <strong>Vente de livres 100 % à toi</strong> — aucune commission,
-                hors caisse : c'est ta logistique ou celle de ton éditeur
-              </span>
-            </Item>
-            <Item>
-              <span>
-                <strong>Aucun cachet</strong> — notre revenu, ce sont les
-                consommations des gens venus te rencontrer
-              </span>
-            </Item>
-            <Item>
-              <span>
-                Besoins légers assurés : micro voix, table + chaise, projection
-                au besoin
-              </span>
-            </Item>
-            <Item>
-              <span>
-                Promo Facebook + Instagram + infolettre + TV intérieure assurée
-                par la maison
-              </span>
-            </Item>
-          </Liste>
+          <Entete>
+            <Emoji>📚</Emoji>
+            <Titres>
+              <Eyebrow>Surnospages</Eyebrow>
+              <Titre>Sur nos pages</Titre>
+              <Sous>Rencontres d'auteur·rice · 5 à 7</Sous>
+            </Titres>
+          </Entete>
+          <Accroche>
+            <strong>Le dimanche, 17 h – 19 h</strong> : lecture, échange, signature.
+            Vente de livres 100 % à toi, aucun cachet.
+          </Accroche>
           <Actions>
             <BtnPrimaire
               href="https://labrassee-pages-depot.vercel.app/?candidature=pages"
@@ -334,11 +256,8 @@ export default function ProposerCards() {
             >
               Proposer mon 5 à 7
             </BtnPrimaire>
-            <BtnSecondaire
-              href="#calendrier"
-              className="cursor-event"
-            >
-              Vois les dimanches
+            <BtnSecondaire href="#calendrier" className="cursor-event">
+              Les dimanches
             </BtnSecondaire>
           </Actions>
         </Carte>
