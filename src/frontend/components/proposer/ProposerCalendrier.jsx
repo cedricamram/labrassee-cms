@@ -245,33 +245,52 @@ const Case = styled.div`
     opacity: 0.85;
   }
 
-  /* Statut LIBRE → cliquable, brand (concert / scène) */
+  /* Statut LIBRE → carré JAUNE pointillé cliquable (Sur la scène) */
   &.libre {
-    background: transparent;
-    border: 1px dashed rgba(255, 255, 255, 0.30);
-    color: rgba(255, 255, 255, 0.62);
+    background: rgba(247, 209, 53, 0.06);
+    border: 1px dashed rgba(247, 209, 53, 0.55);
+    color: rgba(247, 209, 53, 0.90);
     cursor: pointer;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(247, 209, 53, 0.16);
       transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.55);
+      border-color: rgba(247, 209, 53, 0.90);
+      box-shadow: 0 6px 18px rgba(247, 209, 53, 0.15);
     }
   }
 
-  /* Statut LIBRE_EXPO → rond jaune cliquable (dim d'accrochage rotation 4 sem) */
+  /* Statut LIBRE_EXPO → rond BRUN pointillé cliquable (Sur nos murs, ancre 4 sem) */
   &.libre_expo {
-    background: transparent;
-    border: 1px dashed rgba(255, 255, 255, 0.30);
-    color: rgba(255, 255, 255, 0.62);
+    background: rgba(201, 138, 79, 0.08);
+    border: 1px dashed rgba(201, 138, 79, 0.55);
+    color: rgba(224, 178, 128, 0.92);
     border-radius: 50%;
     cursor: pointer;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(201, 138, 79, 0.18);
       transform: translateY(-2px);
-      border-color: rgba(255, 255, 255, 0.55);
-      box-shadow: 0 6px 18px rgba(255, 255, 255, 0.08);
+      border-color: rgba(201, 138, 79, 0.90);
+      box-shadow: 0 6px 18px rgba(201, 138, 79, 0.15);
+    }
+  }
+
+  /* Statut LIBRE_PAGES → rond BLEU pointillé cliquable (Sur nos pages, écrivains).
+     Tout dim sans vernissage, même si une expo occupe les murs (la soirée 5à7
+     reste libre). */
+  &.libre_pages {
+    background: rgba(95, 143, 214, 0.08);
+    border: 1px dashed rgba(95, 143, 214, 0.55);
+    color: rgba(174, 198, 235, 0.92);
+    border-radius: 50%;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(95, 143, 214, 0.18);
+      transform: translateY(-2px);
+      border-color: rgba(95, 143, 214, 0.90);
+      box-shadow: 0 6px 18px rgba(95, 143, 214, 0.15);
     }
   }
 
@@ -391,6 +410,7 @@ function tagPour(statut, vernissageRole) {
   switch (statut) {
     case 'libre': return null
     case 'libre_expo': return 'expo ?'
+    case 'libre_pages': return 'auteur ?'
     case 'libre_expo_attente': return null
     case 'impro': return null // deprecated, plus émis
     case 'reservee': return 'résa'
@@ -481,22 +501,25 @@ export default function ProposerCalendrier({ mois = [] }) {
           Soirs <span className="accent">libres</span> sur notre scène
         </Titre>
         <Intro>
-          Vue calendrier des 3 prochains mois. Clique sur une case <strong style={{ color: 'var(--color-white)' }}>en pointillé</strong> pour
-          nous proposer ta candidature à cette date — le mail s'ouvre pré-rempli.
+          Vue calendrier des 3 prochains mois. Une case <strong style={{ color: 'var(--color-white)' }}>en pointillé</strong> est libre : clique dessus
+          pour proposer ta candidature à cette date. La <strong style={{ color: 'var(--color-white)' }}>couleur dit la scène</strong> —
+          <span style={{ color: '#f7d135' }}> jaune</span> pour un show,
+          <span style={{ color: '#e0b280' }}> brun</span> pour une expo,
+          <span style={{ color: '#aec6eb' }}> bleu</span> pour une rencontre d'auteur·rice.
         </Intro>
 
         <Legende>
           <span className="puce">
-            <span className="swatch" style={{ background: 'transparent', border: '1px dashed rgba(255, 255, 255, 0.4)' }} />
+            <span className="swatch" style={{ background: 'rgba(247, 209, 53, 0.08)', border: '1px dashed rgba(247, 209, 53, 0.6)' }} />
             Soir libre — propose un show
           </span>
           <span className="puce">
-            <span className="swatch" style={{ background: 'transparent', border: '1px dashed rgba(255, 255, 255, 0.4)', borderRadius: '50%' }} />
+            <span className="swatch" style={{ background: 'rgba(201, 138, 79, 0.10)', border: '1px dashed rgba(201, 138, 79, 0.6)', borderRadius: '50%' }} />
             Dim libre — propose une expo
           </span>
           <span className="puce">
-            <span className="swatch" style={{ background: 'rgba(255, 255, 255, 0.04)', border: '1px dashed rgba(255, 255, 255, 0.16)', borderRadius: '50%' }} />
-            Dim couvert (rotation 4 sem)
+            <span className="swatch" style={{ background: 'rgba(95, 143, 214, 0.10)', border: '1px dashed rgba(95, 143, 214, 0.6)', borderRadius: '50%' }} />
+            Dim libre — propose un 5 à 7
           </span>
           <span className="puce">
             <span className="swatch" style={{ background: 'rgba(247, 209, 53, 0.2)', border: '1px solid rgba(247, 209, 53, 0.7)' }} />
@@ -548,6 +571,7 @@ export default function ProposerCalendrier({ mois = [] }) {
                   const tag = tagPour(j.statut, j.vernissageRole)
                   const isClickableScene = j.statut === 'libre'
                   const isClickableExpo = j.statut === 'libre_expo'
+                  const isClickablePages = j.statut === 'libre_pages'
                   // Tooltips génériques uniquement — on ne révèle pas le nom des shows
                   const titleHover =
                     j.statut === 'bookee'
@@ -568,11 +592,13 @@ export default function ProposerCalendrier({ mois = [] }) {
                               ? 'Lundi : soirée Impro (récurrence éditoriale)'
                               : j.statut === 'libre_expo'
                                 ? 'Dimanche libre — clique pour proposer une expo Sur nos murs'
-                                : j.statut === 'libre_expo_attente'
-                                  ? 'Dim couvert par la rotation en cours (4 sem) — prochain accrochage indiqué en jaune cliquable'
+                                : j.statut === 'libre_pages'
+                                  ? 'Dimanche libre — clique pour proposer une rencontre d’auteur·rice (5 à 7)'
+                                  : j.statut === 'libre_expo_attente'
+                                  ? 'Dim couvert par la rotation en cours (4 sem)'
                                   : j.statut === 'ferme'
                                   ? (j.dow === 3 ? 'Mercredi : repos' :
-                                     j.dow === 0 ? 'Dimanche : réservé aux vernissages' :
+                                     j.dow === 0 ? 'Dimanche trop proche — préavis minimum 7 jours' :
                                      (j.iso && j.iso.slice(5, 7) >= '07' && j.iso.slice(5, 7) <= '08' ? 'Juillet–août : on garde la scène pour ven + sam' :
                                       'Trop proche — préavis minimum 7 jours'))
                                   : ''
@@ -580,7 +606,9 @@ export default function ProposerCalendrier({ mois = [] }) {
                     ? () => { window.open(urlDepot('scene', j.iso), '_blank', 'noopener,noreferrer') }
                     : isClickableExpo
                       ? () => { window.open(urlDepot('murs', j.iso), '_blank', 'noopener,noreferrer') }
-                      : undefined
+                      : isClickablePages
+                        ? () => { window.open(urlDepot('pages', j.iso), '_blank', 'noopener,noreferrer') }
+                        : undefined
                   return (
                     <Case
                       key={j.iso}
