@@ -117,6 +117,96 @@ const formatEvent = (event: Event): FrontendEvent => {
   }
 }
 
+// ── Fallback covers depuis Supabase `concerts` (source de vérité EPK) ──
+// Le CMS Payload n'a souvent NI `image` NI `facebookCover` peuplé (events créés
+// hors importateur FB). Or Supabase `concerts` porte déjà `cover_safe_url` (recadrage
+// visage-safe) pour la quasi-totalité des concerts confirmés. Sans ce repli, le
+// carrousel affiche des cartes grises (signalé par Cédric 2026-07-29).
+// Projet EPK distinct de la base du CMS ; l'anon key est publique par conception
+// (rôle anon, exposée côté client — même clé que le pipeline TV labrassee-scripts).
+const CONCERTS_SUPABASE_URL =
+  process.env.CONCERTS_SUPABASE_URL || 'https://xjlpttrziisldlclhsth.supabase.co'
+const CONCERTS_ANON_KEY =
+  process.env.CONCERTS_SUPABASE_ANON_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqbHB0dHJ6aWlzbGRsY2xoc3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjkyODMsImV4cCI6MjA5MjA0NTI4M30.JpkTnJF1ZP08ybzFdM8fFUJOTiKYx8ltTe2nxiDPk24'
+
+type ConcertCover = { titre: string; cover: string }
+
+const coverWords = (s: string) =>
+  new Set(
+    (s || '')
+      .toLowerCase()
+      .replace(/[—–\-_·•]+/g, ' ')
+      .match(/[\p{L}\p{N}]{3,}/gu) || [],
+  )
+
+const coverScore = (a: string, b: string) => {
+  const wa = coverWords(a)
+  const wb = coverWords(b)
+  if (wa.size === 0 || wb.size === 0) return 0
+  let inter = 0
+  for (const w of wa) if (wb.has(w)) inter += 1
+  return inter / (wa.size + wb.size - inter)
+}
+
+const fetchConcertCoversByDate = async (): Promise<Map<string, ConcertCover[]>> => {
+  const map = new Map<string, ConcertCover[]>()
+  try {
+    const today = todayISO()
+    const url =
+      `${CONCERTS_SUPABASE_URL}/rest/v1/concerts?date_show=gte.${today}` +
+      `&statut=eq.confirme&or=(cover_safe_url.not.is.null,cover_image_url.not.is.null)` +
+      `&select=date_show,titre_show,cover_safe_url,cover_image_url`
+    const res = await fetch(url, {
+      headers: { apikey: CONCERTS_ANON_KEY, Authorization: `Bearer ${CONCERTS_ANON_KEY}` },
+      next: { revalidate: 300 },
+    })
+    if (!res.ok) return map
+    const rows: Array<{
+      date_show: string
+      titre_show: string
+      cover_safe_url: string | null
+      cover_image_url: string | null
+    }> = await res.json()
+    for (const r of rows) {
+      const cover = r.cover_safe_url || r.cover_image_url
+      if (!cover) continue
+      const list = map.get(r.date_show) || []
+      list.push({ titre: r.titre_show || '', cover })
+      map.set(r.date_show, list)
+    }
+  } catch {
+    // Repli silencieux : sans covers Supabase, le carrousel garde son comportement actuel.
+  }
+  return map
+}
+
+// Pour chaque event sans image, tente d'attacher la cover Supabase du même jour
+// (match direct si un seul concert ce jour-là, sinon meilleur score de titre).
+const applyConcertCoverFallback = async (events: FrontendEvent[]): Promise<void> => {
+  const missing = events.filter((e) => !e.image)
+  if (missing.length === 0) return
+  const byDate = await fetchConcertCoversByDate()
+  if (byDate.size === 0) return
+  for (const ev of missing) {
+    const day = (ev.date || '').slice(0, 10)
+    const candidates = byDate.get(day)
+    if (!candidates || candidates.length === 0) continue
+    let best = candidates[0]
+    if (candidates.length > 1) {
+      let bestScore = -1
+      for (const c of candidates) {
+        const s = coverScore(ev.title, c.titre)
+        if (s > bestScore) {
+          bestScore = s
+          best = c
+        }
+      }
+    }
+    ev.image = best.cover
+  }
+}
+
 const formatMenuItem = (item: MenuItem): FrontendMenuItem => ({
   description: item.description,
   id: item.slug || item.id,
@@ -197,7 +287,9 @@ export const getUpcomingEventsData = cache(async (limit = 50): Promise<FrontendE
       },
     })
 
-    return response.docs.map(formatEvent)
+    const events = response.docs.map(formatEvent)
+    await applyConcertCoverFallback(events)
+    return events
   } catch {
     return getFallbackUpcomingEvents().slice(0, limit).map((event) => ({
       date: event.date,
