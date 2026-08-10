@@ -154,7 +154,7 @@ export const getArtisteParToken = cache(
     const pathAvenir =
       `/rest/v1/concerts?select=${selectConcert}` +
       `&date_show=gte.${today}` +
-      `&statut=in.("confirme","planifie")` +
+      `&statut=eq.confirme` +
       `&order=date_show.asc&limit=20`
 
     const concertsAvenir = await supaFetch<ConcertPublic[]>(pathAvenir)
@@ -166,7 +166,7 @@ export const getArtisteParToken = cache(
     const pathPasses =
       `/rest/v1/concerts?select=${selectConcert}` +
       `&date_show=lt.${today}` +
-      `&statut=in.("confirme","planifie")` +
+      `&statut=eq.confirme` +
       `&order=date_show.desc&limit=30`
 
     const concertsPasses = await supaFetch<ConcertPublic[]>(pathPasses)

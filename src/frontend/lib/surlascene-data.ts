@@ -163,7 +163,7 @@ export const getUpcomingSurlasceneEvents = cache(
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
-      `&statut=in.(planifie,confirme)&order=date_show.asc&limit=${limit}`
+      `&statut=eq.confirme&order=date_show.asc&limit=${limit}`
     const rows = await supaFetch<RawConcertRow[]>(path)
     if (!rows) return []
     return rows.map(concertToEvent)
@@ -184,7 +184,7 @@ export const getRecentSurlasceneEvents = cache(
     // Fetch desc puis on reverse pour avoir l'ordre chronologique côté retour
     const path =
       `/rest/v1/concerts?select=${select}&date_show=lt.${today}` +
-      `&statut=in.(planifie,confirme)&order=date_show.desc&limit=${limit}`
+      `&statut=eq.confirme&order=date_show.desc&limit=${limit}`
     const rows = await supaFetch<RawConcertRow[]>(path)
     if (!rows) return []
     return rows.map(concertToEvent).reverse()
@@ -238,7 +238,7 @@ export const getUpcomingShowDetails = cache(
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
-      `&statut=in.(planifie,confirme)&order=date_show.asc&limit=${limit}`
+      `&statut=eq.confirme&order=date_show.asc&limit=${limit}`
     const rows = await supaFetch<RawConcertDetailRow[]>(path)
     if (!rows) return []
     return rows.map((r) => {
