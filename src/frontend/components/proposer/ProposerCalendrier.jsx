@@ -446,7 +446,7 @@ function LigneDirectricePourMois({ moisHum }) {
     },
     {
       jour: 'MAR',
-      genre: eteRestrictif ? '—' : 'Jam · open mic',
+      genre: eteRestrictif ? '—' : 'Jam · micro ouvert',
       repos: eteRestrictif,
     },
     {
@@ -456,12 +456,12 @@ function LigneDirectricePourMois({ moisHum }) {
     },
     {
       jour: 'JEU',
-      genre: eteRestrictif ? '—' : 'Jazz · jazz manouche',
+      genre: eteRestrictif ? '—' : 'Duo · trio · chansonnier',
       repos: eteRestrictif,
     },
     {
       jour: 'VEN',
-      genre: 'Jazz · karaoké · poésie',
+      genre: 'Jazz · batterie · cuivres',
     },
     {
       jour: 'SAM',
@@ -501,9 +501,16 @@ export default function ProposerCalendrier({ mois = [] }) {
           Soirs <span className="accent">libres</span> sur notre scène
         </Titre>
         <Intro>
+          <strong style={{ color: 'var(--color-white)' }}>Chaque soir a sa couleur.</strong> L'impro le lundi, la jam le mardi,
+          les petites formules — duo, trio, chansonnier — le jeudi, les groupes avec batterie et cuivres le vendredi,
+          les musiques du monde le samedi. Rien d'hermétique : on regarde toutes les propositions.
+          Mais <strong style={{ color: '#f7d135' }}>choisir le soir qui va à ta formule augmente nettement tes chances</strong> —
+          et le public, lui, sait déjà ce qu'il vient chercher.
+        </Intro>
+        <Intro>
           Vue calendrier des 3 prochains mois. Une case <strong style={{ color: 'var(--color-white)' }}>en pointillé</strong> est libre : clique dessus
           pour proposer ta candidature à cette date. La <strong style={{ color: 'var(--color-white)' }}>couleur dit la scène</strong> —
-          <span style={{ color: '#f7d135' }}> jaune</span> pour un show,
+          <span style={{ color: '#f7d135' }}> jaune</span> pour un spectacle,
           <span style={{ color: '#e0b280' }}> brun</span> pour une expo,
           <span style={{ color: '#aec6eb' }}> bleu</span> pour une rencontre d'auteur·rice.
         </Intro>
@@ -511,7 +518,7 @@ export default function ProposerCalendrier({ mois = [] }) {
         <Legende>
           <span className="puce">
             <span className="swatch" style={{ background: 'rgba(247, 209, 53, 0.08)', border: '1px dashed rgba(247, 209, 53, 0.6)' }} />
-            Soir libre — propose un show
+            Soir libre — propose un spectacle
           </span>
           <span className="puce">
             <span className="swatch" style={{ background: 'rgba(201, 138, 79, 0.10)', border: '1px dashed rgba(201, 138, 79, 0.6)', borderRadius: '50%' }} />

@@ -22,8 +22,11 @@ const Proposer = ({ moisCalendrier = [] }) => {
   return (
     <div style={{ width: '100%', background: 'var(--color-dark)' }}>
       <ProposerHero />
-      <ProposerCards />
+      {/* Le calendrier passe AVANT les cartes (Cédric, 2026-08-10) : la première
+          question d'un artiste est « quand puis-je jouer ? », et la grille de la
+          semaine l'oriente vers le soir où sa formule a le plus de chances. */}
       <ProposerCalendrier mois={moisCalendrier} />
+      <ProposerCards />
     </div>
   )
 }
