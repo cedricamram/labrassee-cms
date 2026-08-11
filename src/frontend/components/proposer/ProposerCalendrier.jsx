@@ -446,7 +446,7 @@ function LigneDirectricePourMois({ moisHum }) {
     },
     {
       jour: 'MAR',
-      genre: eteRestrictif ? '—' : 'Jam · micro ouvert',
+      genre: eteRestrictif ? '—' : 'Jam',
       repos: eteRestrictif,
     },
     {
@@ -461,11 +461,11 @@ function LigneDirectricePourMois({ moisHum }) {
     },
     {
       jour: 'VEN',
-      genre: 'Jazz · batterie · cuivres',
+      genre: 'Jazz · groupes · musique du monde',
     },
     {
       jour: 'SAM',
-      genre: 'Musique du monde',
+      genre: 'Jazz · groupes · musique du monde',
     },
     {
       jour: 'DIM',
@@ -502,8 +502,8 @@ export default function ProposerCalendrier({ mois = [] }) {
         </Titre>
         <Intro>
           <strong style={{ color: 'var(--color-white)' }}>Chaque soir a sa couleur.</strong> L'impro le lundi, la jam le mardi,
-          les petites formules — duo, trio, chansonnier — le jeudi, les groupes avec batterie et cuivres le vendredi,
-          les musiques du monde le samedi. Rien d'hermétique : on regarde toutes les propositions.
+          les petites formules — duo, trio, chansonnier — le jeudi, les groupes et les musiques du monde
+          les vendredis et samedis. Rien d'hermétique : on regarde toutes les propositions.
           Mais <strong style={{ color: '#f7d135' }}>choisir le soir qui va à ta formule augmente nettement tes chances</strong> —
           et le public, lui, sait déjà ce qu'il vient chercher.
         </Intro>
