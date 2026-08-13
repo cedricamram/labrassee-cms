@@ -4,6 +4,7 @@ import React from 'react';
 import Hero from '../components/home/Hero';
 import CalendarSignup from '../components/home/CalendarSignup';
 import EventsSpotlight from '../components/home/EventsSpotlight';
+import AtoutsMaison from '../components/home/AtoutsMaison';
 import Testimonials from '../components/home/Testimonials';
 
 /**
@@ -17,6 +18,7 @@ const Home = ({ events = [], initialIndex = 0 }) => {
     <div style={{ width: '100%', background: 'var(--color-dark)' }}>
       <Hero />
       <EventsSpotlight events={events} initialIndex={initialIndex} />
+      <AtoutsMaison />
       <Testimonials />
       <CalendarSignup />
     </div>
