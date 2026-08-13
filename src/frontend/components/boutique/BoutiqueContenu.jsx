@@ -326,32 +326,6 @@ const BoutiqueContenu = () => (
     </Section>
 
     <Section>
-      <Titre>Un gâteau entier, pour la maison</Titre>
-      <SousTitre>
-        Nos desserts en format familial. Commandez-les à l&apos;avance, on les
-        prépare.
-      </SousTitre>
-      <Liste>
-        <Ligne>
-          <Nom>Gâteau aux carottes</Nom>
-          <Pointilles aria-hidden="true" />
-          <Prix>30,00 $</Prix>
-        </Ligne>
-        <Ligne>
-          <Nom>Croustade</Nom>
-          <Pointilles aria-hidden="true" />
-          <Prix>28,00 $</Prix>
-        </Ligne>
-        <Ligne>
-          <Nom>Pouding chômeur</Nom>
-          <Pointilles aria-hidden="true" />
-          <Prix>25,00 $</Prix>
-        </Ligne>
-      </Liste>
-      <Mention>Taxes incluses. Faits ici, comme le reste de nos pâtisseries.</Mention>
-    </Section>
-
-    <Section>
       <Titre>Et puis, sur les tablettes</Titre>
       <SousTitre>Les petites choses qu&apos;on garde au comptoir.</SousTitre>
       <Liste>

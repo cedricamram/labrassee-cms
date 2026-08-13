@@ -15,6 +15,10 @@ import styled from 'styled-components'
 //   13/08) — il est grillé à la commande, PAS cuit le matin. Ne jamais écrire
 //   « cuit le matin » / « sorti du four ». Le fait maison porte sur la
 //   fabrication, pas sur une cuisson minute.
+// · Les GÂTEAUX ENTIERS (format familial) sont SUSPENDUS depuis le 13/08 —
+//   ils reviennent l'hiver, quand les smoothies s'arrêtent. Saisonnalité
+//   croisée : smoothies l'été, gâteaux entiers l'hiver. Ne pas les remettre
+//   sans le dire à Cédric.
 // · Le SALÉ n'est pas maison : les quiches viennent de Carrément Tarte
 //   (Saint-Michel), Cédric 13/08. Le « cent pour cent » ne vaut QUE pour les
 //   pâtisseries. Ne jamais l'étendre à la cuisine salée.
@@ -202,19 +206,6 @@ const AtoutsMaison = () => (
           <Texte>
             Muffins véganes aux framboises ou aux bleuets, salade végane. Il y
             a toujours quelque chose pour vous, sans avoir à demander.
-          </Texte>
-        </Carte>
-
-        <Carte>
-          <Titre>Un gâteau entier, pour la maison</Titre>
-          <Texte>
-            Notre <Fort>gâteau aux carottes</Fort> est l&apos;une des
-            pâtisseries qu&apos;on vend le plus. Vous pouvez l&apos;emporter en
-            entier — comme la croustade et le pouding chômeur.
-          </Texte>
-          <Texte>
-            De <Fort>25 $ à 30 $</Fort>, faits ici comme le reste.
-            Commandez-les à l&apos;avance.
           </Texte>
         </Carte>
 
