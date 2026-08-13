@@ -44,7 +44,11 @@ function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-function corsHeaders(origin: string | null) {
+// Type de retour annoté explicitement : sans lui, TypeScript infère l'union
+// « {} | { 'Access-Control-Allow-Origin': string; … } », que `HeadersInit`
+// refuse — le build de production échouait dessus depuis le 2026-08-10,
+// donc plus aucun déploiement ne passait. Corrigé le 2026-08-13.
+function corsHeaders(origin: string | null): Record<string, string> {
   const allowed = origin && ALLOWED_ORIGINS.has(origin) ? origin : null
   if (!allowed) return {}
   return {

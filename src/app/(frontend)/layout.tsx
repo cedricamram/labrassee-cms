@@ -8,8 +8,9 @@ import { getBusinessInfoData } from '@/frontend/lib/payload-data'
 import '@/frontend/styles/app.css'
 
 export const metadata: Metadata = {
-  description: 'Site web de La Brassée, café de quartier à Rosepatrie.',
-  title: 'La Brassée - Café de Quartier',
+  description:
+    "Café de quartier au 2522 Beaubien Est, dans Rosemont–La Petite-Patrie. 100 % de nos pâtisseries sont faites maison. Café en grains, thés en vrac et laits à emporter. Buanderie sur place. Concerts et expositions toute l'année.",
+  title: 'La Brassée — Café, buanderie et scène · Rosemont–La Petite-Patrie',
 }
 
 export default async function FrontendLayout(props: { children: React.ReactNode }) {

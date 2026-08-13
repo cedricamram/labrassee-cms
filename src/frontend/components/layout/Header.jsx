@@ -218,6 +218,14 @@ const Header = ({ businessInfo: _providedBusinessInfo }) => {
           >
             Le menu
           </MenuLink>
+          <MenuLink
+            href="/boutique"
+            className={`cursor-menu ${pathname === '/boutique' ? 'active' : ''}`}
+            onClick={(e) => { if (pathname === '/boutique') e.preventDefault(); }}
+            style={{ pointerEvents: pathname === '/boutique' ? 'none' : 'auto' }}
+          >
+            À emporter
+          </MenuLink>
         </NavGroup>
       </HeaderContainer>
     </HeaderSection>
