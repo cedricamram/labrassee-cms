@@ -5,10 +5,16 @@ import styled from 'styled-components'
 
 // Bande de faits — accueil (Apollon, 13/08/2026).
 //
-// Historique : première version en 7 cartes de texte (1889 caractères sur
-// l'accueil). Cédric, 13/08 : « trop de textes sur la première page, pas assez
-// visuel. » Il avait raison — c'était un article, pas une vitrine. Réécrit en
-// pastilles chiffrées : le chiffre porte, la légende tient sur une ligne.
+// Historique en deux temps, et la leçon est dans le deuxième :
+// 1. Première version : 7 cartes de texte, 1889 caractères sur l'accueil.
+//    Cédric : « trop de textes sur la première page, pas assez visuel. »
+// 2. J'ai tout enlevé — 8 chiffres nus, zéro phrase. Cédric : « tu passes
+//    encore une fois du noir au blanc, aucune nuance. En nuançant tu vas
+//    pouvoir mettre quelques phrases clés. »
+// D'où cette version HIÉRARCHISÉE : deux blocs qui portent une histoire
+// (la buanderie, le fait-maison — deux phrases chacun, pas trois paragraphes)
+// puis une bande de chiffres pour les faits qui n'ont pas besoin de récit.
+// La règle qui en sort : doser, pas basculer.
 //
 // ⚠️ GARDE-FOUS DE CONTENU (chaque ligne a coûté une correction de Cédric) :
 // · Le « 100 % » ne vaut QUE pour les PÂTISSERIES. Le salé n'est pas maison —
@@ -45,14 +51,62 @@ const Titre = styled.h2`
   margin: 0 0 46px;
 `
 
-const Grille = styled.div`
+const Recits = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 44px 30px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+  margin-bottom: 62px;
 
   @media (max-width: 834px) {
+    grid-template-columns: 1fr;
+    gap: 34px;
+    margin-bottom: 48px;
+  }
+`
+
+const Recit = styled.div`
+  border-left: 2px solid var(--color-brand);
+  padding-left: 22px;
+`
+
+const RecitTitre = styled.h3`
+  font-family: var(--font-din-condensed);
+  font-size: clamp(19px, 2.4vw, 24px);
+  color: var(--color-white);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 12px;
+`
+
+const Phrase = styled.p`
+  font-family: var(--font-acumin);
+  font-size: clamp(17px, 2.1vw, 20px);
+  line-height: 1.45;
+  color: var(--color-brand);
+  margin: 0 0 10px;
+`
+
+const Suite = styled.p`
+  font-family: var(--font-acumin);
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--color-accent);
+  margin: 0;
+`
+
+const Grille = styled.div`
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 34px 22px;
+  border-top: 1px solid rgba(205, 196, 157, 0.16);
+  padding-top: 46px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 560px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 38px 22px;
   }
 `
 
@@ -62,7 +116,7 @@ const Pastille = styled.div`
 
 const Chiffre = styled.div`
   font-family: var(--font-din-condensed);
-  font-size: clamp(38px, 5.4vw, 58px);
+  font-size: clamp(32px, 4vw, 44px);
   line-height: 1;
   color: var(--color-brand);
   margin-bottom: 9px;
@@ -70,19 +124,33 @@ const Chiffre = styled.div`
 
 const Legende = styled.div`
   font-family: var(--font-acumin);
-  font-size: 14.5px;
+  font-size: 13.5px;
   line-height: 1.45;
   color: var(--color-accent);
-  max-width: 180px;
+  max-width: 165px;
   margin: 0 auto;
 `
 
+const RECITS = [
+  {
+    titre: 'On lave aussi votre linge',
+    phrase:
+      'Nos machines ne sont plus jeunes. On les répare plutôt que de les remplacer.',
+    suite:
+      'Elles ont vu passer des années de linge — et des garde-robes entières, du bébé à l’adulte. Lavage 2,50 $ à 3,50 $, séchage 25 sous.',
+  },
+  {
+    titre: 'Cent pour cent de nos pâtisseries sortent de notre cuisine',
+    phrase: 'Toutes. Sans exception.',
+    suite:
+      'Le salé, c’est autre chose : nos quiches viennent de Carrément Tarte, dans Saint-Michel. On préfère le dire.',
+  },
+]
+
 const FAITS = [
-  { chiffre: '100 %', legende: 'de nos pâtisseries sont faites ici' },
   { chiffre: '0 $', legende: 'de supplément sur les laits végétaux' },
   { chiffre: '40 ¢', legende: 'de moins si vous apportez votre tasse' },
   { chiffre: '32', legende: 'thés et tisanes vendus au poids' },
-  { chiffre: '2,50 $', legende: 'la brassée, à notre buanderie' },
   { chiffre: '7 / 7', legende: 'point de cueillette Lufa' },
   { chiffre: 'À table', legende: 'on prend la commande et on vous sert' },
   { chiffre: 'Végé', legende: 'végane et sans gluten, tous les jours' },
@@ -92,6 +160,15 @@ const AtoutsMaison = () => (
   <Bande>
     <Cadre>
       <Titre>Ce qu&apos;on ne dit pas assez</Titre>
+      <Recits>
+        {RECITS.map((r) => (
+          <Recit key={r.titre}>
+            <RecitTitre>{r.titre}</RecitTitre>
+            <Phrase>{r.phrase}</Phrase>
+            <Suite>{r.suite}</Suite>
+          </Recit>
+        ))}
+      </Recits>
       <Grille>
         {FAITS.map((f) => (
           <Pastille key={f.chiffre}>
