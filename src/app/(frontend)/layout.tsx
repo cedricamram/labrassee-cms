@@ -9,7 +9,7 @@ import '@/frontend/styles/app.css'
 
 export const metadata: Metadata = {
   description:
-    "Café de quartier au 2522 Beaubien Est, dans Rosemont–La Petite-Patrie. Tout ce qu'on prépare est fait ici : 100 % de nos pâtisseries sont maison. Café en grains, thés en vrac et laits à emporter. Buanderie sur place. Concerts et expositions toute l'année.",
+    "Café de quartier au 2522 Beaubien Est, dans Rosemont–La Petite-Patrie. 100 % de nos pâtisseries sont faites maison. Café en grains, thés en vrac et laits à emporter. Buanderie sur place. Concerts et expositions toute l'année.",
   title: 'La Brassée — Café, buanderie et scène · Rosemont–La Petite-Patrie',
 }
 

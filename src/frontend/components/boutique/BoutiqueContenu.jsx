@@ -328,15 +328,17 @@ const BoutiqueContenu = () => (
       <Recit>
         Nos bières viennent de Beauregard. Notre eau pétillante, c&apos;est
         Montellier. Nos jus, Oasis et Héritage. Nos boissons, Gutsy et Guru.
-        Nos thés, on les choisit avec Un Amour des Thés, à Montréal.
+        Nos viandes viennent des Fermes Valens. Nos thés, on les choisit avec
+        Un Amour des Thés, à Montréal. Nos quiches, de Carrément Tarte, dans
+        Saint-Michel.
       </Recit>
       <Recit>
         Le café, lui, ne pousse pas au Québec. Alors on va le chercher là où il
         pousse&nbsp;: à la ferme Las Rosas, en Colombie.
       </Recit>
       <Recit>
-        Et tout ce qu&apos;on cuisine, tout ce qu&apos;on pâtisse, se fait dans
-        notre cuisine. Cent pour cent.
+        Et nos pâtisseries&nbsp;? Cent pour cent d&apos;entre elles sortent de
+        notre cuisine. Toutes.
       </Recit>
     </Provenance>
   </Page>

@@ -11,6 +11,9 @@ import styled from 'styled-components'
 //
 // Garde-fous gravés :
 // · Les confitures du Roti ne sont PAS maison — ne jamais l'écrire (Cédric, 02/07).
+// · Le SALÉ n'est pas maison : les quiches viennent de Carrément Tarte
+//   (Saint-Michel), Cédric 13/08. Le « cent pour cent » ne vaut QUE pour les
+//   pâtisseries. Ne jamais l'étendre à la cuisine salée.
 // · Aucun nombre de buanderies annoncé tant que « 2 buanderies » n'est pas levé.
 // · Prix taxes incluses, conformes au menu papier.
 
@@ -63,6 +66,14 @@ const Carte = styled.article`
   flex-direction: column;
 `
 
+const CarteLarge = styled(Carte)`
+  grid-column: 1 / -1;
+
+  @media (max-width: 834px) {
+    grid-column: auto;
+  }
+`
+
 const Titre = styled.h3`
   font-family: var(--font-din-condensed);
   font-size: clamp(21px, 2.6vw, 27px);
@@ -110,7 +121,7 @@ const AtoutsMaison = () => (
     <Cadre>
       <Intro>Ce qu&apos;on ne dit pas assez</Intro>
       <SousIntro>
-        Quatre choses qu&apos;on fait ici et qui ne se font pas partout.
+        Cinq choses qu&apos;on fait ici et qui ne se font pas partout.
       </SousIntro>
 
       <Grille>
@@ -141,15 +152,12 @@ const AtoutsMaison = () => (
           <Titre>Cent pour cent de nos pâtisseries sont faites ici</Titre>
           <Texte>
             <Fort>Toutes. Sans exception.</Fort> Le pain du Roti, on le pétrit,
-            on le laisse lever et on le cuit ici, le matin.
+            on le laisse lever et on le cuit ici, le matin. La limonade aussi&nbsp;:
+            un concentré maison, trente citrons et neuf oranges par bidon.
           </Texte>
           <Texte>
-            La limonade aussi&nbsp;: un concentré maison, trente citrons et neuf
-            oranges par bidon.
-          </Texte>
-          <Texte>
-            Ce n&apos;est pas une façon de parler. C&apos;est notre cuisine,
-            tous les jours.
+            Le salé, c&apos;est autre chose. Nos quiches viennent de Carrément
+            Tarte, dans Saint-Michel. <Fort>On préfère le dire.</Fort>
           </Texte>
         </Carte>
 
@@ -176,6 +184,14 @@ const AtoutsMaison = () => (
             dans un verre, sur glace, avec une paille.
           </Texte>
         </Carte>
+        <CarteLarge>
+          <Titre>Votre panier Lufa vous attend ici</Titre>
+          <Texte>
+            On est un point de cueillette Lufa — et on est ouverts{' '}
+            <Fort>sept jours sur sept</Fort>. Votre panier vous attend quand ça
+            vous adonne, pas quand ça adonne à un horaire.
+          </Texte>
+        </CarteLarge>
       </Grille>
     </Cadre>
   </Section>
