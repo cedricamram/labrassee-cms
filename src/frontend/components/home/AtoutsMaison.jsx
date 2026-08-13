@@ -11,6 +11,10 @@ import styled from 'styled-components'
 //
 // Garde-fous gravés :
 // · Les confitures du Roti ne sont PAS maison — ne jamais l'écrire (Cédric, 02/07).
+// · Le Roti est pétri, levé et cuit ici, mais PRÉCUIT PUIS CONGELÉ (Cédric,
+//   13/08) — il est grillé à la commande, PAS cuit le matin. Ne jamais écrire
+//   « cuit le matin » / « sorti du four ». Le fait maison porte sur la
+//   fabrication, pas sur une cuisson minute.
 // · Le SALÉ n'est pas maison : les quiches viennent de Carrément Tarte
 //   (Saint-Michel), Cédric 13/08. Le « cent pour cent » ne vaut QUE pour les
 //   pâtisseries. Ne jamais l'étendre à la cuisine salée.
@@ -152,8 +156,9 @@ const AtoutsMaison = () => (
           <Titre>Cent pour cent de nos pâtisseries sont faites ici</Titre>
           <Texte>
             <Fort>Toutes. Sans exception.</Fort> Le pain du Roti, on le pétrit,
-            on le laisse lever et on le cuit ici, le matin. La limonade aussi&nbsp;:
-            un concentré maison, trente citrons et neuf oranges par bidon.
+            on le laisse lever et on le cuit dans notre cuisine — puis on le
+            grille à la commande. La limonade aussi&nbsp;: un concentré maison,
+            trente citrons et neuf oranges par bidon.
           </Texte>
           <Texte>
             Le salé, c&apos;est autre chose. Nos quiches viennent de Carrément
