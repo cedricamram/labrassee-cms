@@ -18,45 +18,74 @@ import { MENU_SALE, MENU_BOISSONS_CHAUDES } from '../../data/menu-texte'
 const Bloc = styled.section`
   width: 100%;
   background: var(--color-dark);
-  padding: 20px 24px 90px;
+  padding: 10px 24px 70px;
 `
 
-const Cadre = styled.div`
+// Replié par défaut (Cédric, 13/08 : « c'est moche en vrai »). Le feuilletage
+// reste la vedette ; le texte existe pour Google, les lecteurs d'écran et
+// quiconque préfère lire. <details> natif = contenu bien présent dans le DOM,
+// donc indexé — rien n'est caché en CSS.
+const Repli = styled.details`
   max-width: 860px;
   margin: 0 auto;
+  border-top: 1px solid rgba(205, 196, 157, 0.18);
+  padding-top: 28px;
+
+  &[open] summary::after {
+    content: '−';
+  }
 `
 
-const Entree = styled.div`
-  text-align: center;
-  border-top: 1px solid rgba(205, 196, 157, 0.2);
-  padding-top: 46px;
-  margin-bottom: 40px;
-`
-
-const GrandTitre = styled.h2`
+const Poignee = styled.summary`
+  list-style: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-din-condensed);
-  font-size: clamp(26px, 4vw, 38px);
-  color: var(--color-brand);
+  font-size: 15px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin: 0 0 8px;
+  color: var(--color-accent);
+  padding: 9px 2px;
+  transition: color 0.2s ease;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &::after {
+    content: '+';
+    font-size: 17px;
+    color: var(--color-brand);
+  }
+
+  &:hover {
+    color: var(--color-brand);
+  }
 `
 
-const Chapeau = styled.p`
-  font-family: var(--font-acumin);
-  font-size: 15.5px;
-  line-height: 1.6;
-  color: var(--color-accent);
-  max-width: 560px;
-  margin: 0 auto;
+const Colonnes = styled.div`
+  column-count: 2;
+  column-gap: 54px;
+  margin-top: 12px;
+
+  > * {
+    break-inside: avoid;
+  }
+
+  @media (max-width: 834px) {
+    column-count: 1;
+  }
 `
 
 const Partie = styled.h3`
   font-family: var(--font-din-condensed);
-  font-size: clamp(22px, 3.2vw, 30px);
+  font-size: 23px;
   color: var(--color-white);
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  margin: 52px 0 4px;
+  margin: 34px 0 4px;
 `
 
 const Famille = styled.h4`
@@ -176,15 +205,9 @@ const MenuTexte = () => {
 
   return (
     <Bloc>
-      <Cadre>
-        <Entree>
-          <GrandTitre>Le menu, en toutes lettres</GrandTitre>
-          <Chapeau>
-            Le même menu que ci-dessus, écrit — pour le lire au calme, le
-            chercher, ou l&apos;entendre. Tous les prix sont taxes incluses.
-          </Chapeau>
-        </Entree>
-
+      <Repli>
+        <Poignee>Le menu en toutes lettres</Poignee>
+        <Colonnes>
         <Partie>{bc.titre}</Partie>
         <Note>{bc.chapeau}</Note>
 
@@ -284,7 +307,8 @@ const MenuTexte = () => {
           Le menu papier fait foi. Si quelque chose diffère, c&apos;est lui qui
           a raison — venez nous le dire, on corrigera.
         </Pied>
-      </Cadre>
+        </Colonnes>
+      </Repli>
     </Bloc>
   )
 }
