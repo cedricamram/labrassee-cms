@@ -2,6 +2,7 @@
 
 import React from 'react'
 import MenuFlipbook from '../components/menu/MenuFlipbook'
+import MenuTexte from '../components/menu/MenuTexte'
 
 // Note (2026-05-17) : Menu rendu en flipbook (carousel feuilletage) des 8
 // pages PNG du menu V2 printemps 2026 (source : menu_v2/png/ généré par
@@ -14,6 +15,7 @@ const Menu = () => {
   return (
     <div style={{ width: '100%', background: 'var(--color-dark)' }}>
       <MenuFlipbook />
+      <MenuTexte />
     </div>
   )
 }

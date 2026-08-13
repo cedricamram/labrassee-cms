@@ -73,3 +73,55 @@ export const MENU_SALE = {
     ],
   },
 }
+
+export const MENU_BOISSONS_CHAUDES = {
+  titre: 'Boissons chaudes',
+  chapeau: 'Cafés, thés, lattés — les laits végétaux au même prix.',
+  cafes: {
+    titre: 'Cafés',
+    notes: [
+      'Décaféiné au même prix.',
+      'Lait Henrietta, avoine, amande, coco, soya — aucun supplément.',
+      'Caramel salé Breton +1 $.',
+    ],
+    items: [
+      { nom: 'Espresso (double)', detail: 'Court ou allongé', prix: '3,60 $' },
+      { nom: 'Américano', detail: 'Petit, moyen ou grand', prix: '3,90 $' },
+      { nom: 'Macchiato', detail: 'Court ou allongé', prix: '4,25 $' },
+      { nom: 'Cortado', detail: 'Court ou allongé', prix: '4,75 $' },
+      { nom: 'Cappuccino', detail: 'Petit', prix: '5,00 $' },
+      { nom: 'Latté', detail: 'Moyen 6,50 $ · grand', prix: '7,50 $' },
+      { nom: 'Flat white', detail: 'Moyen', prix: '6,50 $' },
+      { nom: "Lait d'or", detail: 'Moyen 6,25 $ · grand', prix: '7,25 $' },
+      { nom: 'Chocolat chaud', detail: 'Moyen 6,25 $ · grand', prix: '7,00 $' },
+      { nom: 'Mokaccino', detail: 'Moyen 7,00 $ · grand', prix: '7,50 $' },
+    ],
+  },
+  lattes: {
+    titre: 'Lattés et infusions de thé',
+    notes: ['Sirop de chocolat blanc sur le matcha +1,00 $.'],
+    items: [
+      { nom: 'Matcha latté', detail: 'Régulier · chaï · Earl Grey · mangue — 16 oz', prix: '7,50 $' },
+      { nom: 'London Fog', detail: '16 oz', prix: '7,50 $' },
+      { nom: 'Chaï latté', detail: '16 oz', prix: '7,50 $' },
+      { nom: 'Dirty chaï latté', detail: '16 oz', prix: '8,50 $' },
+    ],
+  },
+  formatsThe: {
+    titre: 'Formats de thé',
+    note: 'Pour une personne.',
+    items: [
+      { nom: 'Petite théière', detail: '12 oz', prix: '4,00 $' },
+      { nom: 'Grande théière', detail: '20 oz', prix: '6,00 $' },
+      { nom: 'Thé à emporter', detail: '16 oz', prix: '4,50 $' },
+    ],
+  },
+  extras: {
+    titre: 'Pour se gâter',
+    items: [
+      { nom: 'Extra gourmand', detail: 'Sirops 1883 · caramel salé maison', prix: '+1,00 $' },
+      { nom: 'Coureur des Bois crème', detail: '1 oz — 18 ans et plus', prix: '+2,50 $' },
+      { nom: 'Whisky', detail: '1 oz — 18 ans et plus', prix: '+3,00 $' },
+    ],
+  },
+}
