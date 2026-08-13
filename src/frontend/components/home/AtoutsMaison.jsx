@@ -117,8 +117,14 @@ const AtoutsMaison = () => (
         <Carte>
           <Titre>On lave aussi votre linge</Titre>
           <Texte>
-            Oui, La Brassée est un café. C&apos;est aussi une vraie buanderie,
-            au 2522 Beaubien Est.
+            Oui, La Brassée est un café. C&apos;est aussi une buanderie, au
+            2522 Beaubien Est.
+          </Texte>
+          <Texte>
+            Nos machines ne sont plus jeunes. On les répare plutôt que de les
+            remplacer, et on les pousse jusqu&apos;au bout. Elles ont vu passer
+            des années de linge — et des garde-robes entières, du bébé à
+            l&apos;adulte.
           </Texte>
           <Texte>
             Le temps d&apos;une brassée, prenez un café. Un vrai, servi à table.

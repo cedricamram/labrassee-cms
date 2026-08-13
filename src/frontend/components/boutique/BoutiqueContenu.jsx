@@ -216,6 +216,15 @@ const FAMILLES_THE = [
     ],
   },
   {
+    famille: 'Matchas',
+    thes: [
+      { nom: 'Régulier', prix: '22,00 $' },
+      { nom: 'Mangue', prix: '22,00 $' },
+      { nom: 'Earl Grey', prix: '22,00 $' },
+      { nom: 'Chaï', prix: '22,00 $' },
+    ],
+  },
+  {
     famille: 'Les inclassables',
     thes: [
       { nom: 'Se Zhong', prix: '17,00 $' },
