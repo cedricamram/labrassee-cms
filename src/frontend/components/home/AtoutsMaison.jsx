@@ -70,14 +70,6 @@ const Carte = styled.article`
   flex-direction: column;
 `
 
-const CarteLarge = styled(Carte)`
-  grid-column: 1 / -1;
-
-  @media (max-width: 834px) {
-    grid-column: auto;
-  }
-`
-
 const Titre = styled.h3`
   font-family: var(--font-din-condensed);
   font-size: clamp(21px, 2.6vw, 27px);
@@ -179,6 +171,17 @@ const AtoutsMaison = () => (
         </Carte>
 
         <Carte>
+          <Titre>Apportez votre tasse, on enlève 40 sous</Titre>
+          <Texte>
+            Votre tasse, votre thermos, votre pot Mason — ce que vous voulez.
+            On la remplit et on retire <Fort>40 sous</Fort> de votre facture.
+          </Texte>
+          <Texte>
+            Chaque fois. Sans carte à faire poinçonner, sans rien à demander.
+          </Texte>
+        </Carte>
+
+        <Carte>
           <Titre>Asseyez-vous, on vient à vous</Titre>
           <Texte>
             Pas de file au comptoir, pas de plateau à rapporter. On prend votre
@@ -192,9 +195,9 @@ const AtoutsMaison = () => (
         <Carte>
           <Titre>Végane et sans gluten, tous les jours</Titre>
           <Texte>
-            Notre <Fort>brownie végane sans gluten</Fort> est la pâtisserie la
-            plus vendue de la maison. Ce n&apos;est pas une option de dépannage,
-            c&apos;est un morceau de notre carte.
+            Notre <Fort>brownie végane sans gluten</Fort> est là tous les
+            jours, et il part. Ce n&apos;est pas une option de dépannage
+            coincée au bout du comptoir, c&apos;est une pâtisserie de la carte.
           </Texte>
           <Texte>
             Muffins véganes aux framboises ou aux bleuets, salade végane. Il y
@@ -205,22 +208,24 @@ const AtoutsMaison = () => (
         <Carte>
           <Titre>Un gâteau entier, pour la maison</Titre>
           <Texte>
-            Gâteau aux carottes, croustade, pouding chômeur — en format
-            familial, à emporter. De <Fort>25 $ à 30 $</Fort>.
+            Notre <Fort>gâteau aux carottes</Fort> est l&apos;une des
+            pâtisseries qu&apos;on vend le plus. Vous pouvez l&apos;emporter en
+            entier — comme la croustade et le pouding chômeur.
           </Texte>
           <Texte>
-            Faits ici, comme le reste. Commandez-les à l&apos;avance.
+            De <Fort>25 $ à 30 $</Fort>, faits ici comme le reste.
+            Commandez-les à l&apos;avance.
           </Texte>
         </Carte>
 
-        <CarteLarge>
+        <Carte>
           <Titre>Votre panier Lufa vous attend ici</Titre>
           <Texte>
             On est un point de cueillette Lufa — et on est ouverts{' '}
             <Fort>sept jours sur sept</Fort>. Votre panier vous attend quand ça
             vous adonne, pas quand ça adonne à un horaire.
           </Texte>
-        </CarteLarge>
+        </Carte>
       </Grille>
     </Cadre>
   </Section>
