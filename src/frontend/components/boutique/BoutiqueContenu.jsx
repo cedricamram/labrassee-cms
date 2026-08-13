@@ -234,11 +234,13 @@ const FAMILLES_THE = [
 ]
 
 const LAITS = [
-  { nom: 'Henrietta', prix: '6,00 $' },
-  { nom: 'Barista Amande', prix: '6,50 $' },
-  { nom: 'Barista Coco', prix: '6,50 $' },
-  { nom: 'Barista Soya', prix: '6,50 $' },
-  { nom: 'Oatly', prix: '6,50 $' },
+  { nom: 'Henrietta — brique', prix: '6,00 $' },
+  { nom: 'Henrietta — pinte', prix: '6,00 $' },
+  { nom: 'Lait végétal — pinte', prix: '6,00 $' },
+  { nom: 'Barista Amande — brique', prix: '6,50 $' },
+  { nom: 'Barista Coco — brique', prix: '6,50 $' },
+  { nom: 'Barista Soya — brique', prix: '6,50 $' },
+  { nom: 'Oatly — brique', prix: '6,50 $' },
 ]
 
 const BoutiqueContenu = () => (
@@ -321,6 +323,79 @@ const BoutiqueContenu = () => (
         ))}
       </Liste>
       <Mention>Taxes incluses.</Mention>
+    </Section>
+
+    <Section>
+      <Titre>Un gâteau entier, pour la maison</Titre>
+      <SousTitre>
+        Nos desserts en format familial. Commandez-les à l&apos;avance, on les
+        prépare.
+      </SousTitre>
+      <Liste>
+        <Ligne>
+          <Nom>Gâteau aux carottes</Nom>
+          <Pointilles aria-hidden="true" />
+          <Prix>30,00 $</Prix>
+        </Ligne>
+        <Ligne>
+          <Nom>Croustade</Nom>
+          <Pointilles aria-hidden="true" />
+          <Prix>28,00 $</Prix>
+        </Ligne>
+        <Ligne>
+          <Nom>Pouding chômeur</Nom>
+          <Pointilles aria-hidden="true" />
+          <Prix>25,00 $</Prix>
+        </Ligne>
+      </Liste>
+      <Mention>Taxes incluses. Faits ici, comme le reste de nos pâtisseries.</Mention>
+    </Section>
+
+    <Section>
+      <Titre>Et puis, sur les tablettes</Titre>
+      <SousTitre>Les petites choses qu&apos;on garde au comptoir.</SousTitre>
+      <Liste>
+        <Ligne>
+          <Nom>
+            Savon à lessive
+            <Detail>Pour la buanderie, ou pour rapporter</Detail>
+          </Nom>
+          <Pointilles aria-hidden="true" />
+          <Prix>1,00 $</Prix>
+        </Ligne>
+        <Ligne>
+          <Nom>Infuseur à thé</Nom>
+          <Pointilles aria-hidden="true" />
+          <Prix>10,00 $</Prix>
+        </Ligne>
+        <Ligne>
+          <Nom>Cahier Gribouille</Nom>
+          <Pointilles aria-hidden="true" />
+          <Prix>2,00 $</Prix>
+        </Ligne>
+        <Ligne>
+          <Nom>
+            Les Zempotés
+            <Detail>190 ml — aussi en supplément sur votre croissant</Detail>
+          </Nom>
+          <Pointilles aria-hidden="true" />
+          <Prix>—</Prix>
+        </Ligne>
+        <Ligne>
+          <Nom>Autocollants</Nom>
+          <Pointilles aria-hidden="true" />
+          <Prix>—</Prix>
+        </Ligne>
+        <Ligne>
+          <Nom>
+            Carte-cadeau
+            <Detail>Le montant que vous voulez</Detail>
+          </Nom>
+          <Pointilles aria-hidden="true" />
+          <Prix>—</Prix>
+        </Ligne>
+      </Liste>
+      <Mention>Taxes incluses. Demandez-nous les prix du moment.</Mention>
     </Section>
 
     <Provenance>

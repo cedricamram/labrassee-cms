@@ -125,7 +125,7 @@ const AtoutsMaison = () => (
     <Cadre>
       <Intro>Ce qu&apos;on ne dit pas assez</Intro>
       <SousIntro>
-        Cinq choses qu&apos;on fait ici et qui ne se font pas partout.
+        Des choses qu&apos;on fait ici et qui ne se font pas partout.
       </SousIntro>
 
       <Grille>
@@ -189,6 +189,30 @@ const AtoutsMaison = () => (
             dans un verre, sur glace, avec une paille.
           </Texte>
         </Carte>
+        <Carte>
+          <Titre>Végane et sans gluten, tous les jours</Titre>
+          <Texte>
+            Notre <Fort>brownie végane sans gluten</Fort> est la pâtisserie la
+            plus vendue de la maison. Ce n&apos;est pas une option de dépannage,
+            c&apos;est un morceau de notre carte.
+          </Texte>
+          <Texte>
+            Muffins véganes aux framboises ou aux bleuets, salade végane. Il y
+            a toujours quelque chose pour vous, sans avoir à demander.
+          </Texte>
+        </Carte>
+
+        <Carte>
+          <Titre>Un gâteau entier, pour la maison</Titre>
+          <Texte>
+            Gâteau aux carottes, croustade, pouding chômeur — en format
+            familial, à emporter. De <Fort>25 $ à 30 $</Fort>.
+          </Texte>
+          <Texte>
+            Faits ici, comme le reste. Commandez-les à l&apos;avance.
+          </Texte>
+        </Carte>
+
         <CarteLarge>
           <Titre>Votre panier Lufa vous attend ici</Titre>
           <Texte>
