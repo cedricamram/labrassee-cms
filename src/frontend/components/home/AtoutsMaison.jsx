@@ -3,6 +3,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
+import { faitsDeLaSemaine } from '../../data/faits-maison'
+
 // Bande de faits — accueil (Apollon, 13/08/2026).
 //
 // Historique en deux temps, et la leçon est dans le deuxième :
@@ -131,37 +133,25 @@ const Legende = styled.div`
   margin: 0 auto;
 `
 
-const RECITS = [
-  {
-    titre: 'On lave aussi votre linge',
-    phrase:
-      'Nos machines ne sont plus jeunes. On les répare plutôt que de les remplacer.',
-    suite:
-      'Elles ont vu passer des années de linge — et des garde-robes entières, du bébé à l’adulte. Lavage 2,50 $ à 3,50 $, séchage 25 sous.',
-  },
-  {
-    titre: 'Cent pour cent de nos pâtisseries sortent de notre cuisine',
-    phrase: 'Toutes. Sans exception.',
-    suite:
-      'Le salé, c’est autre chose : nos quiches viennent de Carrément Tarte, dans Saint-Michel. On préfère le dire.',
-  },
-]
+/**
+ * La sélection tourne chaque lundi (idée de Cédric, 13/08 : « fais vivre la
+ * première page »). Elle est calculée CÔTÉ SERVEUR et passée en props : si on
+ * la calculait ici, le serveur et le navigateur pourraient tomber sur deux
+ * semaines différentes au passage de minuit et l'affichage sauterait.
+ * Le repli sert au rendu isolé (tests, Storybook) — en production, page.tsx
+ * fournit toujours la sélection.
+ *
+ * @param {{ faits?: ReturnType<typeof faitsDeLaSemaine> }} props
+ */
+const AtoutsMaison = ({ faits }) => {
+  const { recits, chiffres } = faits || faitsDeLaSemaine()
 
-const FAITS = [
-  { chiffre: '0 $', legende: 'de supplément sur les laits végétaux' },
-  { chiffre: '40 ¢', legende: 'de moins si vous apportez votre tasse' },
-  { chiffre: '32', legende: 'thés et tisanes vendus au poids' },
-  { chiffre: '7 / 7', legende: 'point de cueillette Lufa' },
-  { chiffre: 'À table', legende: 'on prend la commande et on vous sert' },
-  { chiffre: 'Végé', legende: 'végane et sans gluten, tous les jours' },
-]
-
-const AtoutsMaison = () => (
+  return (
   <Bande>
     <Cadre>
       <Titre>Ce qu&apos;on ne dit pas assez</Titre>
       <Recits>
-        {RECITS.map((r) => (
+        {recits.map((r) => (
           <Recit key={r.titre}>
             <RecitTitre>{r.titre}</RecitTitre>
             <Phrase>{r.phrase}</Phrase>
@@ -170,7 +160,7 @@ const AtoutsMaison = () => (
         ))}
       </Recits>
       <Grille>
-        {FAITS.map((f) => (
+        {chiffres.map((f) => (
           <Pastille key={f.chiffre}>
             <Chiffre>{f.chiffre}</Chiffre>
             <Legende>{f.legende}</Legende>
@@ -179,6 +169,7 @@ const AtoutsMaison = () => (
       </Grille>
     </Cadre>
   </Bande>
-)
+  )
+}
 
 export default AtoutsMaison
