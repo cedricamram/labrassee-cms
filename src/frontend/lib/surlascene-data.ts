@@ -159,7 +159,7 @@ export const getUpcomingSurlasceneEvents = cache(
   async (limit = 30): Promise<FrontendEvent[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      '*,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
@@ -179,7 +179,7 @@ export const getRecentSurlasceneEvents = cache(
   async (limit = 1): Promise<FrontendEvent[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      '*,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
     )
     // Fetch desc puis on reverse pour avoir l'ordre chronologique côté retour
     const path =
@@ -234,7 +234,7 @@ export const getUpcomingShowDetails = cache(
   async (limit = 40): Promise<SurlasceneShowDetail[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      '*,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
@@ -277,7 +277,7 @@ export type SurlasceneDossierTechnique = {
 
 export const getDossierTechnique = cache(
   async (): Promise<SurlasceneDossierTechnique | null> => {
-    const path = '/rest/v1/dossier_technique?select=*&order=cree_le.desc&limit=1'
+    const path = '/rest/v1/dossier_technique?select=id,version,en_brouillon,contenu,pdf_path,notes_publiques,cree_le,maj_le&order=cree_le.desc&limit=1'
     const rows = await supaFetch<SurlasceneDossierTechnique[]>(path)
     return rows && rows[0] ? rows[0] : null
   },
