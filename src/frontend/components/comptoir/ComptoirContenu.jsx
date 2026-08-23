@@ -36,12 +36,20 @@ import styled from 'styled-components'
  * animation est un texte qu'on risque de ne jamais lire.
  */
 
-// ── Section salaire : ÉTEINTE PAR DÉCISION DE CÉDRIC (2026-08-23, 17h04).
-// Verbatim : « on n'annonce pas le salaire ». Ce n'est PAS un trou à combler.
-// Contexte : minimum général QC = 16,60 $/h depuis le 1er mai 2026 (13,30 $ au
-// pourboire), vérifié à la source. Ne pas rallumer sans un nouveau geste de Cédric.
-const TAUX_HORAIRE_DEPART = null
-const POURBOIRES_FORMULATION = null
+// ── Le salaire, tranché par Cédric le 2026-08-23 à 17h58 : « il suffit de dire
+// salaire minimum + pourboires ».
+//
+// Pourquoi c'est la bonne forme : aucun chiffre à maintenir, et la phrase reste
+// vraie le jour où le taux change. (Contexte : minimum général QC = 16,60 $/h
+// depuis le 1er mai 2026, 13,30 $ au pourboire — vérifié à la source.)
+//
+// ⚠️ CONSÉQUENCE À CONNAÎTRE : en écrivant ça, la page DÉCLARE PUBLIQUEMENT payer
+// au moins le minimum légal. Elle doit donc le rester. Cédric vérifie à la
+// prochaine paie que le taux appliqué est bien >= 16,60 $ (il avait 16,50 en tête).
+//
+// « partagés dans l'équipe » est un fait vérifié, pas une promesse de montant.
+// ⛔ NE JAMAIS annoncer un montant de pourboires estimé (Hestia) : une bonne
+// semaine devient une promesse, une mauvaise devient un mensonge.
 
 const Page = styled.div`
   background: var(--color-dark);
@@ -230,17 +238,15 @@ export default function ComptoirContenu() {
         </Texte>
       </Section>
 
-      {/* ── Salaire : affiché seulement si Cédric a donné le taux ── */}
-      {TAUX_HORAIRE_DEPART && (
-        <Section>
-          <Titre2>Le salaire</Titre2>
-          <Texte>
-            À partir de <Fort>{TAUX_HORAIRE_DEPART}/h</Fort>
-            {POURBOIRES_FORMULATION ? `, ${POURBOIRES_FORMULATION}` : ''}. Si tu arrives
-            avec du métier, on paie plus — on en parle.
-          </Texte>
-        </Section>
-      )}
+      {/* ── Le salaire ─────────────────────────────────────────── */}
+      <Section>
+        <Titre2>Le salaire</Titre2>
+        <Texte style={{ marginBottom: 0 }}>
+          <Fort>Le salaire minimum, plus les pourboires</Fort> — qui sont partagés dans
+          l&apos;équipe.
+        </Texte>
+      </Section>
+
     </Page>
   )
 }

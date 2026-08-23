@@ -330,7 +330,8 @@ export default function ComptoirFormulaire() {
       <SousTitre>
         Cinq minutes. Le plus important, ce sont tes disponibilités.{' '}
         <strong style={{ color: '#fff', fontWeight: 500 }}>
-          On te répond dans les sept jours, même si c&apos;est non.
+          C&apos;est Hugo qui les lit, et on te répond dans les sept jours, même si
+          c&apos;est non.
         </strong>
       </SousTitre>
 
