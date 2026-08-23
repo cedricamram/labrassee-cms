@@ -64,12 +64,42 @@ const HeaderContainer = styled.div`
   margin: 0 auto;
   padding: 0 16px;
   font-family: var(--font-din);
+
+  /* Sur petit écran, centrer coupe les DEUX bords : le groupe d'onglets prend
+     toute la largeur et défile lui-même. */
+  @media (max-width: 1000px) {
+    padding: 0;
+  }
 `;
 
 const NavGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
+  /* ⚠️ 2026-08-23 — LES ONGLETS DÉFILENT SUR PETIT ÉCRAN.
+     Mesuré avant correction, à 375 px de large : le groupe fait 497 px, il était
+     simplement COUPÉ (overflow:hidden au-dessus), et « Accueil » commençait à
+     -61 px — hors de l'écran, invisible et incliquable. « À emporter » était
+     coupé à droite. Le défaut existait AVANT l'ajout du 7e onglet : à six, ça
+     débordait déjà. Il touchait toutes les pages, pour tout visiteur sur
+     téléphone.
+     La correction ne change pas le design : on rend le geste possible. */
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding: 0 12px;
+
+  /* La barre de défilement se cache : le geste reste, le trait disparaît. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar { display: none; }
+
+  /* Sans ça, le premier et le dernier onglet collent au bord de l'écran. */
+  @media (max-width: 1000px) {
+    justify-content: flex-start;
+    padding: 0 14px;
+  }
 
   @media (max-width: 960px) {
     gap: 6px;
@@ -217,6 +247,14 @@ const Header = ({ businessInfo: _providedBusinessInfo }) => {
             style={{ pointerEvents: pathname === '/menu' ? 'none' : 'auto' }}
           >
             Le menu
+          </MenuLink>
+          <MenuLink
+            href="/comptoir"
+            className={`cursor-menu ${pathname === '/comptoir' ? 'active' : ''}`}
+            onClick={(e) => { if (pathname === '/comptoir') e.preventDefault(); }}
+            style={{ pointerEvents: pathname === '/comptoir' ? 'none' : 'auto' }}
+          >
+            Travaille avec nous
           </MenuLink>
           <MenuLink
             href="/boutique"
