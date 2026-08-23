@@ -242,6 +242,7 @@ const MentionVie = styled.p`
 export default function ComptoirFormulaire() {
   const [dispos, setDispos] = useState({})
   const [experience, setExperience] = useState(null)
+  const [cv, setCv] = useState(null)
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState(null)
   const [envoye, setEnvoye] = useState(false)
@@ -282,11 +283,20 @@ export default function ComptoirFormulaire() {
 
     setEnvoi(true)
     try {
-      const res = await fetch('/api/candidature', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(charge),
-      })
+      let requete
+      if (cv) {
+        const paquet = new FormData()
+        paquet.append('donnees', JSON.stringify(charge))
+        paquet.append('cv', cv)
+        requete = { method: 'POST', body: paquet }
+      } else {
+        requete = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(charge),
+        }
+      }
+      const res = await fetch('/api/candidature', requete)
       const data = await res.json().catch(() => ({}))
       if (!res.ok) {
         setErreur(data.erreur || "Ça n'a pas passé. Réessaie dans quelques minutes.")
@@ -455,6 +465,23 @@ export default function ComptoirFormulaire() {
             placeholder="Qui tu es, ce que tu cherches, pourquoi ici."
           />
           <Aide>C&apos;est ça qu&apos;on lit en premier. Pas besoin que ce soit beau.</Aide>
+        </Groupe>
+
+        <Groupe>
+          <Etiquette htmlFor="cv">
+            Ton CV<span className="facultatif">facultatif</span>
+          </Etiquette>
+          <Entree
+            id="cv"
+            name="cv"
+            type="file"
+            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+            onChange={(e) => setCv(e.target.files?.[0] || null)}
+          />
+          <Aide>
+            Si tu en as un. Sinon, tes trois lignes plus haut suffisent — on ne
+            l&apos;exige pas. PDF, Word ou une photo, 5 Mo max.
+          </Aide>
         </Groupe>
 
         <Groupe>

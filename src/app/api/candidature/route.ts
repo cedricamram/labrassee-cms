@@ -24,6 +24,23 @@ const RATE_LIMIT_MAX_PER_IP = 6
 const rateLimitEmail = new Map<string, number[]>()
 const rateLimitIP = new Map<string, number[]>()
 
+const CV_BUCKET = 'candidatures-cv'
+const CV_TAILLE_MAX = 5 * 1024 * 1024 // 5 Mo
+const CV_TYPES = new Set([
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/jpeg',
+  'image/png',
+])
+const CV_EXT: Record<string, string> = {
+  'application/pdf': 'pdf',
+  'application/msword': 'doc',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+}
+
 const JOURS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche']
 const PLAGES = ['matin', 'midi', 'soir']
 
@@ -66,9 +83,42 @@ function nettoyerDispos(v: unknown): Record<string, string[]> {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json().catch(() => null)
+    // Le formulaire envoie du multipart quand il y a un CV, du JSON sinon.
+    let body: Record<string, unknown> | null = null
+    let fichierCv: File | null = null
+
+    const typeContenu = request.headers.get('content-type') || ''
+    if (typeContenu.includes('multipart/form-data')) {
+      const form = await request.formData().catch(() => null)
+      if (!form) {
+        return NextResponse.json({ erreur: 'Requête invalide.' }, { status: 400 })
+      }
+      const brut = form.get('donnees')
+      body = typeof brut === 'string' ? JSON.parse(brut) : null
+      const f = form.get('cv')
+      if (f && typeof f !== 'string') fichierCv = f as File
+    } else {
+      body = await request.json().catch(() => null)
+    }
+
     if (!body || typeof body !== 'object') {
       return NextResponse.json({ erreur: 'Requête invalide.' }, { status: 400 })
+    }
+
+    // Le CV est TOUJOURS optionnel (Hestia) — mais s'il est là, il est vérifié.
+    if (fichierCv) {
+      if (fichierCv.size > CV_TAILLE_MAX) {
+        return NextResponse.json(
+          { erreur: 'Ton fichier dépasse 5 Mo. Envoie une version plus légère.' },
+          { status: 400 },
+        )
+      }
+      if (!CV_TYPES.has(fichierCv.type)) {
+        return NextResponse.json(
+          { erreur: 'Formats acceptés : PDF, Word, JPG ou PNG.' },
+          { status: 400 },
+        )
+      }
     }
 
     // Piège à robots : un champ invisible que seul un script remplit.
@@ -131,6 +181,29 @@ export async function POST(request: Request) {
       return t && /^\d{4}-\d{2}-\d{2}$/.test(t) ? t : null
     }
 
+    // ── Dépôt du CV, si le candidat en a joint un.
+    // Chemin non devinable : le nom du fichier d'origine n'est jamais réutilisé.
+    let cvUrl: string | null = null
+    if (fichierCv) {
+      const ext = CV_EXT[fichierCv.type] || 'bin'
+      const chemin = `${crypto.randomUUID()}.${ext}`
+      const up = await fetch(`${SUPABASE_URL}/storage/v1/object/${CV_BUCKET}/${chemin}`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': fichierCv.type,
+        },
+        body: await fichierCv.arrayBuffer(),
+      })
+      if (up.ok) {
+        cvUrl = `${CV_BUCKET}/${chemin}`
+      } else {
+        // Un CV qui ne monte pas ne doit JAMAIS faire perdre la candidature.
+        console.error('cv upload', up.status, await up.text())
+      }
+    }
+
     // Liste blanche stricte : rien d'autre ne part vers la base.
     const ligne = {
       prenom,
@@ -148,6 +221,7 @@ export async function POST(request: Request) {
       experience_detail: texte((body as Record<string, unknown>).experience_detail, 500),
       presentation,
       source: texte((body as Record<string, unknown>).source, 200),
+      cv_url: cvUrl,
       statut: 'nouvelle',
     }
 
