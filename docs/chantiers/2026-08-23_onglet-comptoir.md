@@ -68,6 +68,33 @@ Tranché par Cédric (« a définitivement »). Deux raisons, dont une seule ét
 | 16h49 | `ListAgents` — chercher une session Hestia vivante | aucune identifiable |
 | 16h50 | Convocation d'Hestia avec mandat complet (A besoins / B arbitrages / C textes) | en cours |
 | 16h52 | Branche + cadre + journal | ce fichier |
+| 16h56 | Hestia rend : besoin mesuré sur 9 semaines, 3 arbitrages, 2 textes | 866 h de plancher analysées |
+| 16h57 | Elle attrape 2 pièges que je n'avais pas vus | `recruitment_profiles` (NAS) · deux registres d'employés |
+| 16h58 | Cédric tranche : pas de salaire annoncé, français, 18 ans | gravé dans le code |
+| 17h01 | Vérification à la source du salaire minimum QC | 16,60 $ (Cédric croyait 16,50) → dette posée |
+| 17h05 | Table `candidatures` + RLS, 4 gardes vérifiés depuis dehors | 201 / [] / 401 / 400 |
+| 17h12 | Page + formulaire + API, build vert | `/comptoir` 6,4 kB |
+| 17h20 | Test bout en bout de la porte (5 cas dont robot et injection) | robot absent, injection neutralisée |
+| 17h28 | Réveil quotidien d'Hestia 9h30 sur les candidatures | LaunchAgent chargé, essai à blanc OK |
+
+## 4bis. Deux erreurs de méthode commises pendant ce chantier (à garder)
+
+**① Dater le chantier de la première tâche.** J'ai écrit « ouvert à 16h44 », à
+l'énoncé de la demande. Cédric a corrigé : ça a commencé à « attends, nouveau
+chantier urgent », trois messages plus tôt. **Je compte le travail, pas la
+conversation qui le rend possible.**
+
+**② Conclure d'une mesure faussée par l'instrument.** J'ai constaté 5 sections de
+la page à `opacity: 0` dans le navigateur et j'en ai conclu que l'animation au
+défilement était cassée — j'ai modifié le code sur cette base. La vraie cause :
+le panneau navigateur ne rend pas les animations quand il est masqué. L'écran de
+chargement du site était figé pour la même raison, ce qui aurait dû m'alerter
+plus tôt (un composant que je n'ai pas touché échouait de la même façon).
+**Règle : quand ma mesure accuse mon propre code, vérifier d'abord si quelque
+chose que je n'ai PAS touché échoue pareil.**
+La correction a été conservée, mais pour une autre raison, assumée : sur une page
+publique longue, un texte dont la visibilité dépend d'une animation est un texte
+qu'on risque de ne jamais lire.
 
 ## 5. Bornes tenues
 

@@ -2,7 +2,6 @@
 
 import React from 'react'
 import styled from 'styled-components'
-import { motion } from 'framer-motion'
 
 /**
  * Page « Passe de notre côté du comptoir » — recrutement.
@@ -34,7 +33,7 @@ const Page = styled.div`
   font-family: var(--font-din);
 `
 
-const Section = styled(motion.section)`
+const Section = styled.section`
   max-width: 860px;
   margin: 0 auto;
   padding: 72px 24px;
@@ -118,18 +117,26 @@ const Chapeau = styled.div`
   opacity: 0.95;
 `
 
-const apparition = {
-  initial: { opacity: 0, y: 16 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-80px' },
-  transition: { duration: 0.55 },
-}
+/**
+ * ⚠️ AUCUNE ANIMATION D'APPARITION SUR CES SECTIONS — et c'est délibéré.
+ *
+ * v1 : whileInView + viewport once → mesuré dans un vrai navigateur le 2026-08-23,
+ *      5 sections sur 10 restaient à opacity 0 après un défilement rapide.
+ * v2 : initial/animate au montage → remesuré, 7 sections sur 10 encore à 0.
+ *
+ * Conclusion tirée sur pièce plutôt que de s'acharner : sur une page de
+ * recrutement, un texte qui dépend d'une animation pour exister est un texte
+ * qu'on risque de ne jamais lire. Le hero est animé (il l'est au montage et il
+ * marche) ; le corps, non.
+ *
+ * Règle générale : l'animation décore, elle ne conditionne JAMAIS la visibilité.
+ */
 
 export default function ComptoirContenu() {
   return (
     <Page>
       {/* ── Ce qu'on cherche en ce moment ─────────────────────────── */}
-      <Section {...apparition}>
+      <Section>
         <Titre2>Ce qu&apos;on cherche en ce moment</Titre2>
         <Texte>
           <Fort>Une personne pour le comptoir.</Fort> Entre 20 et 25 heures par semaine,
@@ -156,7 +163,7 @@ export default function ComptoirContenu() {
       </Section>
 
       {/* ── Ce que c'est vraiment ─────────────────────────────────── */}
-      <Section {...apparition}>
+      <Section>
         <Titre2>Ce que c&apos;est vraiment</Titre2>
         <Texte>
           Le matin commence à 8 h, sept jours sur sept : une heure à monter la machine
@@ -181,7 +188,7 @@ export default function ComptoirContenu() {
       </Section>
 
       {/* ── Ce qu'on cherche chez toi ─────────────────────────────── */}
-      <Section {...apparition}>
+      <Section>
         <Titre2>Ce qu&apos;on cherche chez toi</Titre2>
         <Liste>
           <Item>
@@ -212,7 +219,7 @@ export default function ComptoirContenu() {
       </Section>
 
       {/* ── L'expérience ──────────────────────────────────────────── */}
-      <Section {...apparition}>
+      <Section>
         <Titre2>Est-ce qu&apos;il faut de l&apos;expérience&nbsp;?</Titre2>
         <Texte>
           De l&apos;expérience en café ou en restauration, ça aide pour vrai — c&apos;est
@@ -227,7 +234,7 @@ export default function ComptoirContenu() {
       </Section>
 
       {/* ── Ce qu'on ne demande pas ───────────────────────────────── */}
-      <Section {...apparition}>
+      <Section>
         <Titre2>Ce qu&apos;on ne te demande pas</Titre2>
         <Liste>
           <Item>Pas de CV en bonne et due forme. Un formulaire rempli, ça suffit.</Item>
@@ -256,7 +263,7 @@ export default function ComptoirContenu() {
 
       {/* ── Salaire : affiché seulement si Cédric a donné le taux ─── */}
       {TAUX_HORAIRE_DEPART && (
-        <Section {...apparition}>
+        <Section>
           <Titre2>Le salaire</Titre2>
           <Texte>
             À partir de <Fort>{TAUX_HORAIRE_DEPART}/h</Fort>
@@ -267,7 +274,7 @@ export default function ComptoirContenu() {
       )}
 
       {/* ── Comment ça se passe ───────────────────────────────────── */}
-      <Section {...apparition}>
+      <Section>
         <Titre2>Comment ça se passe</Titre2>
         <Texte>
           Tu remplis le formulaire — ça prend cinq minutes. <Fort>On te répond dans les
