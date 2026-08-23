@@ -219,6 +219,14 @@ const Header = ({ businessInfo: _providedBusinessInfo }) => {
             Le menu
           </MenuLink>
           <MenuLink
+            href="/comptoir"
+            className={`cursor-menu ${pathname === '/comptoir' ? 'active' : ''}`}
+            onClick={(e) => { if (pathname === '/comptoir') e.preventDefault(); }}
+            style={{ pointerEvents: pathname === '/comptoir' ? 'none' : 'auto' }}
+          >
+            Travaille avec nous
+          </MenuLink>
+          <MenuLink
             href="/boutique"
             className={`cursor-menu ${pathname === '/boutique' ? 'active' : ''}`}
             onClick={(e) => { if (pathname === '/boutique') e.preventDefault(); }}
