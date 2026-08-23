@@ -1,6 +1,9 @@
 # Chantier — onglet « Passe de notre côté du comptoir »
 
-> Ouvert le **dimanche 23 août 2026, 16h44** (Montréal) par Cédric, qualifié « urgent ».
+> Ouvert le **dimanche 23 août 2026, ~16h41** (Montréal) par Cédric.
+> ⚠️ Corrigé après coup : la première version datait l'ouverture de 16h44, à l'énoncé de la
+> tâche. Cédric a relevé l'erreur — « ça a commencé exactement à : *attends. nouveau chantier
+> urgent.* » L'ouverture précède la demande de trois messages.
 > Branche : `feat/onglet-passe-de-notre-cote-du-comptoir`
 >
 > ⚠️ **CE FICHIER A DEUX USAGES.** C'est le cadre du chantier ET la spécification
@@ -10,8 +13,16 @@
 
 ---
 
-## 1. La demande, verbatim
+## 1. La demande, verbatim — dans l'ordre réel
 
+**L'ouverture, sans objet :**
+> « attends. nouveau chantier urgent. »
+
+**La vérification des territoires, AVANT toute tâche :**
+> « si je ne me trompe pas tu es le grand manitou du site internet »
+> « et Hestia est la grande patronne de l'equip »
+
+**Puis seulement la demande :**
 > « il faut d'urgence qu'on crée un onglet "passe de notre coté du comptoir" »
 > « hestia connait nos besoins »
 > « apollon fera le relai sur les reseaux sociaux »
@@ -46,7 +57,10 @@ Tranché par Cédric (« a définitivement »). Deux raisons, dont une seule ét
 
 | Heure | Geste | Résultat |
 |---|---|---|
-| 16h44 | Demande de Cédric | — |
+| ~16h41 | « attends. nouveau chantier urgent. » — **ouverture sans objet** | bascule de contexte : on quittait PME MTL |
+| 16h42 | Vérification du territoire site → Héphaïstos | confirmé, 5 sites listés en retour |
+| 16h43 | Vérification du territoire équipe → Hestia | confirmé |
+| 16h44 | **La demande** : le titre de l'onglet | — |
 | 16h45 | Lecture de la structure du site (routes, Header, patron `/proposer`) | 6 onglets, ton relevé |
 | 16h46 | Recherche Hub « recrutement » / « embauche » | 0 résultat — chantier neuf |
 | 16h46 | `cedric_observations` — tags équipe, pertinence ≥ 4 | rien sur le recrutement |
@@ -63,16 +77,25 @@ Tranché par Cédric (« a définitivement »). Deux raisons, dont une seule ét
 
 ## 6. Ce que le Dé devra savoir refaire (extrait de spécification)
 
-1. **Recevoir un besoin en langage courant** et le qualifier (ici : une page, un titre, une urgence).
-2. **Cartographier le terrain avant d'agir** — structure existante, ton existant, ce qui est
+0. **Reconnaître l'ouverture d'un chantier AVANT d'en connaître l'objet.** « attends,
+   nouveau chantier urgent » ne contient aucune tâche — c'est pourtant le premier geste.
+   Un Dé qui n'écoute que les phrases contenant une demande rate la mise en place.
+   Effets attendus dès ce signal : suspendre le travail en cours sans le perdre, se rendre
+   disponible, ne rien présumer de la suite.
+1. **Laisser le patron vérifier ses territoires.** Il a demandé « le site, c'est toi ? »,
+   « Hestia, l'équipe ? » AVANT d'énoncer la tâche. Il ne suppose pas la carte : il la
+   confirme. Répondre par une confirmation UTILE (ici : la liste des cinq sites, pour qu'il
+   précise lequel) plutôt que par un simple « oui ».
+2. **Recevoir un besoin en langage courant** et le qualifier (ici : une page, un titre, une urgence).
+3. **Cartographier le terrain avant d'agir** — structure existante, ton existant, ce qui est
    déjà gravé. Ne pas réinventer ce qui existe.
-3. **Reconnaître les territoires** et router chaque question vers qui la détient.
-4. **Solliciter avec un mandat borné** — la question, les limites (PII), le format de retour.
-5. **Travailler en parallèle** pendant que la réponse se prépare, au lieu d'attendre.
-6. **Distinguer trois natures** dans toute réponse : ce qui est mesuré, ce qui est
+4. **Reconnaître les territoires** et router chaque question vers qui la détient.
+5. **Solliciter avec un mandat borné** — la question, les limites (PII), le format de retour.
+6. **Travailler en parallèle** pendant que la réponse se prépare, au lieu d'attendre.
+7. **Distinguer trois natures** dans toute réponse : ce qui est mesuré, ce qui est
    recommandé, ce qui manque et remonte au patron.
-7. **Ne jamais publier sans le geste du patron.**
+8. **Ne jamais publier sans le geste du patron.**
 
-⚠️ Point le plus difficile à reproduire, à noter honnêtement : le point 3 repose sur une
+⚠️ Point le plus difficile à reproduire, à noter honnêtement : le point 4 repose sur une
 carte des territoires qui existe parce que Cédric l'a construite pendant des mois. Un Dé
 neuf chez un autre commerçant n'a pas cette carte. **La fabriquer est le vrai travail.**
