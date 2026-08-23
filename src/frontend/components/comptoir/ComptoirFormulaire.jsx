@@ -328,8 +328,10 @@ export default function ComptoirFormulaire() {
     <Section id="postuler">
       <Titre2>Écris-nous</Titre2>
       <SousTitre>
-        Cinq minutes, pas plus. Le plus important pour nous, ce sont tes disponibilités —
-        c&apos;est ce qui nous dit tout de suite si ça peut marcher.
+        Cinq minutes. Le plus important, ce sont tes disponibilités.{' '}
+        <strong style={{ color: '#fff', fontWeight: 500 }}>
+          On te répond dans les sept jours, même si c&apos;est non.
+        </strong>
       </SousTitre>
 
       <form onSubmit={soumettre}>

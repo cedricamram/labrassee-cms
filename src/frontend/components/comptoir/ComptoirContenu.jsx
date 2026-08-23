@@ -7,23 +7,39 @@ import styled from 'styled-components'
  * Page « Passe de notre côté du comptoir » — recrutement.
  * Ouvert le 2026-08-23 par Cédric. Cadre : docs/chantiers/2026-08-23_onglet-comptoir.md
  *
- * ⚠️ TOUT le contenu RH de cette page vient d'Hestia (agent équipe), mesuré sur
- * 9 semaines de `shifts` (29 juin → 24 août 2026). Ne PAS le réécrire au feeling :
- * si un besoin change, on redemande à Hestia. C'est une décision de Cédric — la page
- * n'est volontairement PAS branchée en direct sur la base d'équipe (données publiques).
+ * ⚠️ VERSION COURTE ÉCRITE PAR HESTIA (2026-08-23 17h50), mot pour mot.
+ *
+ * Retour de Cédric sur la v1 : « trop de texte à lire sur la page ». J'ai d'abord
+ * coupé moi-même — Cédric m'a arrêté : « laisse Hestia faire son propre résumé ».
+ * Il avait raison : couper le texte d'un autre, c'est encore toucher à son texte.
+ * ~410 mots → ~270. Six sections → trois.
+ *
+ * QUATRE PHRASES QU'ELLE DÉFEND et qu'on ne coupe pas sans la consulter :
+ *   1. « mal aux jambes et de la musique dans la tête » — dit à la fois que c'est
+ *      physique et que ça vaut la peine.
+ *   2. « encore être là dans six mois » — seul endroit où vit la doctrine de Cédric
+ *      sur les gens qui ne sont pas des ressources.
+ *   3. le paragraphe sur l'expérience, ENTIER — c'est lui qui décide si quelqu'un
+ *      ferme l'onglet ou remplit le formulaire.
+ *   4. les mardis où on jase avec les habitués — seule ligne qui promet du calme.
+ *      Sans elle, la page ne décrit qu'un rush.
+ *
+ * ⛔ NE JAMAIS mettre ses chiffres internes sur cette page (79 % d'ouvertures en
+ * solo, 137 h à une personne, 33/38 % mardi-mercredi). Ça sert à décider, pas à
+ * recruter : « on manque de monde 33 % du temps » fait fuir ceux qu'on veut.
+ *
+ * ⚠️ Le contenu RH vient d'Hestia, mesuré sur 9 semaines de `shifts`
+ * (29 juin → 24 août 2026). Si un besoin change, on lui redemande — la page n'est
+ * volontairement PAS branchée en direct sur la base d'équipe.
+ *
+ * ⚠️ AUCUNE ANIMATION D'APPARITION. Un texte dont la visibilité dépend d'une
+ * animation est un texte qu'on risque de ne jamais lire.
  */
 
 // ── Section salaire : ÉTEINTE PAR DÉCISION DE CÉDRIC (2026-08-23, 17h04).
-// Verbatim : « on n'annonce pas le salaire ». Ce n'est PAS un trou à combler, c'est
-// un choix. Ne pas rallumer sans un nouveau geste de Cédric.
-//
-// Contexte de la décision, pour qui relira : le taux général du salaire minimum au
-// Québec est 16,60 $/h depuis le 1er mai 2026 (13,30 $ pour les salariés au
-// pourboire) — vérifié à la source, communiqué quebec.ca. Cédric avait 16,50 $ en
-// tête ; il vérifie l'écart à la prochaine paie. La page n'attend PAS ce résultat.
-//
-// Pour rallumer un jour : renseigner les deux constantes ci-dessous, la section
-// réapparaît telle quelle.
+// Verbatim : « on n'annonce pas le salaire ». Ce n'est PAS un trou à combler.
+// Contexte : minimum général QC = 16,60 $/h depuis le 1er mai 2026 (13,30 $ au
+// pourboire), vérifié à la source. Ne pas rallumer sans un nouveau geste de Cédric.
 const TAUX_HORAIRE_DEPART = null
 const POURBOIRES_FORMULATION = null
 
@@ -34,32 +50,32 @@ const Page = styled.div`
 `
 
 const Section = styled.section`
-  max-width: 860px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 72px 24px;
+  padding: 56px 24px;
   border-top: 1px solid rgba(255, 255, 255, 0.07);
 
   @media (max-width: 640px) {
-    padding: 52px 20px;
+    padding: 40px 20px;
   }
 `
 
 const Titre2 = styled.h2`
   color: var(--color-brand);
-  font-size: clamp(30px, 4.5vw, 52px);
+  font-size: clamp(28px, 4vw, 46px);
   font-weight: 200;
   letter-spacing: -1px;
   line-height: 1;
-  margin: 0 0 28px 0;
+  margin: 0 0 22px 0;
   text-wrap: balance;
 `
 
 const Texte = styled.p`
-  font-size: clamp(16px, 1.6vw, 19px);
-  line-height: 1.75;
+  font-size: clamp(16px, 1.55vw, 18.5px);
+  line-height: 1.7;
   color: rgba(255, 255, 255, 0.86);
-  margin: 0 0 20px 0;
-  max-width: 68ch;
+  margin: 0 0 16px 0;
+  max-width: 64ch;
 `
 
 const Fort = styled.strong`
@@ -72,24 +88,24 @@ const Liste = styled.ul`
   padding: 0;
   margin: 0;
   display: grid;
-  gap: 22px;
+  gap: 13px;
 `
 
 const Item = styled.li`
-  font-size: clamp(16px, 1.6vw, 19px);
-  line-height: 1.7;
+  font-size: clamp(15.5px, 1.5vw, 18px);
+  line-height: 1.6;
   color: rgba(255, 255, 255, 0.86);
-  padding-left: 22px;
+  padding-left: 20px;
   position: relative;
-  max-width: 68ch;
+  max-width: 64ch;
 
   &::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 0.72em;
-    width: 8px;
-    height: 8px;
+    top: 0.68em;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--color-brand);
     opacity: 0.85;
@@ -100,168 +116,121 @@ const Encadre = styled.div`
   border: 1px solid rgba(247, 209, 53, 0.28);
   background: rgba(247, 209, 53, 0.06);
   border-radius: 14px;
-  padding: 26px 28px;
-  margin-top: 8px;
+  padding: 22px 26px;
+  margin: 4px 0 18px;
 
   @media (max-width: 640px) {
-    padding: 20px;
+    padding: 18px;
+  }
+`
+
+const Colonnes = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+    gap: 30px;
   }
 `
 
 const Chapeau = styled.div`
   color: var(--color-brand);
   text-transform: uppercase;
-  letter-spacing: 3px;
-  font-size: 13px;
-  margin-bottom: 12px;
+  letter-spacing: 2.5px;
+  font-size: 12.5px;
+  margin-bottom: 14px;
   opacity: 0.95;
 `
-
-/**
- * ⚠️ AUCUNE ANIMATION D'APPARITION SUR CES SECTIONS — et c'est délibéré.
- *
- * v1 : whileInView + viewport once → mesuré dans un vrai navigateur le 2026-08-23,
- *      5 sections sur 10 restaient à opacity 0 après un défilement rapide.
- * v2 : initial/animate au montage → remesuré, 7 sections sur 10 encore à 0.
- *
- * Conclusion tirée sur pièce plutôt que de s'acharner : sur une page de
- * recrutement, un texte qui dépend d'une animation pour exister est un texte
- * qu'on risque de ne jamais lire. Le hero est animé (il l'est au montage et il
- * marche) ; le corps, non.
- *
- * Règle générale : l'animation décore, elle ne conditionne JAMAIS la visibilité.
- */
 
 export default function ComptoirContenu() {
   return (
     <Page>
-      {/* ── Ce qu'on cherche en ce moment ─────────────────────────── */}
+      {/* ── 1. Ce qu'on cherche ────────────────────────────────── */}
       <Section>
-        <Titre2>Ce qu&apos;on cherche en ce moment</Titre2>
+        <Titre2>Ce qu&apos;on cherche</Titre2>
         <Texte>
-          <Fort>Une personne pour le comptoir.</Fort> Entre 20 et 25 heures par semaine,
-          sur quatre jours. On ne cherche pas un titre — ici, tout le monde fait le café,
-          la caisse, la cuisine, les commandes et l&apos;ouverture. On tient le comptoir
-          ensemble.
+          On cherche <Fort>une personne pour le comptoir</Fort>. Pas de titre : ici, tout
+          le monde fait le café, la caisse, la cuisine et les commandes.
+        </Texte>
+        <Texte>
+          <Fort>20 à 25 heures par semaine, sur 4 jours.</Fort>
         </Texte>
         <Encadre>
-          <Chapeau>Là où on a le plus besoin de toi</Chapeau>
           <Texte style={{ marginBottom: 0 }}>
-            <Fort>Les matins</Fort> — le quart commence à <Fort>8 h</Fort>, une heure
-            avant qu&apos;on ouvre la porte — et surtout{' '}
-            <Fort>le mardi et le mercredi</Fort>. Ce sont nos deux matins les plus
-            minces : il n&apos;y a souvent qu&apos;une seule personne au plancher, et
-            c&apos;est là que ça tire.
+            Ce sont les matins qui nous manquent, surtout <Fort>le mardi et le
+            mercredi</Fort>. Le quart commence à 8 h, une heure avant qu&apos;on ouvre la
+            porte à 9 h — le temps de tout partir avant le premier client.
           </Texte>
         </Encadre>
-        <Texte style={{ marginTop: 24 }}>
-          On n&apos;est pas dans l&apos;urgence — l&apos;horaire tourne. On ouvre la porte
-          parce qu&apos;on veut trouver la bonne personne, pas la première. L&apos;idée,
-          c&apos;est quelqu&apos;un qui commence en septembre et qui soit à l&apos;aise
-          d&apos;ici la fin du mois.
+        <Texte style={{ marginBottom: 0 }}>
+          On n&apos;est pas dans l&apos;urgence. On préfère attendre la bonne personne.
         </Texte>
       </Section>
 
-      {/* ── Ce que c'est vraiment ─────────────────────────────────── */}
+      {/* ── 2. Ce que c'est vraiment ───────────────────────────── */}
       <Section>
         <Titre2>Ce que c&apos;est vraiment</Titre2>
         <Texte>
-          Le matin commence à 8 h, sept jours sur sept : une heure à monter la machine
-          et sortir le pain avant que la porte s&apos;ouvre à 9 h. Après, c&apos;est du
-          monde qui n&apos;a pas encore parlé à personne — ça va vite, c&apos;est debout,
-          et la machine ne pardonne pas l&apos;à-peu-près. Mais on te montre&nbsp;:
-          personne n&apos;est né en sachant tirer un espresso.
+          On te montre tout — personne n&apos;est né en sachant tirer un espresso. Mais le
+          matin va vite, et c&apos;est debout.
         </Texte>
         <Texte>
           Les soirs de spectacle, la salle se remplit d&apos;un coup et tu passes du café
-          au bar en quinze minutes. Le lundi c&apos;est l&apos;impro, toutes les semaines.
-          Le jeudi, le vendredi ou le samedi, c&apos;est souvent du jazz.
+          au bar en quinze minutes. Le lundi, c&apos;est l&apos;impro. Jeudi, vendredi ou
+          samedi, souvent du jazz.
         </Texte>
-        <Texte>
-          Tu vas finir tes journées avec mal aux jambes et de la musique dans la tête.
-        </Texte>
-        <Texte>
-          Et il y a des mardis après-midi tranquilles où on jase avec les habitués pendant
-          vingt minutes. <Fort>Ça aussi, c&apos;est la job — c&apos;est même la meilleure
-          partie.</Fort>
+        <Texte style={{ marginBottom: 0 }}>
+          Tu vas finir tes journées avec <Fort>mal aux jambes et de la musique dans la
+          tête</Fort>. Et il y a des mardis après-midi où on jase vingt minutes avec les
+          habitués. Ça aussi, c&apos;est la job.
         </Texte>
       </Section>
 
-      {/* ── Ce qu'on cherche chez toi ─────────────────────────────── */}
+      {/* ── 3. Ce qu'on cherche chez toi ───────────────────────── */}
       <Section>
         <Titre2>Ce qu&apos;on cherche chez toi</Titre2>
         <Liste>
           <Item>
-            <Fort>Quelqu&apos;un de fiable.</Fort> Pas parfait — fiable. Tu dis quand tu
-            peux, tu viens quand tu l&apos;as dit, et si ça capote tu appelles au lieu de
-            disparaître.
+            <Fort>Fiable.</Fort> Tu dis quand tu peux, tu viens quand tu l&apos;as dit, et
+            si ça capote tu appelles.
           </Item>
           <Item>
-            <Fort>Quelqu&apos;un qui regarde autour.</Fort> Le monde qui cherche une
-            place, la tasse vide, le collègue dans le jus. Le voir avant qu&apos;on te le
-            demande, c&apos;est les trois quarts de la job.
+            <Fort>Tu regardes autour.</Fort> La tasse vide, le monde qui cherche une
+            place, le collègue dans le jus.
           </Item>
           <Item>
-            <Fort>Quelqu&apos;un qui aime le monde.</Fort> On sert des voisins, pas des
-            numéros. Il y a des habitués ici dont on connaît la commande et le prénom des
-            enfants.
+            <Fort>Tu aimes le monde.</Fort> On sert des voisins, pas des numéros.
           </Item>
           <Item>
-            <Fort>Quelqu&apos;un qui dit quand ça va pas.</Fort> On ne devine pas. Un
-            problème dit le mardi, c&apos;est un problème réglé le mercredi.
+            <Fort>Tu dis quand ça va pas.</Fort> On ne devine pas.
           </Item>
         </Liste>
-        <Texte style={{ marginTop: 28 }}>
-          On ne cherche pas quelqu&apos;un qui va « donner 110 % ». On cherche quelqu&apos;un
-          qui va <Fort>encore être là dans six mois</Fort>, et qui va être correct avec
-          lui-même en attendant.
-        </Texte>
-      </Section>
-
-      {/* ── L'expérience ──────────────────────────────────────────── */}
-      <Section>
-        <Titre2>Est-ce qu&apos;il faut de l&apos;expérience&nbsp;?</Titre2>
-        <Texte>
-          De l&apos;expérience en café ou en restauration, ça aide pour vrai — c&apos;est
-          ce qu&apos;on regarde en premier, on va être honnêtes.
+        <Texte style={{ marginTop: 22 }}>
+          On ne cherche pas quelqu&apos;un qui va « donner 110 % ». On cherche
+          quelqu&apos;un qui va <Fort>encore être là dans six mois</Fort>, et qui va être
+          correct avec lui-même en attendant.
         </Texte>
         <Texte>
-          Mais ce qui compte le plus, c&apos;est de{' '}
-          <Fort>pouvoir tenir le comptoir tout seul un matin</Fort>, une fois qu&apos;on
-          t&apos;a montré. Si tu n&apos;as jamais fait ça et que tu sais quand même que tu
-          en es capable, écris-nous pareil et dis-nous pourquoi.
+          <Fort>On ne demande pas</Fort> de CV en bonne et due forme, ni de lettre de
+          motivation, ni de latte art, ni de « disponibilité totale ». Dis-nous tes vraies
+          dispos, on bâtit l&apos;horaire avec — c&apos;est comme ça pour tout le monde ici.
+        </Texte>
+        <Texte>
+          <Fort>On demande</Fort> de pouvoir être là à 8 h au moins deux matins par
+          semaine, de tenir le comptoir seul un matin une fois formé, d&apos;avoir 18 ans
+          parce qu&apos;on sert de l&apos;alcool, et de pouvoir travailler légalement au
+          Québec.
+        </Texte>
+        <Texte style={{ marginBottom: 0 }}>
+          De l&apos;expérience en café ou en resto, ça aide pour vrai, et c&apos;est ce
+          qu&apos;on regarde en premier. Mais si tu n&apos;en as pas et que tu sais quand
+          même que tu en es capable, <Fort>écris-nous</Fort> et dis-nous pourquoi.
         </Texte>
       </Section>
 
-      {/* ── Ce qu'on ne demande pas ───────────────────────────────── */}
-      <Section>
-        <Titre2>Ce qu&apos;on ne te demande pas</Titre2>
-        <Liste>
-          <Item>Pas de CV en bonne et due forme. Un formulaire rempli, ça suffit.</Item>
-          <Item>Pas de lettre de motivation. On lit tes trois lignes, c&apos;est bien assez.</Item>
-          <Item>Pas de latte art de compétition.</Item>
-          <Item>
-            <Fort>Pas de « disponibilité totale ».</Fort> Dis-nous tes vraies dispos, on
-            bâtit l&apos;horaire avec. C&apos;est comme ça qu&apos;on fonctionne avec tout
-            le monde ici.
-          </Item>
-        </Liste>
-
-        <Titre2 style={{ marginTop: 56 }}>Ce qu&apos;on te demande</Titre2>
-        <Liste>
-          <Item>
-            Pouvoir être là à 8 h au moins deux matins par semaine — oui, ça veut dire
-            se lever tôt. Le mardi et le mercredi, c&apos;est là qu&apos;on a le plus
-            besoin de quelqu&apos;un.
-          </Item>
-          <Item>Être capable de tenir le comptoir seul un matin, une fois formé.</Item>
-          <Item>Parler français couramment.</Item>
-          <Item>Avoir 18 ans — on sert de l&apos;alcool.</Item>
-          <Item>Pouvoir travailler légalement au Québec.</Item>
-        </Liste>
-      </Section>
-
-      {/* ── Salaire : affiché seulement si Cédric a donné le taux ─── */}
+      {/* ── Salaire : affiché seulement si Cédric a donné le taux ── */}
       {TAUX_HORAIRE_DEPART && (
         <Section>
           <Titre2>Le salaire</Titre2>
@@ -272,20 +241,6 @@ export default function ComptoirContenu() {
           </Texte>
         </Section>
       )}
-
-      {/* ── Comment ça se passe ───────────────────────────────────── */}
-      <Section>
-        <Titre2>Comment ça se passe</Titre2>
-        <Texte>
-          Tu remplis le formulaire — ça prend cinq minutes. <Fort>On te répond dans les
-          sept jours, même si c&apos;est non.</Fort> Une porte ouverte qui ne répond pas,
-          c&apos;est pire qu&apos;une porte fermée.
-        </Texte>
-        <Texte>
-          Si ça clique, on te fait venir prendre un café de ce côté-ci du comptoir, et on
-          jase.
-        </Texte>
-      </Section>
     </Page>
   )
 }
