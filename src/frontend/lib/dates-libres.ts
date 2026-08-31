@@ -248,7 +248,7 @@ export const getCalendrierMois = cache(
     // Une expo = date_install → date_decrochage. Tous les dimanches dans cette
     // plage doivent être marqués comme « expo en cours » (rond vert/orange)
     // même s'ils n'ont pas de concert spécifique en BD.
-    type ExpoRange = { start: string; end: string; signature: boolean }
+    type ExpoRange = { start: string; end: string }
     const exposEnCours: ExpoRange[] = []
     // Dimanches de VERNISSAGE (seul événement expo public — l'accrochage ne l'est
     // pas, cf. Cédric). Un vernissage occupe le 5à7 du dimanche → ce dim n'est PAS
@@ -258,7 +258,10 @@ export const getCalendrierMois = cache(
     try {
       const urlExpos =
         SUPABASE_URL +
-        '/rest/v1/artistes_murs?select=date_install,date_decrochage,date_vernissage,signature_acceptee' +
+        // ⚠️ `signature_acceptee` volontairement ABSENT du select : colonne hors GRANT anon,
+        // sa seule présence fait échouer la requête (42501) et le calendrier cesse alors de
+        // bloquer les dimanches occupés. La policy RLS ne renvoie que les expos signées.
+        '/rest/v1/artistes_murs?select=date_install,date_decrochage,date_vernissage' +
         `&date_install=lte.${limitISO}&date_decrochage=gte.${todayISO}` +
         '&date_install=not.is.null&date_decrochage=not.is.null'
       const resExpos = await fetch(urlExpos, {
@@ -273,13 +276,11 @@ export const getCalendrierMois = cache(
           date_install: string
           date_decrochage: string
           date_vernissage: string | null
-          signature_acceptee: boolean
         }[] = await resExpos.json()
         for (const r of rows) {
           exposEnCours.push({
             start: r.date_install,
             end: r.date_decrochage,
-            signature: !!r.signature_acceptee,
           })
           if (r.date_vernissage) vernissageSundays.add(r.date_vernissage)
         }
