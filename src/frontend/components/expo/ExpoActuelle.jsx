@@ -795,8 +795,23 @@ export default function ExpoActuelle({ artiste, photosUrls = [], portraitUrl = n
           <>
             <GalerieTitre>
               <div className="eyebrow">Les œuvres</div>
-              <h2>{photosUrls.length} pièce{photosUrls.length > 1 ? 's' : ''} à voir en vrai</h2>
-              <div className="count">Clique pour zoomer · flèches ← → pour naviguer</div>
+              {/* « à voir en vrai » comptait les PHOTOS déposées, pas les œuvres accrochées :
+                  Pierre P Fortin a 54 pièces au mur et n'en a photographié que 10, et la page
+                  annonçait « 10 pièces à voir en vrai ». Quand l'artiste a renseigné nb_oeuvres
+                  et qu'il dépasse le nombre de photos, on dit les deux — le mur, puis l'aperçu. */}
+              {artiste?.nb_oeuvres > photosUrls.length ? (
+                <>
+                  <h2>{artiste.nb_oeuvres} œuvres accrochées</h2>
+                  <div className="count">
+                    {photosUrls.length} en aperçu ici · clique pour zoomer · flèches ← → pour naviguer
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2>{photosUrls.length} pièce{photosUrls.length > 1 ? 's' : ''} à voir en vrai</h2>
+                  <div className="count">Clique pour zoomer · flèches ← → pour naviguer</div>
+                </>
+              )}
             </GalerieTitre>
             <Galerie>
               {photosUrls.map((url, i) => {
