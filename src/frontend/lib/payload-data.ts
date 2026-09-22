@@ -497,11 +497,11 @@ export const getUpcomingEventsData = cache(async (limit = 50): Promise<FrontendE
  *
  * Stratégie « phase de transition » (gravée par Cédric 2026-05-16) :
  *   - Tant qu'un artiste n'a pas déposé son EPK, l'event Facebook créé manuellement
- *     par Joshué dans Payload reste la SOURCE de la vignette (affiche FB + infos).
+ *     dans Payload reste la SOURCE de la vignette (affiche FB + infos).
  *   - Dès qu'un dépôt EPK arrive, la vignette est régénérée automatiquement à
  *     partir du dépôt (photo HD + bio + liens) ET les events FB/Insta sont
  *     auto-générés à partir de cette même source.
- *   - À terme (Phase 2 = 100 % dépôts) : plus de saisie manuelle Joshué.
+ *   - À terme (Phase 2 = 100 % dépôts) : plus de saisie manuelle.
  *
  * Règle de dédoublonnage : si une date donnée a BOTH un event Payload AND un
  * concert Surlascène → on GARDE Payload (priorité 1) et on SKIP le Surlascène.
@@ -594,7 +594,7 @@ export const getEventsCetteSemaine = cache(async (): Promise<FrontendEvent[]> =>
 /**
  * Récupère les N prochains événements (Payload + Surlascène), en incluant celui
  * d'aujourd'hui s'il existe. Dédoublonnage par date avec priorité Payload (phase
- * de transition : si Joshué a créé un event Payload pour une date, il prend le
+ * de transition : si un event Payload existe pour une date, il prend le
  * pas sur le concert Surlascène pour cette date).
  *
  * Utilisé par la home pour la section "Les prochains événements".
@@ -616,7 +616,7 @@ export const getProchainsEvents = cache(async (n = 5): Promise<FrontendEvent[]> 
  *   - facebookLink : l'URL de l'event Facebook (clic sur la card → onglet FB)
  *
  * Stratégie de transition : tant qu'un concert Surlascène n'a pas son event
- * Facebook créé côté Payload (par Joshué), on affiche la photo artiste ou
+ * Facebook créé côté Payload, on affiche la photo artiste ou
  * un fallback. Dès qu'il a son event FB → l'affiche officielle prend le dessus.
  */
 export const getSceneAgendaShows = cache(

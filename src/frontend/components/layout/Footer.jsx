@@ -140,35 +140,6 @@ const CreditText = styled.span`
   }
 `;
 
-const CreditName = styled.span`
-  color: var(--color-brand);
-  font-family: var(--font-acumin);
-  font-size: 14px;
-  font-weight: bold;
-  
-  @media (max-width: 480px) {
-    font-size: 12px;
-  }
-`;
-
-const CreditEmail = styled.a`
-  color: var(--color-white);
-  font-family: var(--font-acumin);
-  font-size: 12px;
-  text-decoration: none;
-  opacity: 0.8;
-  transition: color 0.3s ease;
-  
-  &:hover {
-    color: var(--color-brand);
-    opacity: 1;
-  }
-  
-  @media (max-width: 480px) {
-    font-size: 10px;
-  }
-`;
-
 const IacoubaCredit = styled.a`
   display: inline-flex;
   align-items: center;
@@ -282,12 +253,6 @@ const Footer = ({ businessInfo: providedBusinessInfo }) => {
         </motion.div>
 
         <Credits variants={itemVariants}>
-          <CreditText>Site web réalisé par</CreditText>
-          <br />
-          <CreditName>Joshué Collin</CreditName>
-          <br />
-          <CreditEmail href="mailto:pro@joshuep.com">pro@joshuep.com</CreditEmail>
-          <br />
           <IacoubaCredit
             href="https://iacouba.ca"
             target="_blank"

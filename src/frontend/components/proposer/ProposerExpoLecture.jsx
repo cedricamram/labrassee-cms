@@ -272,14 +272,14 @@ export default function ProposerExpoLecture() {
           Tout ce qu'il faut savoir avant de proposer ton expo : durée, vernissage,
           vente, accrochage, communication. La sélection du créneau précis se
           fera <strong style={{ color: 'var(--color-brand)' }}>après</strong> que
-          Cédric et Joshué aient accepté ta candidature.
+          Cédric et l'équipe de La Brassée aient accepté ta candidature.
         </Intro>
 
         <ChronoBande>
           <div className="head">Le cycle, étape par étape</div>
           <ol>
             <li><strong>Candidature</strong> · tu déposes ton dossier (bio, photos d'œuvres, technique, dimensions)</li>
-            <li><strong>Validation</strong> · Cédric et Joshué arbitrent et te proposent une rotation</li>
+            <li><strong>Validation</strong> · L'équipe de La Brassée arbitre et te propose une rotation</li>
             <li><strong>Accrochage</strong> · dimanche matin (10 h–14 h), en autonomie, matériel fourni</li>
             <li><strong>Vernissage 5 à 7</strong> · le dimanche suivant, présence artiste obligatoire</li>
             <li><strong>4 semaines d'expo</strong> · ventes directes au public, La Brassée fait le pont</li>
