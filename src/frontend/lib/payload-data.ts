@@ -704,8 +704,17 @@ export const getEventsCarousel = cache(
       getRecentPayloadEvents(nPasses * 2),
       getRecentSurlasceneEvents(nPasses * 2),
     ])
-    // Fusion + dédoublonnage des passés (priorité Payload)
-    const passesAll = fusionnerEtDedoublonner(passesPayload, passesSurlascene)
+    // Fusion + dédoublonnage des passés (priorité Payload).
+    // 2026-09-29 : la stratégie du 16/05 dit « 1 event passé (HIER) ». Sans borne,
+    // le plus récent passé restait en tête des « prochains événements » pendant des
+    // jours (Philippe Massé Trio du 26/09, encore là le 28, badge « TERMINÉ »).
+    // On ne garde donc que ce qui date d'hier (Montréal) ; sinon, aucun passé.
+    const hier = new Date(todayISO() + 'T12:00:00Z')
+    hier.setUTCDate(hier.getUTCDate() - 1)
+    const hierISO = hier.toISOString().slice(0, 10)
+    const passesAll = fusionnerEtDedoublonner(passesPayload, passesSurlascene).filter(
+      (e) => e.date.slice(0, 10) >= hierISO,
+    )
     // On garde les nPasses les plus récents (qui sont à la fin après tri chrono)
     const passes = passesAll.slice(Math.max(0, passesAll.length - nPasses))
     const events = [...passes, ...futurs]
