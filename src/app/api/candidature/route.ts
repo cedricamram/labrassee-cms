@@ -17,6 +17,15 @@ const SUPABASE_ANON_KEY =
 const RESEND_BASE_URL = 'https://api.resend.com'
 const FROM_ADDRESS = 'La Brassée <info@labrassee.cafe>'
 
+/**
+ * Qui reçoit les candidatures à La Brassée (Hugo aujourd'hui).
+ * ⚠️ Donnée nominative d'employé — JAMAIS en dur dans le dépôt.
+ * Se pose côté Vercel : `vercel env add RECRUTEMENT_NOTIF_TO`.
+ * Absente, la notification est simplement sautée : une candidature ne se perd pas
+ * parce qu'une variable manque.
+ */
+const NOTIF_TO = process.env.RECRUTEMENT_NOTIF_TO
+
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000 // 1 heure
 const RATE_LIMIT_MAX_PER_EMAIL = 2
 const RATE_LIMIT_MAX_PER_IP = 6
@@ -183,10 +192,17 @@ export async function POST(request: Request) {
 
     // ── Dépôt du CV, si le candidat en a joint un.
     // Chemin non devinable : le nom du fichier d'origine n'est jamais réutilisé.
+    // Le buffer est CONSERVÉ : c'est la seule occasion de lire ce fichier.
+    // Le bucket n'a aucune règle de lecture (que des INSERT) — une fois déposé,
+    // le CV n'est plus récupérable côté app. Il part donc à Hugo tout de suite.
     let cvUrl: string | null = null
+    let cvBuffer: ArrayBuffer | null = null
+    let cvNomFichier: string | null = null
     if (fichierCv) {
       const ext = CV_EXT[fichierCv.type] || 'bin'
       const chemin = `${crypto.randomUUID()}.${ext}`
+      cvBuffer = await fichierCv.arrayBuffer()
+      cvNomFichier = `CV-${prenom}-${nom}.${ext}`.replace(/[^\w.\-]/g, '_')
       const up = await fetch(`${SUPABASE_URL}/storage/v1/object/${CV_BUCKET}/${chemin}`, {
         method: 'POST',
         headers: {
@@ -194,7 +210,7 @@ export async function POST(request: Request) {
           Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
           'Content-Type': fichierCv.type,
         },
-        body: await fichierCv.arrayBuffer(),
+        body: cvBuffer,
       })
       if (up.ok) {
         cvUrl = `${CV_BUCKET}/${chemin}`
@@ -242,6 +258,82 @@ export async function POST(request: Request) {
         { erreur: "Ça n'a pas passé de notre côté. Réessaie dans quelques minutes." },
         { status: 502 },
       )
+    }
+
+    // ── Le dossier part à qui lit les candidatures, avec le CV en pièce jointe.
+    // Envoyé MAINTENANT parce que c'est le seul moment où le fichier est lisible
+    // (bucket sans règle de lecture). Sans ça, personne n'est prévenu d'un dépôt :
+    // une candidature a dormi quatre jours le 25/08 pour cette raison.
+    if (NOTIF_TO && process.env.RESEND_API_KEY) {
+      const jourFR = (d: Date) =>
+        d.toLocaleDateString('fr-CA', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          timeZone: 'America/Toronto',
+        })
+      const echeance = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+
+      const disposTexte =
+        JOURS.filter((j) => dispos[j]?.length)
+          .map((j) => `  ${j.padEnd(9)} ${dispos[j].join(', ')}`)
+          .join('\n') || '  (aucune)'
+
+      const heures =
+        ligne.heures_min && ligne.heures_max
+          ? `${ligne.heures_min} à ${ligne.heures_max} h / semaine`
+          : ligne.heures_max
+            ? `jusqu'à ${ligne.heures_max} h / semaine`
+            : 'non précisé'
+
+      const corps = `${prenom} ${nom} vient de déposer sa candidature.
+
+⏰ On lui a promis une réponse d'ici le ${jourFR(echeance)}.
+
+  Cherche      : ${heures}
+  Peut débuter : ${ligne.debut_possible ?? 'non précisé'}
+  Expérience   : ${ligne.experience === true ? 'oui' : ligne.experience === false ? 'non' : 'non précisé'}
+  Contact      : ${courriel}${telephone ? ` · ${telephone}` : ''}
+
+Disponibilités
+${disposTexte}
+
+${ligne.experience_detail ? `Son expérience\n${ligne.experience_detail}\n\n` : ''}Ce qu'elle ou il raconte
+${presentation}
+
+${ligne.source ? `Nous a connus par : ${ligne.source}\n\n` : ''}${
+        cvBuffer ? 'Le CV est en pièce jointe.' : "Pas de CV joint."
+      }
+
+Le dossier est aussi dans la table « candidatures », au statut « nouvelle ».
+
+— envoi automatique du formulaire du comptoir`
+
+      const attachments =
+        cvBuffer && cvNomFichier
+          ? [
+              {
+                filename: cvNomFichier,
+                content: Buffer.from(cvBuffer).toString('base64'),
+              },
+            ]
+          : undefined
+
+      await fetch(`${RESEND_BASE_URL}/emails`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: FROM_ADDRESS,
+          to: [NOTIF_TO],
+          subject: `Nouvelle candidature — ${prenom} ${nom}`,
+          text: corps,
+          attachments,
+        }),
+        // Une notification qui rate ne doit JAMAIS faire perdre la candidature.
+      }).catch((err) => console.error('notif recrutement', err))
     }
 
     // ── Accusé de réception. Signé « La Brassée » — jamais un nom d'agent.
