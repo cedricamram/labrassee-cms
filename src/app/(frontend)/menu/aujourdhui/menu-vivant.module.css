@@ -6,7 +6,8 @@
   font-family: var(--font-acumin, sans-serif);
   max-width: 640px;
   margin: 0 auto;
-  padding: 24px 16px 64px;
+  /* L'en-tête du site est FIXE (56 px, z-index 1000) : sans ce décalage il cachait le titre. */
+  padding: 76px 16px 64px;
   min-height: 100vh;
 }
 .entete { text-align: center; margin-bottom: 16px; }
@@ -20,7 +21,7 @@
 .maj { color: var(--color-accent, #cdc49d); font-size: 0.95rem; margin: 6px 0 0; }
 .raccourcis {
   position: sticky;
-  top: 0;
+  top: 56px; /* sous l'en-tête fixe du site, sinon les raccourcis disparaissent au défilement */
   z-index: 2;
   display: flex;
   gap: 8px;
@@ -46,7 +47,7 @@
   white-space: nowrap;
 }
 .puce:focus-visible, .puce:hover { border-color: var(--color-brand, #f7d135); color: var(--color-brand, #f7d135); }
-.section { padding-top: 20px; scroll-margin-top: 64px; }
+.section { padding-top: 20px; scroll-margin-top: 130px; }
 .sectionTitre {
   font-family: var(--font-din, 'Arial Narrow', sans-serif);
   color: var(--color-brand, #f7d135);
