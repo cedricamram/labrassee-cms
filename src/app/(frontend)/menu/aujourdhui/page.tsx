@@ -85,7 +85,7 @@ export default async function MenuAujourdhuiPage() {
       ))}
 
       <footer className={s.pied}>
-        <p>Ce menu suit la caisse et se met à jour chaque matin. S'il diffère du menu papier, c'est celui-ci qui fait foi.</p>
+        <p>Ce menu suit la caisse et se met à jour chaque matin. S’il diffère du menu papier, c’est celui-ci qui fait foi.</p>
         <p>Une allergie, une question ? Demande-nous au comptoir.</p>
       </footer>
     </main>
