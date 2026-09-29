@@ -198,3 +198,26 @@ export const getArtisteParId = cache(
     return { artiste, prochaines, passees, photoUrl, galerieUrls, videosUrls, benefice }
   },
 )
+
+/**
+ * Ids des artistes publics qui ont au moins un concert confirmé à venir — pour le
+ * plan du site (2026-09-29). Même règle d'appariement que la fiche : le nom de
+ * l'artiste doit figurer dans le titre du concert.
+ */
+export async function getIdsArtistesAvecConcertAVenir(): Promise<string[]> {
+  const statutsFilter = STATUTS_PUBLICS.map((s) => `"${s}"`).join(',')
+  const [artistes, concerts] = await Promise.all([
+    supaFetch<Array<{ id: string; nom_artiste: string }>>(
+      `/rest/v1/artistes_scene?select=id,nom_artiste&statut=in.(${encodeURIComponent(statutsFilter)})&limit=500`,
+      3600,
+    ),
+    supaFetch<Array<{ titre_show: string | null }>>(
+      `/rest/v1/concerts?select=titre_show&date_show=gte.${todayMontrealISO()}&statut=eq.confirme&limit=200`,
+      3600,
+    ),
+  ])
+  if (!artistes || !concerts) return []
+  return artistes
+    .filter((a) => a.nom_artiste && concerts.some((c) => matchNomArtiste(c.titre_show, a.nom_artiste)))
+    .map((a) => a.id)
+}
