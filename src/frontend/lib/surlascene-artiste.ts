@@ -1,7 +1,7 @@
 /**
  * Surlascène — fiche publique d'un artiste (page /scene/[slug]).
  *
- * Fetche l'artiste par son token_depot (= slug URL), ainsi que ses concerts
+ * Fetche l'artiste par son id (= slug URL — PAS le token_depot, qui est la clé du dépôt), ainsi que ses concerts
  * à venir et ses trois derniers concerts passés à La Brassée.
  */
 
@@ -18,7 +18,6 @@ const STATUTS_PUBLICS = ['programme', 'confirme', 'depot_complet', 'candidature_
 
 export type ArtistePublic = {
   id: string
-  token_depot: string
   nom_artiste: string
   bio: string | null
   genre: string | null
@@ -125,19 +124,25 @@ function matchNomArtiste(titreShow: string | null, nomArtiste: string): boolean 
 }
 
 /**
- * Fetche la fiche publique d'un artiste Surlascène par son token_depot.
+ * Fetche la fiche publique d'un artiste Surlascène par son id.
+ * 2026-09-28 : l'URL publique portait le token_depot, qui est la clé d'édition du
+ * dossier de dépôt — tout lien partagé donnait la clé. L'id n'ouvre rien.
  * Retourne null si l'artiste n'existe pas ou n'est pas dans un statut public.
  */
-export const getArtisteParToken = cache(
-  async (token: string): Promise<FicheArtiste | null> => {
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export const getArtisteParId = cache(
+  async (id: string): Promise<FicheArtiste | null> => {
+    // Un ancien lien /scene/<token> n'est pas un uuid : 404 franc, sans requête.
+    if (!UUID_RE.test(id)) return null
     // 1. Chercher l'artiste
     const statutsFilter = STATUTS_PUBLICS.map((s) => `"${s}"`).join(',')
     const selectArtiste = encodeURIComponent(
-      'id,token_depot,nom_artiste,bio,genre,nb_personnes_scene,duree_set_minutes,photo_artiste_path,photos_hd_paths,videos_paths,titre_set,categorie,instagram,site_web,spotify_url,bandcamp_url,youtube_url,tiktok,statut',
+      'id,nom_artiste,bio,genre,nb_personnes_scene,duree_set_minutes,photo_artiste_path,photos_hd_paths,videos_paths,titre_set,categorie,instagram,site_web,spotify_url,bandcamp_url,youtube_url,tiktok,statut',
     )
     const pathArtiste =
       `/rest/v1/artistes_scene?select=${selectArtiste}` +
-      `&token_depot=eq.${encodeURIComponent(token)}` +
+      `&id=eq.${encodeURIComponent(id)}` +
       `&statut=in.(${encodeURIComponent(statutsFilter)})` +
       `&limit=1`
 

@@ -2,7 +2,7 @@ import React from 'react'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { getArtisteParToken } from '@/frontend/lib/surlascene-artiste'
+import { getArtisteParId } from '@/frontend/lib/surlascene-artiste'
 import ArtistePage from './ArtistePage'
 
 // Regen toutes les 5 min (même cadence que le reste de la section /scene)
@@ -14,7 +14,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const fiche = await getArtisteParToken(slug)
+  const fiche = await getArtisteParId(slug)
   if (!fiche) {
     return {
       title: 'Artiste introuvable — La Brassée',
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ArtisteSlugPage({ params }: Props) {
   const { slug } = await params
-  const fiche = await getArtisteParToken(slug)
+  const fiche = await getArtisteParId(slug)
   if (!fiche) notFound()
 
   return (

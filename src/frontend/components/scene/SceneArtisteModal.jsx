@@ -323,8 +323,8 @@ export default function SceneArtisteModal({ show, onClose }) {
   const galerie = (a.photos_hd_paths || []).slice(1, 13)
 
   // Lien vers la fiche complète de l'artiste (bio, galerie, liens streaming).
-  // Disponible seulement si l'artiste a un token de dépôt public.
-  const artisteUrl = a.token_depot ? `/scene/${a.token_depot}` : null
+  // Adressée par l'id : le token_depot est la clé du dépôt, jamais une URL.
+  const artisteUrl = a.id ? `/scene/${a.id}` : null
 
   return (
     <Backdrop onClick={(e) => e.target === e.currentTarget && onClose()}>

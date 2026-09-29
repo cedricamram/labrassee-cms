@@ -26,7 +26,7 @@ export type FrontendEvent = {
   // la BD Supabase Surlascène, ignorées par les cards Payload events) ---
   surlasceneSource?: 'surlascene'
   surlasceneShowId?: string
-  surlasceneToken?: string | null
+  surlasceneArtisteId?: string | null
   surlasceneType?: string
   surlascenePosterPhoto?: string | null
   surlasceneArtiste?: {

@@ -25,7 +25,6 @@ export const SURLASCENE_DEPOT_URL = 'https://labrassee-surlascene-depot.vercel.a
 
 export type SurlasceneArtiste = {
   id: string
-  token_depot?: string | null
   nom_artiste: string
   genre: string | null
   bio: string | null
@@ -134,7 +133,7 @@ const concertToEvent = (row: RawConcertRow): FrontendEvent => {
     // Extensions Surlascène (lues optionnellement par EventCard)
     surlasceneShowId: row.id,
     surlasceneSource: 'surlascene',
-    surlasceneToken: artiste?.token_depot || null,
+    surlasceneArtisteId: artiste?.id || null,
     surlasceneArtiste: artiste,
     surlasceneType: row.type_show,
     surlascenePosterPhoto: photoFull, // rétro-compat (peut être null si pas de photo)
@@ -159,7 +158,7 @@ export const getUpcomingSurlasceneEvents = cache(
   async (limit = 30): Promise<FrontendEvent[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
@@ -179,7 +178,7 @@ export const getRecentSurlasceneEvents = cache(
   async (limit = 1): Promise<FrontendEvent[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
     )
     // Fetch desc puis on reverse pour avoir l'ordre chronologique côté retour
     const path =
@@ -234,7 +233,7 @@ export const getUpcomingShowDetails = cache(
   async (limit = 40): Promise<SurlasceneShowDetail[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
