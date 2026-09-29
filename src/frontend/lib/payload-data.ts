@@ -331,17 +331,48 @@ function formatHeureFromMinutes(min: number): string {
  * Ouverture : 9h00 (statique).
  * Source events : Payload + Surlascène fusionnés (priorité Payload).
  */
+// Fermetures exceptionnelles (table Supabase `fermetures_exceptionnelles`, 2026-09-29) :
+// une ligne pour un jour l'emporte sur le calcul automatique. Même table lue par le cron
+// dashboard sync-google-hours, pour que le site et Google disent la même heure.
+async function fetchFermeturesExceptionnelles(): Promise<Map<string, string>> {
+  const map = new Map<string, string>()
+  try {
+    const res = await fetch(
+      `${CONCERTS_SUPABASE_URL}/rest/v1/fermetures_exceptionnelles?select=jour,fermeture&jour=gte.${todayISO()}`,
+      {
+        headers: { apikey: CONCERTS_ANON_KEY, Authorization: `Bearer ${CONCERTS_ANON_KEY}` },
+        next: { revalidate: 300 },
+      },
+    )
+    if (!res.ok) return map
+    const rows: Array<{ jour: string; fermeture: string }> = await res.json()
+    for (const r of rows) {
+      const [h, m] = r.fermeture.split(':').map(Number)
+      if (Number.isFinite(h)) map.set(r.jour, formatHeureFromMinutes(h * 60 + (m || 0)))
+    }
+  } catch {
+    /* sans la table, on retombe sur le calcul automatique */
+  }
+  return map
+}
+
+// Un événement annulé garde sa fiche publiée (titre « ANNULÉ · … ») : il ne doit plus
+// allonger la journée.
+const estAnnule = (titre?: string | null) => /^\s*ANNUL[ÉE]/i.test(titre || '')
+
 async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']> {
   try {
-    const [payloadEvents, surlasceneEvents] = await Promise.all([
+    const [payloadEvents, surlasceneEvents, exceptions] = await Promise.all([
       getUpcomingEventsData(80),
       getUpcomingSurlasceneEvents(80),
+      fetchFermeturesExceptionnelles(),
     ])
     const fusion = fusionnerEtDedoublonner(payloadEvents, surlasceneEvents)
 
     // Index : ISO date → heure de début la PLUS TARDIVE ce jour-là (en minutes)
     const latestStartParJour = new Map<string, number>()
     for (const e of fusion) {
+      if (estAnnule(e.title)) continue
       const iso = e.date.slice(0, 10)
       const min = parseHeureMinutes(e.time)
       if (min === null) continue
@@ -373,9 +404,10 @@ async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']>
       const latestMin = latestStartParJour.get(iso)
       const FERMETURE_DEFAUT_MIN = 19 * 60
       const close =
-        latestMin !== undefined
+        exceptions.get(iso) ??
+        (latestMin !== undefined
           ? formatHeureFromMinutes(Math.max(latestMin + 150, FERMETURE_DEFAUT_MIN))
-          : '19h00'
+          : '19h00')
       const jourLabel = JOURS_FR_LONG[d.getDay()]
       const dateLabel = `${d.getDate()} ${MOIS_FR_LONG[d.getMonth()]}`
       result.push({
