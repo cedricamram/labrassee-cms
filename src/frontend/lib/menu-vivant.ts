@@ -1,16 +1,32 @@
 /**
- * Menu vivant — lit le menu publié depuis Koomi (table public.menu_vivant).
+ * Menu vivant — lit le menu publié (table public.menu_vivant).
  * Projet « Menu vivant par QR » (idée de Sébastien, GO Cédric 29/09/2026).
- * Construit chaque matin sur le Mac par ~/labrassee-scripts/bin/menu_v2/menu_vivant.py
- * (lecture seule de Koomi). Le site ne fait que lire.
+ *
+ * v2 (Cédric, 29/09 21h33) : le contenu est le MENU PAPIER (menu_data.json, le fichier
+ * même qui produit la carte imprimée) ; la caisse (Koomi, lecture seule) ne fait que
+ * tenir les prix. Construit sur le Mac par ~/labrassee-scripts/bin/menu_v2/menu_vivant.py.
  */
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from './surlascene-data'
 
-export type Prix = { libelle?: string; ttc: number }
-export type Choix = { nom: string; ttc: number }
-export type Produit = { nom: string; prix?: Prix[]; choix?: Choix[]; saveurs?: string[] }
-export type Section = { id: string; titre: string; note: string | null; produits: Produit[] }
-export type MenuVivant = { koomi_lu_le: string; genere_le: string; sections: Section[] }
+export type Produit = {
+  nom: string
+  detail?: string
+  format?: string
+  etiquette?: string
+  prix?: number[]
+  prix_texte?: string
+}
+export type Section = {
+  titre?: string
+  sous_titre?: string
+  produits?: Produit[]
+  groupes?: { titre?: string; produits: Produit[] }[]
+  jours?: { day?: string; vg?: string; viande?: string; text?: string }[]
+  listes?: { titre: string; noms: string[] }[]
+  encadres?: { titre?: string; texte?: string; prix?: string }[]
+}
+export type Page = { id: string; titre: string; sous_titre?: string; sections: Section[] }
+export type MenuVivant = { version: number; koomi_lu_le: string; genere_le: string; pages: Page[] }
 
 export async function getMenuVivant(): Promise<MenuVivant | null> {
   try {
@@ -23,7 +39,9 @@ export async function getMenuVivant(): Promise<MenuVivant | null> {
       return null
     }
     const rows = (await res.json()) as Array<{ contenu: MenuVivant }>
-    return rows[0]?.contenu ?? null
+    const menu = rows[0]?.contenu
+    // Un document d'un autre format (v1) ne s'affiche pas à moitié : repli honnête.
+    return menu && menu.version >= 2 && Array.isArray(menu.pages) ? menu : null
   } catch (e) {
     console.error('[menu-vivant] erreur', e)
     return null
@@ -38,4 +56,12 @@ export function dateFr(iso: string): string {
   return new Date(iso).toLocaleDateString('fr-CA', {
     timeZone: 'America/Toronto', weekday: 'long', day: 'numeric', month: 'long',
   })
+}
+
+/** « GRILLED CHEESE » → « Grilled cheese » : le papier est en capitales, l'écran se lit mieux sans. */
+export function casse(s?: string): string {
+  if (!s) return ''
+  if (s !== s.toUpperCase()) return s
+  const bas = s.toLocaleLowerCase('fr-CA')
+  return bas.charAt(0).toLocaleUpperCase('fr-CA') + bas.slice(1)
 }

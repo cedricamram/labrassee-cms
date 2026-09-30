@@ -68,3 +68,11 @@
 .pied { margin-top: 32px; color: var(--color-accent, #cdc49d); font-size: 0.9rem; text-align: center; line-height: 1.5; }
 .vide { text-align: center; margin-top: 24px; line-height: 1.5; }
 .vide a { color: var(--color-brand, #f7d135); }
+/* v2 — structure du menu papier (29/09) : blocs, encadrés, groupes. Simple, comme la carte. */
+.bloc { margin-top: 14px; }
+.blocTitre { font-family: var(--font-din, 'Arial Narrow', sans-serif); font-size: 1.25rem; color: var(--color-white, #f1efe4); margin: 10px 0 2px; letter-spacing: 0.02em; }
+.format { color: var(--color-accent, #cdc49d); font-size: 0.9rem; }
+.encadre { border: 1px dashed rgba(247, 209, 53, 0.45); border-radius: 10px; padding: 10px 12px; margin: 10px 0; line-height: 1.4; }
+.encadre p { margin: 0 0 4px; }
+.encadreTitre { font-weight: 600; color: var(--color-brand, #f7d135); }
+.encadrePrix { color: var(--color-accent, #cdc49d); font-size: 0.9rem; }
