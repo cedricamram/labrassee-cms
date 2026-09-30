@@ -17,7 +17,7 @@ import type { FrontendEvent } from './payload-data'
 export const SUPABASE_URL = 'https://xjlpttrziisldlclhsth.supabase.co'
 // Anon key publique — déjà exposée sur le HTML statique surlascene-publique.vercel.app
 export const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqbHB0dHJ6aWlzbGRsY2xoc3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjkyODMsImV4cCI6MjA5MjA0NTI4M30.JpkTnJF1ZP08ybzFdM8fFUJOTiKYx8ltTe2nxiDPk24'
+  'sb_publishable_qG5XGinXYpNpGbmUyjej-Q_-eADJKcW'
 export const SURLASCENE_BUCKET_URL =
   SUPABASE_URL + '/storage/v1/object/public/artistes-scene-epk/'
 export const SURLASCENE_PUBLIC_URL = 'https://labrassee-surlascene-publique.vercel.app'

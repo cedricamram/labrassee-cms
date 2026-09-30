@@ -179,7 +179,7 @@ const CONCERTS_SUPABASE_URL =
   process.env.CONCERTS_SUPABASE_URL || 'https://xjlpttrziisldlclhsth.supabase.co'
 const CONCERTS_ANON_KEY =
   process.env.CONCERTS_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqbHB0dHJ6aWlzbGRsY2xoc3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjkyODMsImV4cCI6MjA5MjA0NTI4M30.JpkTnJF1ZP08ybzFdM8fFUJOTiKYx8ltTe2nxiDPk24'
+  'sb_publishable_qG5XGinXYpNpGbmUyjej-Q_-eADJKcW'
 
 type ConcertCover = { titre: string; cover: string }
 
