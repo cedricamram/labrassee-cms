@@ -17,7 +17,9 @@ export const metadata: Metadata = {
 }
 
 function LigneProduit({ p }: { p: Produit }) {
-  const prix = p.prix_texte
+  const prix = p.formats && p.formats.length
+    ? p.formats.map((f) => `${f.libelle} ${prixFr(f.ttc)}`).join(' · ')
+    : p.prix_texte
     ? p.prix_texte.replace(/·/g, '/') + ' $'
     : p.prix && p.prix.length
       ? p.prix.map(prixFr).join(' / ')

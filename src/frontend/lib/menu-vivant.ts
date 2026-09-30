@@ -15,6 +15,8 @@ export type Produit = {
   etiquette?: string
   prix?: number[]
   prix_texte?: string
+  /** Tableau à colonnes du papier : « Court ou allongé » 3,60 $ … */
+  formats?: { libelle: string; ttc: number }[]
 }
 export type Section = {
   titre?: string
