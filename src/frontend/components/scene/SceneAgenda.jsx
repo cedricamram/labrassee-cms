@@ -322,6 +322,26 @@ const Carte = styled.article`
       height: 70px;
     }
   }
+  &.annule {
+    cursor: default;
+    opacity: 0.72;
+  }
+  &.annule .photo-mini {
+    filter: grayscale(0.55) brightness(0.8);
+  }
+  &.annule .corps h3 {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .badge-annule {
+    display: inline-block;
+    background: #f7d135;
+    color: #0a0907;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 2px 10px;
+    border-radius: 6px;
+  }
   .corps h3 {
     font-family: var(--font-din);
     font-weight: 300;
@@ -393,7 +413,9 @@ function buildLiens(a) {
 export default function SceneAgenda({ shows = [] }) {
   const [selectedShow, setSelectedShow] = useState(null)
   const [countdown, setCountdown] = useState({ j: 0, h: 0, m: 0 })
-  const first = shows[0]
+  // Le « prochain show » mis en vedette est toujours une soirée qui a lieu ;
+  // les annulées restent dans la liste, marquées « Annulé ».
+  const first = shows.find((s) => s.statut !== 'annule')
 
   useEffect(() => {
     if (!first) return
@@ -415,7 +437,7 @@ export default function SceneAgenda({ shows = [] }) {
     return () => clearInterval(id)
   }, [first])
 
-  if (!shows || shows.length === 0) {
+  if (!shows || shows.length === 0 || !first) {
     return (
       <Section id="agenda">
         <Container>
@@ -536,9 +558,9 @@ export default function SceneAgenda({ shows = [] }) {
           </Feature>
         )}
 
-        {shows.length > 1 && <SubTitle>Les shows suivants</SubTitle>}
+        {shows.filter((s) => s !== first).length > 0 && <SubTitle>Les shows suivants</SubTitle>}
 
-        {shows.slice(1).map((s) => {
+        {shows.filter((s) => s !== first).map((s) => {
           const art = s.artiste
           const nom = (art && art.nom_artiste) || 'À confirmer'
           const genre =
@@ -558,7 +580,12 @@ export default function SceneAgenda({ shows = [] }) {
             s.description_publique ||
             (art ? 'Avec ' + nom : 'Programmation à confirmer')
           return (
-            <Carte id={`concert-${s.id}`} key={s.id} onClick={() => setSelectedShow(s)}>
+            <Carte
+              id={`concert-${s.id}`}
+              key={s.id}
+              className={s.statut === 'annule' ? 'annule' : undefined}
+              onClick={s.statut === 'annule' ? undefined : () => setSelectedShow(s)}
+            >
               <div className="date-bloc">
                 <div className="jour">{JOURS_FR[dd.getDay()]}</div>
                 <div className="jour-num">{dd.getDate()}</div>
@@ -570,7 +597,9 @@ export default function SceneAgenda({ shows = [] }) {
                 <div className="photo-mini">{premiereLettre(nom)}</div>
               )}
               <div className="corps">
-                <div className="type">{genre}</div>
+                <div className="type">
+                  {s.statut === 'annule' ? <span className="badge-annule">Annulé</span> : genre}
+                </div>
                 <h3>{s.titre_show || nom}</h3>
                 <div className="desc">{desc}</div>
               </div>

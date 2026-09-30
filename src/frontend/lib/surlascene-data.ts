@@ -215,6 +215,7 @@ export type SurlasceneShowDetail = {
 }
 
 type RawConcertDetailRow = {
+  cover_safe_url?: string | null
   id: string
   date_show: string
   heure_debut: string | null
@@ -237,7 +238,8 @@ export const getUpcomingShowDetails = cache(
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
-      `&statut=eq.confirme&order=date_show.asc&limit=${limit}`
+      // Les soirées annulées restent affichées, marquées « Annulé » (Cédric 30/09 : « annulé partout mais ne supprime pas »).
+      `&statut=in.(confirme,annule)&order=date_show.asc&limit=${limit}`
     const rows = await supaFetch<RawConcertDetailRow[]>(path)
     if (!rows) return []
     return rows.map((r) => {
@@ -253,7 +255,11 @@ export const getUpcomingShowDetails = cache(
         description_publique: r.description_publique,
         statut: r.statut,
         artiste: arts[0]?.artistes_scene || null,
-        coverImage: r.cover_image_url || null,
+        // Annulé : l'affiche avec le bandeau ANNULÉ (cover_safe_url) prime sur l'originale.
+        coverImage:
+          (r.statut === 'annule' && r.cover_safe_url && r.cover_safe_url.includes('ANNULE')
+            ? r.cover_safe_url
+            : r.cover_image_url) || null,
         facebookLink: r.fb_event_url || null,
       }
     })
