@@ -28,7 +28,24 @@ export type Section = {
   encadres?: { titre?: string; texte?: string; prix?: string }[]
 }
 export type Page = { id: string; titre: string; sous_titre?: string; sections: Section[] }
-export type MenuVivant = { version: number; koomi_lu_le: string; genere_le: string; pages: Page[] }
+export type CorrespondanceKoomi = { id: number; statut: string; nom: string }
+export type Controle = {
+  retrouves_en_caisse: number
+  corriges: { produit: string; papier: number; caisse: number }[]
+  non_retrouves: string[]
+  filtres_inactifs_koomi: string[]
+}
+export type MenuVivant = {
+  version: number
+  koomi_lu_le: string
+  /** Date de l'audit Koomi (statuts Active/Inactive) utilisé pour le filtrage. */
+  koomi_audit_le?: string
+  genere_le: string
+  pages: Page[]
+  /** Table de correspondance nom_normalisé → {id Koomi, statut, nom original}. */
+  correspondances_koomi?: Record<string, CorrespondanceKoomi>
+  controle?: Controle
+}
 
 export async function getMenuVivant(): Promise<MenuVivant | null> {
   try {

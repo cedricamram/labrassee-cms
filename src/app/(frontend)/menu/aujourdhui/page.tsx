@@ -127,6 +127,9 @@ export default async function MenuAujourdhuiPage() {
 
       <footer className={s.pied}>
         <p>C’est le menu de nos tables, avec les prix de la caisse. Une allergie, une question ? Demande-nous au comptoir.</p>
+        {(menu.controle?.filtres_inactifs_koomi?.length ?? 0) > 0 && (
+          <p className={s.note}>Certains produits ne sont pas disponibles en ce moment et n&apos;apparaissent pas ici.</p>
+        )}
       </footer>
     </main>
   )
