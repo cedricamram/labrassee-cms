@@ -154,7 +154,7 @@ export default function SceneHero() {
       </Pitch>
       <CTAs>
         <Btn href="#agenda" className="primaire">
-          Voir le prochain show
+          Voir le prochain spectacle
         </Btn>
         <Btn href="/proposer" className="secondaire">
           Proposer ma candidature

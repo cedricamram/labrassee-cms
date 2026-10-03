@@ -140,7 +140,7 @@ export default function SceneCommentCaMarche() {
             <Num>2</Num>
             <TitreCarte>Le chapeau circule</TitreCarte>
             <Desc>
-              À la fin du show, les artistes passent (ou pas) le chapeau. Tu donnes
+              À la fin du spectacle, les artistes passent (ou pas) le chapeau. Tu donnes
               ce que tu veux, directement à eux.
             </Desc>
           </Carte>
@@ -148,7 +148,7 @@ export default function SceneCommentCaMarche() {
             <Num>3</Num>
             <TitreCarte>La maison ajoute 10 %</TitreCarte>
             <Desc>
-              Sur ta facture pendant le show, La Brassée ajoute une{' '}
+              Sur ta facture pendant le spectacle, La Brassée ajoute une{' '}
               <strong>contribution artistes de 10 %</strong>.{' '}
               <strong>100 % reversé aux musiciens</strong>. Le café ne prend rien.
             </Desc>

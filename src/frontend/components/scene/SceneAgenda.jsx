@@ -443,7 +443,7 @@ export default function SceneAgenda({ shows = [] }) {
         <Container>
           <Label>Agenda</Label>
           <Titre>
-            Les <span className="u">prochains shows</span>
+            Les <span className="u">prochains spectacles</span>
           </Titre>
           <Intro>
             Cinq concerts par semaine (lundi, mardi, jeudi, vendredi, samedi). Entrée
@@ -478,7 +478,7 @@ export default function SceneAgenda({ shows = [] }) {
       <Container>
         <Label>Agenda</Label>
         <Titre>
-          Les <span className="u">prochains shows</span>
+          Les <span className="u">prochains spectacles</span>
         </Titre>
         <Intro>
           Cinq concerts par semaine (lundi, mardi, jeudi, vendredi, samedi). Entrée
@@ -488,7 +488,7 @@ export default function SceneAgenda({ shows = [] }) {
         {first && a && (
           <CountdownBloc>
             <div className="gauche">
-              <div className="label-cd">Prochain show</div>
+              <div className="label-cd">Prochain spectacle</div>
               <div className="titre-cd">{a.nom_artiste}</div>
               <div className="meta-cd">{dateTxt}</div>
             </div>
@@ -517,7 +517,7 @@ export default function SceneAgenda({ shows = [] }) {
               <PhotoHD>{premiereLettre(a.nom_artiste)}</PhotoHD>
             )}
             <InfosFeat>
-              <div className="surtitre">Prochain show · {dateTxt}</div>
+              <div className="surtitre">Prochain spectacle · {dateTxt}</div>
               <h3>{a.nom_artiste}</h3>
               {a.genre && (
                 <div className="genre">
@@ -536,7 +536,7 @@ export default function SceneAgenda({ shows = [] }) {
                 <strong>
                   {first.heure_soundcheck ? first.heure_soundcheck.slice(0, 5) : '1 h avant'}
                 </strong>{' '}
-                · show <strong>{first.heure_debut ? first.heure_debut.slice(0, 5) : '19:30'}</strong>
+                · spectacle <strong>{first.heure_debut ? first.heure_debut.slice(0, 5) : '19:30'}</strong>
               </div>
               {a.bio && <div className="bio">{a.bio}</div>}
               {liens.length > 0 && (
@@ -558,7 +558,9 @@ export default function SceneAgenda({ shows = [] }) {
           </Feature>
         )}
 
-        {shows.filter((s) => s !== first).length > 0 && <SubTitle>Les shows suivants</SubTitle>}
+        {shows.filter((s) => s !== first).length > 0 && (
+          <SubTitle>Les spectacles suivants</SubTitle>
+        )}
 
         {shows.filter((s) => s !== first).map((s) => {
           const art = s.artiste
