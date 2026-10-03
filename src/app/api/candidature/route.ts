@@ -26,6 +26,11 @@ const rateLimitIP = new Map<string, number[]>()
 
 const CV_BUCKET = 'candidatures-cv'
 const CV_TAILLE_MAX = 5 * 1024 * 1024 // 5 Mo
+// Plancher : un envoi qui échoue côté navigateur arrive en fichier vide, et sans ce
+// seuil il repartait en 200 — le candidat croyait avoir joint son CV. Mesuré le 29/08
+// sur un dépôt réel de 22 octets dans candidatures-cv. Un CV d'une page pèse au bas mot
+// quelques dizaines de Ko : 1 Ko n'attrape que le vide.
+const CV_TAILLE_MIN = 1024 // 1 Ko
 const CV_TYPES = new Set([
   'application/pdf',
   'application/msword',
@@ -110,6 +115,15 @@ export async function POST(request: Request) {
       if (fichierCv.size > CV_TAILLE_MAX) {
         return NextResponse.json(
           { erreur: 'Ton fichier dépasse 5 Mo. Envoie une version plus légère.' },
+          { status: 400 },
+        )
+      }
+      if (fichierCv.size < CV_TAILLE_MIN) {
+        return NextResponse.json(
+          {
+            erreur:
+              "Ton fichier semble vide. Vérifie qu'il s'est bien joint, puis renvoie-le — ou laisse-le de côté, le CV est optionnel.",
+          },
           { status: 400 },
         )
       }
