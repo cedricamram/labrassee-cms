@@ -210,7 +210,7 @@ const EventsCarousel = ({ events = [] }) => {
             <i className="fab fa-facebook"></i>
           </InfoIcon>
           <InfoText>
-            Clique sur une affiche pour voir le détail du show ou l'événement Facebook.
+            Clique sur une affiche pour voir le détail de la soirée ou l'événement Facebook.
           </InfoText>
         </InfoBlock>
       </CarouselContainer>
