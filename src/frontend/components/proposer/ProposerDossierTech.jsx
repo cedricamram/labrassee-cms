@@ -232,7 +232,7 @@ export default function ProposerDossierTech({ dossier }) {
   return (
     <Section id="dossier-technique">
       <Container>
-        <Eyebrow>Pick what you need</Eyebrow>
+        <Eyebrow>Choisis ce qu'il te faut</Eyebrow>
         <Titre>
           Dis-nous ce dont tu as <span className="accent">besoin</span> pour qu'on se prépare
         </Titre>
