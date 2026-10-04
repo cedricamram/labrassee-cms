@@ -10,9 +10,22 @@ import { usePathname, useRouter } from 'next/navigation';
  *     (2e itération Cédric : trop visuel, plus aéré sans).
  *   - Bandeau bas (64px desktop · 56px mobile) avec effet liquid glass :
  *     backdrop-filter blur + saturate + gradient dark + bordure top fine.
- *   - 4 onglets centrés horizontalement (justify-content: center).
+ *   - 5 onglets centrés horizontalement (justify-content: center).
  *   - Header toujours visible — pas d'auto-hide au scroll.
  *   - Header cliquable (retour home) sauf clic direct onglet.
+ *
+ * Retouche téléphone 2026-10-04 (Cédric, 03/10 : « les onglets sont durs à
+ * lire »). Trois gestes, tous mesurés au banc `~/labrassee-ops/mesures-site/` :
+ *   1. Plancher de taille remonté de 10 px à 14 px, et quatre paliers de
+ *      réduction retirés (six breakpoints → deux sous 1100 px).
+ *   2. Les articles retirés des libellés — « Les événements » → « Événements »,
+ *      « L'expo actuelle » → « Expo », « Le menu » → « Menu ». Ils ne portaient
+ *      rien et coûtaient 95 px de large. « Viens te faire voir » reste entier.
+ *   3. Le vrai coupable du débordement n'était pas la mise en page : tant que
+ *      la police Typekit n'a pas répondu, le navigateur rend une police 33 %
+ *      plus large et la rangée passe de 340 px à 473 px pour 343 px de place —
+ *      le premier et le dernier onglet sont coupés. Corrigé par un repli
+ *      ajusté (`size-adjust`) déclaré dans `styles/app.css`.
  */
 
 const HEADER_HEIGHT = 64; // px — bandeau slim
@@ -64,6 +77,12 @@ const HeaderContainer = styled.div`
   margin: 0 auto;
   padding: 0 16px;
   font-family: var(--font-din);
+
+  /* 8 px au lieu de 16 sur téléphone : 16 px rendus à la rangée, c'est ce qui
+     fait tenir les cinq onglets à 14 px sur un iPhone de 375 px. */
+  @media (max-width: 560px) {
+    padding: 0 8px;
+  }
 `;
 
 const NavGroup = styled.div`
@@ -76,6 +95,18 @@ const NavGroup = styled.div`
   }
   @media (max-width: 480px) {
     gap: 3px;
+  }
+
+  /* Filet de sécurité (2026-10-04) : sous 340 px — l'iPhone SE première
+     génération, et surtout l'affichage « zoomé » d'iOS que beaucoup de gens
+     activent pour mieux voir — la rangée dépasse encore de ~32 px. Elle défile
+     alors au doigt au lieu d'être coupée en silence. Mesuré au banc :
+     ~/labrassee-ops/mesures-site/banc-onglets.html */
+  @media (max-width: 560px) {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
   }
 `;
 
@@ -129,27 +160,19 @@ const MenuLink = styled(Link)`
   }
 
   @media (max-width: 880px) {
-    font-size: 15px;
+    font-size: 16px;
     letter-spacing: 0.8px;
-    padding: 9px 12px;
-  }
-
-  @media (max-width: 720px) {
-    font-size: 13px;
-    letter-spacing: 0.5px;
     padding: 8px 10px;
   }
 
+  /* Plancher à 14 px (2026-10-04). Avant : la taille continuait de descendre
+     jusqu'à 10 px sur quatre paliers de plus — Cédric, 03/10 : « les onglets
+     sont durs à lire ». 14 px tient à partir de 340 px de large une fois les
+     articles retirés des libellés ; en dessous, NavGroup fait défiler. */
   @media (max-width: 560px) {
-    font-size: 11px;
-    letter-spacing: 0.4px;
-    padding: 7px 8px;
-  }
-
-  @media (max-width: 420px) {
-    font-size: 10px;
-    letter-spacing: 0.3px;
-    padding: 6px 6px;
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    padding: 7px 6px;
   }
 `;
 
@@ -192,7 +215,7 @@ const Header = ({ businessInfo: _providedBusinessInfo }) => {
             onClick={(e) => { if (pathname === '/scene') e.preventDefault(); }}
             style={{ pointerEvents: pathname === '/scene' ? 'none' : 'auto' }}
           >
-            Les événements
+            Événements
           </MenuLink>
           <MenuLink
             href="/expo"
@@ -200,7 +223,7 @@ const Header = ({ businessInfo: _providedBusinessInfo }) => {
             onClick={(e) => { if (pathname === '/expo') e.preventDefault(); }}
             style={{ pointerEvents: pathname === '/expo' ? 'none' : 'auto' }}
           >
-            L'expo actuelle
+            Expo
           </MenuLink>
           <MenuLink
             href="/proposer"
@@ -216,7 +239,7 @@ const Header = ({ businessInfo: _providedBusinessInfo }) => {
             onClick={(e) => { if (pathname === '/menu') e.preventDefault(); }}
             style={{ pointerEvents: pathname === '/menu' ? 'none' : 'auto' }}
           >
-            Le menu
+            Menu
           </MenuLink>
         </NavGroup>
       </HeaderContainer>
