@@ -121,7 +121,7 @@ const cards = [
     desc: (
       <>
         Pas de billetterie. Le public donne ce qu'il veut. La Brassée ajoute 10 % sur
-        les factures pendant le show — <strong>100 % reversé aux artistes</strong>.
+        les factures pendant le spectacle — <strong>100 % reversé aux artistes</strong>.
         Plus 30 $ de conso offerte/artiste, plafond 120 $/soirée.
       </>
     ),
@@ -130,7 +130,7 @@ const cards = [
     titre: '🎤 Soundcheck + format',
     desc: (
       <>
-        Soundcheck dès <strong>18 h 30</strong> avec Cédric à la console. Show à{' '}
+        Soundcheck dès <strong>18 h 30</strong> avec Cédric à la console. Spectacle à{' '}
         <strong>19 h 30</strong>. Format : <strong>2 sets de 45 min</strong> avec
         pause de 15 min.
       </>
@@ -140,7 +140,7 @@ const cards = [
     titre: '📅 Cadence',
     desc: (
       <>
-        5 shows/semaine (lun, mar, jeu, ven, sam). Un artiste peut revenir{' '}
+        5 soirées/semaine (lun, mar, jeu, ven, sam). Un artiste peut revenir{' '}
         <strong>max 3 fois/an</strong> — on aime faire tourner.
       </>
     ),
@@ -151,7 +151,7 @@ const cards = [
       <>
         Sur demande : <strong>enregistrement audio + vidéo stéréo sur clé USB</strong>{' '}
         de ta prestation pour <strong>40 $</strong>. Pratique pour ta promo.
-        (Multipiste à venir avec l'upgrade de console.)
+        (Multipiste à venir avec la nouvelle console.)
       </>
     ),
   },
@@ -159,9 +159,9 @@ const cards = [
     titre: '📷 Promo',
     desc: (
       <>
-        On t'annonce sur Facebook (event créé dès réception de ta photo +
-        descriptif), Instagram, newsletter, TV interne. Réels FB+Insta pendant le
-        show. Droit d'image pour la promo (et 6 mois après).
+        On t'annonce sur Facebook (événement créé dès réception de ta photo +
+        descriptif), Instagram, infolettre, TV interne. Réels FB+Insta pendant le
+        spectacle. Droit d'image pour la promo (et 6 mois après).
       </>
     ),
   },

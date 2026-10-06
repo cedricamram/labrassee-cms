@@ -47,11 +47,6 @@ const SocialText = styled.span`
   text-transform: uppercase;
 `;
 
-const OnlyFansIcon = styled.img`
-  width: 40px;
-  height: 40px;
-`;
-
 const SocialLinks = ({ businessInfo }) => {
   const source = businessInfo || fallbackBusinessInfo;
 
@@ -67,13 +62,17 @@ const SocialLinks = ({ businessInfo }) => {
       icon: 'fab fa-instagram',
       color: '#f14179',
       link: source.social?.instagram || fallbackBusinessInfo.social.instagram
-    },
-    {
-      name: 'ONLYFANS',
-      icon: 'onlyfans',
-      link: source.social?.onlyfans || fallbackBusinessInfo.social.onlyfans
     }
   ];
+  // ⚠️ 2026-08-23 — le clin d'œil ONLYFANS a été retiré du site ENTIER.
+  // Décision de Cédric à 18h24 : « on enlève le clin d'œil de partout ».
+  // Contexte : Apollon a relevé que ce n'était pas une blague inerte — le lien
+  // pointait vraiment vers onlyfans.com et ouvrait un nouvel onglet, présenté à
+  // poids égal avec les deux vrais comptes. Sur /comptoir (page d'employeur),
+  // quelqu'un de 18 ans à sa première candidature ne pouvait pas le lire comme
+  // une blague. Cédric a tranché plus large que la question posée : partout.
+  // Le champ `social.onlyfans` existe encore dans Payload et dans les types —
+  // il n'est plus rendu nulle part. Ne pas le rebrancher.
 
   return (
     <SocialContainer>
@@ -88,13 +87,9 @@ const SocialLinks = ({ businessInfo }) => {
           transition={{ delay: index * 0.1 }}
           whileHover={{ y: -5 }}
         >
-          {social.icon === 'onlyfans' ? (
-            <OnlyFansIcon src="/images/misc/onlyfans-logo.svg" alt="OnlyFans" />
-          ) : (
-            <IconWrapper $color={social.color}>
-              <i className={social.icon}></i>
-            </IconWrapper>
-          )}
+          <IconWrapper $color={social.color}>
+            <i className={social.icon}></i>
+          </IconWrapper>
           <SocialText>{social.name}</SocialText>
         </SocialBlock>
       ))}

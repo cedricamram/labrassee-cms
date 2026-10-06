@@ -277,10 +277,10 @@ const EventCard = ({ event, index }) => {
   const isSurlascene = event.surlasceneSource === 'surlascene';
   const concertKey = event.surlasceneShowId || String(event.id);
 
-  // Lien vers la fiche publique de l'artiste (si token_depot disponible)
+  // Lien vers la fiche publique de l'artiste (par son id — jamais le token_depot)
   const ficheArtisteHref =
-    isSurlascene && event.surlasceneToken
-      ? `/scene/${event.surlasceneToken}`
+    isSurlascene && event.surlasceneArtisteId
+      ? `/scene/${event.surlasceneArtisteId}`
       : null;
 
   // Lien de la card :

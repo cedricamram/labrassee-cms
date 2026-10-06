@@ -17,7 +17,7 @@ import { cache } from 'react'
 
 const SUPABASE_URL = 'https://xjlpttrziisldlclhsth.supabase.co'
 const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqbHB0dHJ6aWlzbGRsY2xoc3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjkyODMsImV4cCI6MjA5MjA0NTI4M30.JpkTnJF1ZP08ybzFdM8fFUJOTiKYx8ltTe2nxiDPk24'
+  'sb_publishable_qG5XGinXYpNpGbmUyjej-Q_-eADJKcW'
 
 export type DateLibre = {
   iso: string           // 'YYYY-MM-DD'
@@ -137,15 +137,18 @@ export function grouperParMois(dates: DateLibre[]): Array<{ cleMois: string; lib
 // ─────────────────────────────────────────────────────────────────────────
 
 export type StatutJour =
-  | 'libre'             // soir ouvert + aucun concert → cliquable pour proposer un show
-  | 'libre_expo'        // dim d'accrochage (rotation 4 sem) → cliquable pour proposer une expo
-  | 'libre_expo_attente' // dim libre hors cadence rotation → jaune visible, non cliquable
+  | 'libre'             // soir ouvert + aucun concert → cliquable, JAUNE pointillé (Sur la scène)
+  | 'libre_expo'        // dim d'accrochage (rotation 4 sem) → cliquable, BRUN pointillé (Sur nos murs)
+  | 'libre_pages'       // dim sans vernissage → cliquable, BLEU pointillé (Sur nos pages, écrivains)
+  | 'libre_expo_attente' // (DEPRECATED) dim libre hors cadence → désormais 'libre_pages'
   | 'impro'             // (DEPRECATED) lundi réservé Impro — désormais 'bookee_perm'
   | 'reservee'          // concert (scène) statut='planifie' (option, attente confirmation)
   | 'bookee'            // concert (scène) statut='confirme'
   | 'bookee_perm'       // récurrence éditoriale confirmée (impro lundi, etc.) — vert SANS tag
   | 'reservee_expo'     // dim expo statut='planifie' (rond orange, distinct des concerts carrés)
   | 'bookee_expo'       // dim expo statut='confirme' (rond vert)
+  | 'reservee_pages'    // dim rencontre d'auteur·rice statut='planifie' (rond bleu creux)
+  | 'bookee_pages'      // dim rencontre d'auteur·rice statut='confirme' (rond bleu plein)
   | 'ferme'             // soir non scène (mer + dim) ou hors préavis (< 7 jours)
   | 'passee'            // date dans le passé
   | 'horsmois'          // padding début/fin du mois pour avoir grille 7 colonnes
@@ -245,12 +248,20 @@ export const getCalendrierMois = cache(
     // Une expo = date_install → date_decrochage. Tous les dimanches dans cette
     // plage doivent être marqués comme « expo en cours » (rond vert/orange)
     // même s'ils n'ont pas de concert spécifique en BD.
-    type ExpoRange = { start: string; end: string; signature: boolean }
+    type ExpoRange = { start: string; end: string }
     const exposEnCours: ExpoRange[] = []
+    // Dimanches de VERNISSAGE (seul événement expo public — l'accrochage ne l'est
+    // pas, cf. Cédric). Un vernissage occupe le 5à7 du dimanche → ce dim n'est PAS
+    // ouvert aux écrivains (conflit d'horaire). Tous les autres dim couverts par une
+    // expo restent ouverts aux écrivains (les murs sont pris, pas la soirée).
+    const vernissageSundays = new Set<string>()
     try {
       const urlExpos =
         SUPABASE_URL +
-        '/rest/v1/artistes_murs?select=date_install,date_decrochage,signature_acceptee' +
+        // ⚠️ `signature_acceptee` volontairement ABSENT du select : colonne hors GRANT anon,
+        // sa seule présence fait échouer la requête (42501) et le calendrier cesse alors de
+        // bloquer les dimanches occupés. La policy RLS ne renvoie que les expos signées.
+        '/rest/v1/artistes_murs?select=date_install,date_decrochage,date_vernissage' +
         `&date_install=lte.${limitISO}&date_decrochage=gte.${todayISO}` +
         '&date_install=not.is.null&date_decrochage=not.is.null'
       const resExpos = await fetch(urlExpos, {
@@ -264,14 +275,14 @@ export const getCalendrierMois = cache(
         const rows: {
           date_install: string
           date_decrochage: string
-          signature_acceptee: boolean
+          date_vernissage: string | null
         }[] = await resExpos.json()
         for (const r of rows) {
           exposEnCours.push({
             start: r.date_install,
             end: r.date_decrochage,
-            signature: !!r.signature_acceptee,
           })
+          if (r.date_vernissage) vernissageSundays.add(r.date_vernissage)
         }
       }
     } catch (e) {
@@ -387,23 +398,33 @@ export const getCalendrierMois = cache(
           if (concert.type === 'vernissage' || concert.type === 'accrochage' || concert.type === 'decrochage') {
             statut = concert.statut === 'confirme' ? 'bookee_expo' : 'reservee_expo'
             vernissageRole = concert.type === 'vernissage' ? 'vernissage' : 'accrochage'
+          } else if (concert.type === 'auteur' || concert.type === 'litteraire') {
+            // Rencontre d'auteur·rice (5 à 7 dominical, « Sur nos pages ») → rond bleu.
+            // N'existe que si une ligne concerts porte type_show='auteur' : zéro
+            // impact tant qu'aucune rencontre n'est saisie. Réf. categorie-jour.js.
+            statut = concert.statut === 'confirme' ? 'bookee_pages' : 'reservee_pages'
           } else {
             statut = concert.statut === 'confirme' ? 'bookee' : 'reservee'
           }
         } else if (iso < todayISO) {
           statut = 'passee'
-        } else if (expoCe) {
-          // Dimanche pendant une expo en cours → bloqué (rond vert).
-          // Les murs sont occupés, peu importe l'état de signature du contrat
-          // (la signature concerne le contrat artistique, pas l'occupation
-          // physique : si l'expo est accrochée, le mur est pris).
-          statut = 'bookee_expo'
-        } else if (dow === 0 && iso >= preavisISO) {
-          // Dimanche libre : on garde l'apparence jaune dans tous les cas
-          // mais seul·e·s les dim "ancres" (rotation 4 sem) sont cliquables.
-          // Les autres dim libres = visibles mais non interactifs (l'expo
-          // qui s'accroche à l'ancre précédente les couvre déjà).
-          statut = dimAncres.has(iso) ? 'libre_expo' : 'libre_expo_attente'
+        } else if (dow === 0) {
+          // DIMANCHE — logique dédiée. Un dim n'est jamais un soir de scène.
+          // Trois issues cliquables + deux bloquées :
+          //   • vernissage ce dim → 5à7 public déjà pris → BRUN plein (bloqué)
+          //   • trop proche (< préavis 7j) → fermé
+          //   • ancre rotation 4 sem ET murs libres → BRUN pointillé (Sur nos murs)
+          //   • tout autre dim (même si une expo occupe les murs, la SOIRÉE est
+          //     libre) → BLEU pointillé cliquable (Sur nos pages, écrivains).
+          if (vernissageSundays.has(iso)) {
+            statut = 'bookee_expo'
+          } else if (iso < preavisISO) {
+            statut = 'ferme'
+          } else if (dimAncres.has(iso) && !expoCe) {
+            statut = 'libre_expo'
+          } else {
+            statut = 'libre_pages'
+          }
         } else if (
           dow === 1 &&
           iso >= IMPRO_DEBUT &&

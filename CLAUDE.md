@@ -1,5 +1,9 @@
 # Payload CMS - Notes Projet (La Brassée)
 
+## ⏰ Fuseau horaire — INVIOLABLE (gravée 2026-05-23, primordiale sur toute autre règle de ce repo)
+
+Cédric et La Brassée sont à Montréal (America/Toronto, EDT/EST). Tu raisonnes en heure Montréal 100 % du temps. JAMAIS d'UTC, JAMAIS d'autre fuseau. Le SessionStart hook injecte un bloc `⏰ HORODATAGE MONTRÉAL` en tête de session — relire avant toute mention temporelle. SQL Supabase : `(NOW() AT TIME ZONE 'America/Toronto')::date`, JAMAIS `CURRENT_DATE`. Référence : `~/.claude/CLAUDE.md` § Fuseau horaire + `_claude/directives_agents_communes.md` § RÈGLE 0.
+
 ## Stack
 - Next.js App Router (`next@15`)
 - Payload CMS (`payload@3.40.0`)

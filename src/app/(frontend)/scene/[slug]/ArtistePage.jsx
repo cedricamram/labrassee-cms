@@ -742,7 +742,7 @@ const ArtistePage = ({ fiche }) => {
 
             {videosUrls.length > 0 && !benefice && (
               <section>
-                <SectionTitle>L&apos;artiste en live</SectionTitle>
+                <SectionTitle>L&apos;artiste sur scène</SectionTitle>
                 <VideoGrid $single={videosUrls.length === 1}>
                   {videosUrls.map((url, i) => (
                     <VideoFrame

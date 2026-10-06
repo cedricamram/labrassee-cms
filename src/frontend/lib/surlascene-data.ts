@@ -14,10 +14,10 @@ import { cache } from 'react'
 
 import type { FrontendEvent } from './payload-data'
 
-const SUPABASE_URL = 'https://xjlpttrziisldlclhsth.supabase.co'
+export const SUPABASE_URL = 'https://xjlpttrziisldlclhsth.supabase.co'
 // Anon key publique — déjà exposée sur le HTML statique surlascene-publique.vercel.app
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqbHB0dHJ6aWlzbGRsY2xoc3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjkyODMsImV4cCI6MjA5MjA0NTI4M30.JpkTnJF1ZP08ybzFdM8fFUJOTiKYx8ltTe2nxiDPk24'
+export const SUPABASE_ANON_KEY =
+  'sb_publishable_qG5XGinXYpNpGbmUyjej-Q_-eADJKcW'
 export const SURLASCENE_BUCKET_URL =
   SUPABASE_URL + '/storage/v1/object/public/artistes-scene-epk/'
 export const SURLASCENE_PUBLIC_URL = 'https://labrassee-surlascene-publique.vercel.app'
@@ -25,7 +25,6 @@ export const SURLASCENE_DEPOT_URL = 'https://labrassee-surlascene-depot.vercel.a
 
 export type SurlasceneArtiste = {
   id: string
-  token_depot?: string | null
   nom_artiste: string
   genre: string | null
   bio: string | null
@@ -134,7 +133,7 @@ const concertToEvent = (row: RawConcertRow): FrontendEvent => {
     // Extensions Surlascène (lues optionnellement par EventCard)
     surlasceneShowId: row.id,
     surlasceneSource: 'surlascene',
-    surlasceneToken: artiste?.token_depot || null,
+    surlasceneArtisteId: artiste?.id || null,
     surlasceneArtiste: artiste,
     surlasceneType: row.type_show,
     surlascenePosterPhoto: photoFull, // rétro-compat (peut être null si pas de photo)
@@ -159,11 +158,11 @@ export const getUpcomingSurlasceneEvents = cache(
   async (limit = 30): Promise<FrontendEvent[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      '*,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
-      `&statut=in.(planifie,confirme)&order=date_show.asc&limit=${limit}`
+      `&statut=eq.confirme&order=date_show.asc&limit=${limit}`
     const rows = await supaFetch<RawConcertRow[]>(path)
     if (!rows) return []
     return rows.map(concertToEvent)
@@ -179,12 +178,12 @@ export const getRecentSurlasceneEvents = cache(
   async (limit = 1): Promise<FrontendEvent[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      '*,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
     )
     // Fetch desc puis on reverse pour avoir l'ordre chronologique côté retour
     const path =
       `/rest/v1/concerts?select=${select}&date_show=lt.${today}` +
-      `&statut=in.(planifie,confirme)&order=date_show.desc&limit=${limit}`
+      `&statut=eq.confirme&order=date_show.desc&limit=${limit}`
     const rows = await supaFetch<RawConcertRow[]>(path)
     if (!rows) return []
     return rows.map(concertToEvent).reverse()
@@ -216,6 +215,7 @@ export type SurlasceneShowDetail = {
 }
 
 type RawConcertDetailRow = {
+  cover_safe_url?: string | null
   id: string
   date_show: string
   heure_debut: string | null
@@ -234,11 +234,12 @@ export const getUpcomingShowDetails = cache(
   async (limit = 40): Promise<SurlasceneShowDetail[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      '*,concerts_artistes(ordre,artistes_scene(id,token_depot,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
-      `&statut=in.(planifie,confirme)&order=date_show.asc&limit=${limit}`
+      // Les soirées annulées restent affichées, marquées « Annulé » (Cédric 30/09 : « annulé partout mais ne supprime pas »).
+      `&statut=in.(confirme,annule)&order=date_show.asc&limit=${limit}`
     const rows = await supaFetch<RawConcertDetailRow[]>(path)
     if (!rows) return []
     return rows.map((r) => {
@@ -254,7 +255,11 @@ export const getUpcomingShowDetails = cache(
         description_publique: r.description_publique,
         statut: r.statut,
         artiste: arts[0]?.artistes_scene || null,
-        coverImage: r.cover_image_url || null,
+        // Annulé : l'affiche avec le bandeau ANNULÉ (cover_safe_url) prime sur l'originale.
+        coverImage:
+          (r.statut === 'annule' && r.cover_safe_url && r.cover_safe_url.includes('ANNULE')
+            ? r.cover_safe_url
+            : r.cover_image_url) || null,
         facebookLink: r.fb_event_url || null,
       }
     })
@@ -277,7 +282,7 @@ export type SurlasceneDossierTechnique = {
 
 export const getDossierTechnique = cache(
   async (): Promise<SurlasceneDossierTechnique | null> => {
-    const path = '/rest/v1/dossier_technique?select=*&order=cree_le.desc&limit=1'
+    const path = '/rest/v1/dossier_technique?select=id,version,en_brouillon,contenu,pdf_path,notes_publiques,cree_le,maj_le&order=cree_le.desc&limit=1'
     const rows = await supaFetch<SurlasceneDossierTechnique[]>(path)
     return rows && rows[0] ? rows[0] : null
   },

@@ -1,7 +1,7 @@
 /**
  * Surlascène — fiche publique d'un artiste (page /scene/[slug]).
  *
- * Fetche l'artiste par son token_depot (= slug URL), ainsi que ses concerts
+ * Fetche l'artiste par son id (= slug URL — PAS le token_depot, qui est la clé du dépôt), ainsi que ses concerts
  * à venir et ses trois derniers concerts passés à La Brassée.
  */
 
@@ -11,14 +11,13 @@ import { SURLASCENE_BUCKET_URL } from './surlascene-data'
 
 const SUPABASE_URL = 'https://xjlpttrziisldlclhsth.supabase.co'
 const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqbHB0dHJ6aWlzbGRsY2xoc3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjkyODMsImV4cCI6MjA5MjA0NTI4M30.JpkTnJF1ZP08ybzFdM8fFUJOTiKYx8ltTe2nxiDPk24'
+  'sb_publishable_qG5XGinXYpNpGbmUyjej-Q_-eADJKcW'
 
 /** Statuts d'artiste visibles publiquement. */
 const STATUTS_PUBLICS = ['programme', 'confirme', 'depot_complet', 'candidature_complete']
 
 export type ArtistePublic = {
   id: string
-  token_depot: string
   nom_artiste: string
   bio: string | null
   genre: string | null
@@ -125,19 +124,25 @@ function matchNomArtiste(titreShow: string | null, nomArtiste: string): boolean 
 }
 
 /**
- * Fetche la fiche publique d'un artiste Surlascène par son token_depot.
+ * Fetche la fiche publique d'un artiste Surlascène par son id.
+ * 2026-09-28 : l'URL publique portait le token_depot, qui est la clé d'édition du
+ * dossier de dépôt — tout lien partagé donnait la clé. L'id n'ouvre rien.
  * Retourne null si l'artiste n'existe pas ou n'est pas dans un statut public.
  */
-export const getArtisteParToken = cache(
-  async (token: string): Promise<FicheArtiste | null> => {
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+export const getArtisteParId = cache(
+  async (id: string): Promise<FicheArtiste | null> => {
+    // Un ancien lien /scene/<token> n'est pas un uuid : 404 franc, sans requête.
+    if (!UUID_RE.test(id)) return null
     // 1. Chercher l'artiste
     const statutsFilter = STATUTS_PUBLICS.map((s) => `"${s}"`).join(',')
     const selectArtiste = encodeURIComponent(
-      'id,token_depot,nom_artiste,bio,genre,nb_personnes_scene,duree_set_minutes,photo_artiste_path,photos_hd_paths,videos_paths,titre_set,categorie,instagram,site_web,spotify_url,bandcamp_url,youtube_url,tiktok,statut',
+      'id,nom_artiste,bio,genre,nb_personnes_scene,duree_set_minutes,photo_artiste_path,photos_hd_paths,videos_paths,titre_set,categorie,instagram,site_web,spotify_url,bandcamp_url,youtube_url,tiktok,statut',
     )
     const pathArtiste =
       `/rest/v1/artistes_scene?select=${selectArtiste}` +
-      `&token_depot=eq.${encodeURIComponent(token)}` +
+      `&id=eq.${encodeURIComponent(id)}` +
       `&statut=in.(${encodeURIComponent(statutsFilter)})` +
       `&limit=1`
 
@@ -154,7 +159,7 @@ export const getArtisteParToken = cache(
     const pathAvenir =
       `/rest/v1/concerts?select=${selectConcert}` +
       `&date_show=gte.${today}` +
-      `&statut=in.("confirme","planifie")` +
+      `&statut=eq.confirme` +
       `&order=date_show.asc&limit=20`
 
     const concertsAvenir = await supaFetch<ConcertPublic[]>(pathAvenir)
@@ -166,7 +171,7 @@ export const getArtisteParToken = cache(
     const pathPasses =
       `/rest/v1/concerts?select=${selectConcert}` +
       `&date_show=lt.${today}` +
-      `&statut=in.("confirme","planifie")` +
+      `&statut=eq.confirme` +
       `&order=date_show.desc&limit=30`
 
     const concertsPasses = await supaFetch<ConcertPublic[]>(pathPasses)
@@ -193,3 +198,26 @@ export const getArtisteParToken = cache(
     return { artiste, prochaines, passees, photoUrl, galerieUrls, videosUrls, benefice }
   },
 )
+
+/**
+ * Ids des artistes publics qui ont au moins un concert confirmé à venir — pour le
+ * plan du site (2026-09-29). Même règle d'appariement que la fiche : le nom de
+ * l'artiste doit figurer dans le titre du concert.
+ */
+export async function getIdsArtistesAvecConcertAVenir(): Promise<string[]> {
+  const statutsFilter = STATUTS_PUBLICS.map((s) => `"${s}"`).join(',')
+  const [artistes, concerts] = await Promise.all([
+    supaFetch<Array<{ id: string; nom_artiste: string }>>(
+      `/rest/v1/artistes_scene?select=id,nom_artiste&statut=in.(${encodeURIComponent(statutsFilter)})&limit=500`,
+      3600,
+    ),
+    supaFetch<Array<{ titre_show: string | null }>>(
+      `/rest/v1/concerts?select=titre_show&date_show=gte.${todayMontrealISO()}&statut=eq.confirme&limit=200`,
+      3600,
+    ),
+  ])
+  if (!artistes || !concerts) return []
+  return artistes
+    .filter((a) => a.nom_artiste && concerts.some((c) => matchNomArtiste(c.titre_show, a.nom_artiste)))
+    .map((a) => a.id)
+}

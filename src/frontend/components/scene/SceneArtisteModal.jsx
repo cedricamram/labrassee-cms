@@ -248,12 +248,12 @@ function genererIcs(show, artiste) {
     '00Z'
   const start = new Date(show.date_show + 'T' + (show.heure_debut || '19:30'))
   const end = new Date(show.date_show + 'T' + (show.heure_fin || '21:30'))
-  const titre = artiste?.nom_artiste || show.titre_show || 'Show La Brassée'
+  const titre = artiste?.nom_artiste || show.titre_show || 'Spectacle La Brassée'
   const desc =
     (artiste?.bio ? artiste.bio + '\\n\\n' : '') +
     'Soundcheck dès ' +
     (show.heure_soundcheck ? show.heure_soundcheck.slice(0, 5) : '18:30') +
-    '. Show à ' +
+    '. Spectacle à ' +
     (show.heure_debut ? show.heure_debut.slice(0, 5) : '19:30') +
     '.\\n' +
     "Entrée libre · participation volontaire (chapeau + 10 % sur factures, 100 % aux artistes).\\n\\n" +
@@ -323,8 +323,8 @@ export default function SceneArtisteModal({ show, onClose }) {
   const galerie = (a.photos_hd_paths || []).slice(1, 13)
 
   // Lien vers la fiche complète de l'artiste (bio, galerie, liens streaming).
-  // Disponible seulement si l'artiste a un token de dépôt public.
-  const artisteUrl = a.token_depot ? `/scene/${a.token_depot}` : null
+  // Adressée par l'id : le token_depot est la clé du dépôt, jamais une URL.
+  const artisteUrl = a.id ? `/scene/${a.id}` : null
 
   return (
     <Backdrop onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -345,7 +345,7 @@ export default function SceneArtisteModal({ show, onClose }) {
           <NomArtiste>{show.titre_show || a.nom_artiste}</NomArtiste>
 
           <ShowInfo>
-            📅 <strong>{formatDateLong(show.date_show)}</strong> · show{' '}
+            📅 <strong>{formatDateLong(show.date_show)}</strong> · spectacle{' '}
             {show.heure_debut ? show.heure_debut.slice(0, 5) : '19:30'}
             {show.heure_fin && ` → ${show.heure_fin.slice(0, 5)}`} · soundcheck{' '}
             {show.heure_soundcheck ? show.heure_soundcheck.slice(0, 5) : '1 h avant'}

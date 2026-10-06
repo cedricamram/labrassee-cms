@@ -245,33 +245,52 @@ const Case = styled.div`
     opacity: 0.85;
   }
 
-  /* Statut LIBRE → cliquable, brand (concert / scène) */
+  /* Statut LIBRE → carré JAUNE pointillé cliquable (Sur la scène) */
   &.libre {
-    background: rgba(247, 209, 53, 0.12);
-    border: 1px solid rgba(247, 209, 53, 0.45);
-    color: var(--color-brand);
+    background: rgba(247, 209, 53, 0.06);
+    border: 1px dashed rgba(247, 209, 53, 0.55);
+    color: rgba(247, 209, 53, 0.90);
     cursor: pointer;
 
     &:hover {
-      background: rgba(247, 209, 53, 0.25);
+      background: rgba(247, 209, 53, 0.16);
       transform: translateY(-2px);
-      border-color: var(--color-brand);
+      border-color: rgba(247, 209, 53, 0.90);
+      box-shadow: 0 6px 18px rgba(247, 209, 53, 0.15);
     }
   }
 
-  /* Statut LIBRE_EXPO → rond jaune cliquable (dim d'accrochage rotation 4 sem) */
+  /* Statut LIBRE_EXPO → rond BRUN pointillé cliquable (Sur nos murs, ancre 4 sem) */
   &.libre_expo {
-    background: rgba(247, 209, 53, 0.12);
-    border: 1px solid rgba(247, 209, 53, 0.45);
-    color: var(--color-brand);
+    background: rgba(201, 138, 79, 0.08);
+    border: 1px dashed rgba(201, 138, 79, 0.55);
+    color: rgba(224, 178, 128, 0.92);
     border-radius: 50%;
     cursor: pointer;
 
     &:hover {
-      background: rgba(247, 209, 53, 0.28);
+      background: rgba(201, 138, 79, 0.18);
       transform: translateY(-2px);
-      border-color: var(--color-brand);
-      box-shadow: 0 6px 18px rgba(247, 209, 53, 0.2);
+      border-color: rgba(201, 138, 79, 0.90);
+      box-shadow: 0 6px 18px rgba(201, 138, 79, 0.15);
+    }
+  }
+
+  /* Statut LIBRE_PAGES → rond BLEU pointillé cliquable (Sur nos pages, écrivains).
+     Tout dim sans vernissage, même si une expo occupe les murs (la soirée 5à7
+     reste libre). */
+  &.libre_pages {
+    background: rgba(95, 143, 214, 0.08);
+    border: 1px dashed rgba(95, 143, 214, 0.55);
+    color: rgba(174, 198, 235, 0.92);
+    border-radius: 50%;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(95, 143, 214, 0.18);
+      transform: translateY(-2px);
+      border-color: rgba(95, 143, 214, 0.90);
+      box-shadow: 0 6px 18px rgba(95, 143, 214, 0.15);
     }
   }
 
@@ -280,58 +299,74 @@ const Case = styled.div`
      en cours » : visible pour cohérence mais l'artiste ne peut pas
      candidater dessus. */
   &.libre_expo_attente {
-    background: rgba(247, 209, 53, 0.05);
-    border: 1px dashed rgba(247, 209, 53, 0.28);
-    color: rgba(247, 209, 53, 0.45);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px dashed rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.30);
     border-radius: 50%;
     cursor: default;
   }
 
-  /* Statut IMPRO → DEPRECATED, conservé pour compat (plus émis par dates-libres) */
+  /* Statut IMPRO → DEPRECATED (plus émis). Aligné jaune concert (zéro vert). */
   &.impro {
-    background: rgba(86, 180, 110, 0.18);
-    border: 1px solid rgba(86, 180, 110, 0.55);
-    color: rgba(180, 230, 195, 0.95);
+    background: rgba(247, 209, 53, 0.20);
+    border: 1px solid rgba(247, 209, 53, 0.6);
+    color: rgba(247, 209, 53, 0.95);
   }
 
-  /* Statut RÉSERVÉE (concert scène en attente) → orange CARRÉ */
+  /* Statut RÉSERVÉE (concert scène, option) → jaune creux CARRÉ (le tag dit l'attente) */
   &.reservee {
-    background: rgba(255, 159, 64, 0.18);
-    border: 1px solid rgba(255, 159, 64, 0.55);
-    color: rgba(255, 200, 145, 0.95);
+    background: rgba(247, 209, 53, 0.10);
+    border: 1px dashed rgba(247, 209, 53, 0.5);
+    color: rgba(247, 209, 53, 0.85);
   }
 
-  /* Statut BOOKÉE (concert scène confirmé) → vert CARRÉ */
+  /* Statut BOOKÉE (concert scène confirmé) → jaune plein CARRÉ */
   &.bookee {
-    background: rgba(86, 180, 110, 0.18);
-    border: 1px solid rgba(86, 180, 110, 0.55);
-    color: rgba(180, 230, 195, 0.95);
+    background: rgba(247, 209, 53, 0.20);
+    border: 1px solid rgba(247, 209, 53, 0.6);
+    color: rgba(247, 209, 53, 0.95);
   }
 
   /* Statut BOOKEE_PERM (récurrence éditoriale : impro lundi, etc.) → même
      vert que les concerts bookés, mais SANS tag. Le jour de semaine dit
      déjà tout (lundi = impro pour les habitués). */
   &.bookee_perm {
-    background: rgba(86, 180, 110, 0.18);
-    border: 1px solid rgba(86, 180, 110, 0.55);
-    color: rgba(180, 230, 195, 0.95);
+    background: rgba(247, 209, 53, 0.20);
+    border: 1px solid rgba(247, 209, 53, 0.6);
+    color: rgba(247, 209, 53, 0.95);
   }
 
   /* Statut RÉSERVÉE_EXPO (vernissage/accrochage en attente) → orange ROND
      même couleur que les concerts en attente mais forme ronde = expo. */
   &.reservee_expo {
-    background: rgba(255, 159, 64, 0.18);
-    border: 1px solid rgba(255, 159, 64, 0.55);
-    color: rgba(255, 200, 145, 0.95);
+    background: rgba(201, 138, 79, 0.12);
+    border: 1px dashed rgba(201, 138, 79, 0.5);
+    color: rgba(224, 178, 128, 0.9);
     border-radius: 50%;
   }
 
   /* Statut BOOKÉE_EXPO (vernissage/accrochage confirmé) → vert ROND
      même couleur que les concerts bookés mais forme ronde = expo. */
   &.bookee_expo {
-    background: rgba(86, 180, 110, 0.18);
-    border: 1px solid rgba(86, 180, 110, 0.55);
-    color: rgba(180, 230, 195, 0.95);
+    background: rgba(201, 138, 79, 0.22);
+    border: 1px solid rgba(201, 138, 79, 0.6);
+    color: rgba(224, 178, 128, 0.95);
+    border-radius: 50%;
+  }
+
+  /* Statut RÉSERVÉE_PAGES (rencontre d'auteur·rice, option) → bleu creux ROND */
+  &.reservee_pages {
+    background: rgba(95, 143, 214, 0.12);
+    border: 1px dashed rgba(95, 143, 214, 0.5);
+    color: rgba(174, 198, 235, 0.9);
+    border-radius: 50%;
+  }
+
+  /* Statut BOOKÉE_PAGES (rencontre d'auteur·rice confirmée) → bleu plein ROND */
+  &.bookee_pages {
+    background: rgba(95, 143, 214, 0.22);
+    border: 1px solid rgba(95, 143, 214, 0.6);
+    color: rgba(174, 198, 235, 0.97);
     border-radius: 50%;
   }
 
@@ -364,9 +399,10 @@ const JOURS_HEAD = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM']
 
 const DEPOT_SCENE_URL = 'https://labrassee-surlascene-depot.vercel.app/?candidature=scene'
 const DEPOT_MURS_URL = 'https://labrassee-murs-depot.vercel.app/?candidature=murs'
+const DEPOT_PAGES_URL = 'https://labrassee-pages-depot.vercel.app/?candidature=pages'
 
 function urlDepot(type, iso) {
-  const base = type === 'murs' ? DEPOT_MURS_URL : DEPOT_SCENE_URL
+  const base = type === 'murs' ? DEPOT_MURS_URL : type === 'pages' ? DEPOT_PAGES_URL : DEPOT_SCENE_URL
   return iso ? `${base}&date=${encodeURIComponent(iso)}` : base
 }
 
@@ -374,6 +410,7 @@ function tagPour(statut, vernissageRole) {
   switch (statut) {
     case 'libre': return null
     case 'libre_expo': return 'expo ?'
+    case 'libre_pages': return 'auteur ?'
     case 'libre_expo_attente': return null
     case 'impro': return null // deprecated, plus émis
     case 'reservee': return 'résa'
@@ -383,6 +420,9 @@ function tagPour(statut, vernissageRole) {
       return vernissageRole === 'accrochage' ? 'acc.' : 'vern.'
     case 'bookee_expo':
       return vernissageRole === 'accrochage' ? 'acc.' : 'vern.'
+    case 'reservee_pages':
+    case 'bookee_pages':
+      return '5à7'
     case 'ferme': return null
     case 'passee': return null
     default: return null
@@ -406,7 +446,7 @@ function LigneDirectricePourMois({ moisHum }) {
     },
     {
       jour: 'MAR',
-      genre: eteRestrictif ? '—' : 'Jam · open mic',
+      genre: eteRestrictif ? '—' : 'Jam',
       repos: eteRestrictif,
     },
     {
@@ -416,16 +456,16 @@ function LigneDirectricePourMois({ moisHum }) {
     },
     {
       jour: 'JEU',
-      genre: eteRestrictif ? '—' : 'Jazz · jazz manouche',
+      genre: eteRestrictif ? '—' : 'Duo · trio · chansonnier',
       repos: eteRestrictif,
     },
     {
       jour: 'VEN',
-      genre: 'Jazz · karaoké · poésie',
+      genre: 'Jazz · groupes · musique du monde',
     },
     {
       jour: 'SAM',
-      genre: 'Musique du monde',
+      genre: 'Jazz · groupes · musique du monde',
     },
     {
       jour: 'DIM',
@@ -461,38 +501,44 @@ export default function ProposerCalendrier({ mois = [] }) {
           Soirs <span className="accent">libres</span> sur notre scène
         </Titre>
         <Intro>
-          Vue calendrier des 3 prochains mois. Clique sur une case <strong style={{ color: 'var(--color-brand)' }}>jaune</strong> pour
-          nous proposer ta candidature à cette date — le mail s'ouvre pré-rempli.
+          <strong style={{ color: 'var(--color-white)' }}>Chaque soir a sa couleur.</strong> L'impro le lundi, la jam le mardi,
+          les petites formules — duo, trio, chansonnier — le jeudi, les groupes et les musiques du monde
+          les vendredis et samedis. Rien d'hermétique : on regarde toutes les propositions.
+          Mais <strong style={{ color: '#f7d135' }}>choisir le soir qui va à ta formule augmente nettement tes chances</strong> —
+          et le public, lui, sait déjà ce qu'il vient chercher.
+        </Intro>
+        <Intro>
+          Vue calendrier des 3 prochains mois. Une case <strong style={{ color: 'var(--color-white)' }}>en pointillé</strong> est libre : clique dessus
+          pour proposer ta candidature à cette date. La <strong style={{ color: 'var(--color-white)' }}>couleur dit la scène</strong> —
+          <span style={{ color: '#f7d135' }}> jaune</span> pour un spectacle,
+          <span style={{ color: '#e0b280' }}> brun</span> pour une expo,
+          <span style={{ color: '#aec6eb' }}> bleu</span> pour une rencontre d'auteur·rice.
         </Intro>
 
         <Legende>
           <span className="puce">
-            <span className="swatch" style={{ background: 'rgba(247, 209, 53, 0.5)', border: '1px solid var(--color-brand)' }} />
-            Soir libre — propose un show
+            <span className="swatch" style={{ background: 'rgba(247, 209, 53, 0.08)', border: '1px dashed rgba(247, 209, 53, 0.6)' }} />
+            Soir libre — propose un spectacle
           </span>
           <span className="puce">
-            <span className="swatch" style={{ background: 'rgba(247, 209, 53, 0.5)', border: '1px solid var(--color-brand)', borderRadius: '50%' }} />
+            <span className="swatch" style={{ background: 'rgba(201, 138, 79, 0.10)', border: '1px dashed rgba(201, 138, 79, 0.6)', borderRadius: '50%' }} />
             Dim libre — propose une expo
           </span>
           <span className="puce">
-            <span className="swatch" style={{ background: 'rgba(247, 209, 53, 0.08)', border: '1px dashed rgba(247, 209, 53, 0.4)', borderRadius: '50%' }} />
-            Dim couvert (rotation 4 sem)
+            <span className="swatch" style={{ background: 'rgba(95, 143, 214, 0.10)', border: '1px dashed rgba(95, 143, 214, 0.6)', borderRadius: '50%' }} />
+            Dim libre — propose un 5 à 7
           </span>
           <span className="puce">
-            <span className="swatch" style={{ background: 'rgba(255, 159, 64, 0.4)', border: '1px solid rgba(255, 159, 64, 0.8)' }} />
-            Concert en attente
+            <span className="swatch" style={{ background: 'rgba(247, 209, 53, 0.2)', border: '1px solid rgba(247, 209, 53, 0.7)' }} />
+            Concert
           </span>
           <span className="puce">
-            <span className="swatch" style={{ background: 'rgba(86, 180, 110, 0.4)', border: '1px solid rgba(86, 180, 110, 0.8)' }} />
-            Concert bookée
+            <span className="swatch" style={{ background: 'rgba(201, 138, 79, 0.24)', border: '1px solid rgba(201, 138, 79, 0.7)', borderRadius: '50%' }} />
+            Vernissage
           </span>
           <span className="puce">
-            <span className="swatch" style={{ background: 'rgba(255, 159, 64, 0.4)', border: '1px solid rgba(255, 159, 64, 0.8)', borderRadius: '50%' }} />
-            Expo en attente
-          </span>
-          <span className="puce">
-            <span className="swatch" style={{ background: 'rgba(86, 180, 110, 0.4)', border: '1px solid rgba(86, 180, 110, 0.8)', borderRadius: '50%' }} />
-            Expo bookée
+            <span className="swatch" style={{ background: 'rgba(95, 143, 214, 0.24)', border: '1px solid rgba(95, 143, 214, 0.7)', borderRadius: '50%' }} />
+            Rencontre d'auteur·rice
           </span>
           <span className="puce">
             <span className="swatch" style={{ background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.18)' }} />
@@ -532,6 +578,7 @@ export default function ProposerCalendrier({ mois = [] }) {
                   const tag = tagPour(j.statut, j.vernissageRole)
                   const isClickableScene = j.statut === 'libre'
                   const isClickableExpo = j.statut === 'libre_expo'
+                  const isClickablePages = j.statut === 'libre_pages'
                   // Tooltips génériques uniquement — on ne révèle pas le nom des shows
                   const titleHover =
                     j.statut === 'bookee'
@@ -552,11 +599,13 @@ export default function ProposerCalendrier({ mois = [] }) {
                               ? 'Lundi : soirée Impro (récurrence éditoriale)'
                               : j.statut === 'libre_expo'
                                 ? 'Dimanche libre — clique pour proposer une expo Sur nos murs'
-                                : j.statut === 'libre_expo_attente'
-                                  ? 'Dim couvert par la rotation en cours (4 sem) — prochain accrochage indiqué en jaune cliquable'
+                                : j.statut === 'libre_pages'
+                                  ? 'Dimanche libre — clique pour proposer une rencontre d’auteur·rice (5 à 7)'
+                                  : j.statut === 'libre_expo_attente'
+                                  ? 'Dim couvert par la rotation en cours (4 sem)'
                                   : j.statut === 'ferme'
                                   ? (j.dow === 3 ? 'Mercredi : repos' :
-                                     j.dow === 0 ? 'Dimanche : réservé aux vernissages' :
+                                     j.dow === 0 ? 'Dimanche trop proche — préavis minimum 7 jours' :
                                      (j.iso && j.iso.slice(5, 7) >= '07' && j.iso.slice(5, 7) <= '08' ? 'Juillet–août : on garde la scène pour ven + sam' :
                                       'Trop proche — préavis minimum 7 jours'))
                                   : ''
@@ -564,7 +613,9 @@ export default function ProposerCalendrier({ mois = [] }) {
                     ? () => { window.open(urlDepot('scene', j.iso), '_blank', 'noopener,noreferrer') }
                     : isClickableExpo
                       ? () => { window.open(urlDepot('murs', j.iso), '_blank', 'noopener,noreferrer') }
-                      : undefined
+                      : isClickablePages
+                        ? () => { window.open(urlDepot('pages', j.iso), '_blank', 'noopener,noreferrer') }
+                        : undefined
                   return (
                     <Case
                       key={j.iso}

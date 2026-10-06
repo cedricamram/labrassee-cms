@@ -16,7 +16,7 @@ import { cache } from 'react'
 
 const SUPABASE_URL = 'https://xjlpttrziisldlclhsth.supabase.co'
 const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqbHB0dHJ6aWlzbGRsY2xoc3RoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NjkyODMsImV4cCI6MjA5MjA0NTI4M30.JpkTnJF1ZP08ybzFdM8fFUJOTiKYx8ltTe2nxiDPk24'
+  'sb_publishable_qG5XGinXYpNpGbmUyjej-Q_-eADJKcW'
 
 const BUCKET_URL = SUPABASE_URL + '/storage/v1/object/public/artistes-murs-photos/'
 
@@ -94,6 +94,12 @@ function todayMontrealISO(): string {
  * S'il y a chevauchement (rare, en transition), on prend celui avec la
  * date_install la plus récente.
  */
+// ⚠️ NE PAS remettre de filtre/select sur `signature_acceptee` : cette colonne n'est
+// PAS dans le GRANT par colonnes accordé à `anon` (durcissement Loi 25), et Postgres
+// exige le privilège SELECT même pour un simple filtre → « permission denied for table
+// artistes_murs », donc page vide en silence. La policy RLS `p_artistes_murs_select_public`
+// impose DÉJÀ `signature_acceptee = true AND date_install IS NOT NULL` côté serveur :
+// toute ligne renvoyée est signée, le filtre applicatif était redondant.
 export const getExpoActuelle = cache(async (): Promise<ArtisteMurs | null> => {
   const today = todayMontrealISO()
   const select = encodeURIComponent(
@@ -105,7 +111,7 @@ export const getExpoActuelle = cache(async (): Promise<ArtisteMurs | null> => {
   const path =
     `/rest/v1/artistes_murs?select=${select}` +
     `&date_install=lte.${today}&date_decrochage=gte.${today}` +
-    '&signature_acceptee=eq.true&order=date_install.desc&limit=1'
+    '&order=date_install.desc&limit=1'
   const rows = await supaFetch<ArtisteMurs[]>(path)
   return rows && rows[0] ? rows[0] : null
 })
@@ -150,7 +156,7 @@ export const getProchaineExpo = cache(async (): Promise<ArtisteMurs | null> => {
   const path =
     `/rest/v1/artistes_murs?select=${select}` +
     `&date_install=gt.${today}` +
-    '&signature_acceptee=eq.true&order=date_install.asc&limit=1'
+    '&order=date_install.asc&limit=1'
   const rows = await supaFetch<ArtisteMurs[]>(path)
   return rows && rows[0] ? rows[0] : null
 })

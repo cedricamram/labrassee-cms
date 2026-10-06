@@ -7,9 +7,27 @@ import StyledComponentsRegistry from '@/frontend/components/layout/StyledCompone
 import { getBusinessInfoData } from '@/frontend/lib/payload-data'
 import '@/frontend/styles/app.css'
 
+const DESCRIPTION =
+  "Café de quartier au 2522 Beaubien Est, dans Rosemont–La Petite-Patrie. 100 % de nos pâtisseries sont faites maison. Café en grains, thés en vrac et laits à emporter. Buanderie sur place. Concerts et expositions toute l'année."
+const TITRE = 'La Brassée — Café, buanderie et scène · Rosemont–La Petite-Patrie'
+
+// 2026-09-29 : sans Open Graph, un lien partagé sur Facebook, Instagram ou Messenger
+// s'affichait sans image. L'aperçu par défaut est la façade (enseigne visible) ;
+// /scene/[slug] garde son propre aperçu.
 export const metadata: Metadata = {
-  description: 'Site web de La Brassée, café de quartier à Rosepatrie.',
-  title: 'La Brassée - Café de Quartier',
+  metadataBase: new URL('https://www.labrassee.cafe'),
+  description: DESCRIPTION,
+  title: TITRE,
+  alternates: { canonical: './' },
+  openGraph: {
+    type: 'website',
+    locale: 'fr_CA',
+    siteName: 'La Brassée',
+    title: TITRE,
+    description: DESCRIPTION,
+    images: [{ url: '/images/og/facade-og.jpg', width: 1200, height: 630, alt: 'La façade de La Brassée, rue Beaubien Est' }],
+  },
+  twitter: { card: 'summary_large_image', title: TITRE, description: DESCRIPTION, images: ['/images/og/facade-og.jpg'] },
 }
 
 export default async function FrontendLayout(props: { children: React.ReactNode }) {
@@ -17,9 +35,8 @@ export default async function FrontendLayout(props: { children: React.ReactNode 
   const businessInfo = await getBusinessInfoData()
 
   return (
-    <html lang="fr" className="app-loading">
+    <html lang="fr-CA" className="app-loading">
       <head>
-        <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" type="image/png" sizes="32x32" href="/images/brand/icon-cafe-32.png?v=3" />
         <link rel="icon" type="image/png" sizes="512x512" href="/images/brand/icon-cafe-512.png?v=3" />
