@@ -26,11 +26,12 @@ const HeroSection = styled.section`
 // de la scène avec artistes »). Photos de la banque d'Apollon, 2026, sans public
 // reconnaissable. Pour en ajouter une : la déposer dans /images/landing et
 // l'inscrire ici avec le point à garder dans le cadre.
+// Cadrages testés à 375 px (05/10/2026) : les visages des artistes passent
+// AU-DESSUS du titre « Entre voisins », jamais dessous.
 const PHOTOS_SCENE = [
-  { src: '/images/landing/scene-1.jpg', position: '50% 42%' },
-  { src: '/images/landing/scene-2.jpg', position: '50% 48%' },
-  { src: '/images/landing/scene-5.jpg', position: '50% 40%' },
-  { src: '/images/landing/scene-6.jpg', position: '50% 46%' },
+  { src: '/images/landing/scene-1.jpg', position: '50% 62%' },
+  { src: '/images/landing/scene-2.jpg', position: '50% 70%' },
+  { src: '/images/landing/scene-5.jpg', position: '50% 55%' },
 ];
 
 const BackgroundImage = styled.img`
