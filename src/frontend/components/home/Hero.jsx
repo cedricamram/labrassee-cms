@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 
@@ -21,14 +21,30 @@ const HeroSection = styled.section`
   }
 `;
 
+// Le fond tire au hasard une photo de la scène avec des artistes à chaque visite
+// (Cédric, 05/10/2026 : « changer aléatoirement le fond d'écran », « des photos
+// de la scène avec artistes »). Photos de la banque d'Apollon, 2026, sans public
+// reconnaissable. Pour en ajouter une : la déposer dans /images/landing et
+// l'inscrire ici avec le point à garder dans le cadre.
+const PHOTOS_SCENE = [
+  { src: '/images/landing/scene-1.jpg', position: '50% 42%' },
+  { src: '/images/landing/scene-2.jpg', position: '50% 48%' },
+  { src: '/images/landing/scene-5.jpg', position: '50% 40%' },
+  { src: '/images/landing/scene-6.jpg', position: '50% 46%' },
+];
+
 const BackgroundImage = styled.img`
   position: absolute;
   width: 100vw;
   height: 100%;
   object-fit: cover;
-  /* Bibliothèque et salon : on garde l'enseigne et les livres dans le cadre. */
-  object-position: 50% 12%;
   z-index: 0;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+
+  &.visible {
+    opacity: 1;
+  }
 `;
 
 const GradientOverlay = styled.div`
@@ -112,6 +128,14 @@ const ScrollArrow = styled(motion.div)`
 `;
 
 const Hero = () => {
+  // Tirage côté navigateur : la page est mise en cache côté serveur, un tirage
+  // là-bas montrerait la même photo à tout le monde pendant 5 minutes.
+  const [photo, setPhoto] = useState(null);
+  const [chargee, setChargee] = useState(false);
+  useEffect(() => {
+    setPhoto(PHOTOS_SCENE[Math.floor(Math.random() * PHOTOS_SCENE.length)]);
+  }, []);
+
   const titleVariants = {
     hidden: { 
       opacity: 0, 
@@ -159,11 +183,16 @@ const Hero = () => {
 
   return (
     <HeroSection>
-      <BackgroundImage 
-        src="/images/landing/interieur-bibliotheque-salon.jpg"
-        alt=""
-        fetchPriority="high"
-      />
+      {photo && (
+        <BackgroundImage
+          src={photo.src}
+          alt=""
+          fetchPriority="high"
+          style={{ objectPosition: photo.position }}
+          className={chargee ? 'visible' : undefined}
+          onLoad={() => setChargee(true)}
+        />
+      )}
       <GradientOverlay />
       
       <HeroContent>
