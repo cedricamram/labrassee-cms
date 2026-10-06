@@ -10,7 +10,7 @@ import { getSceneAgendaShows } from '@/frontend/lib/payload-data'
 export const metadata: Metadata = {
   title: 'Les événements — La Brassée',
   description:
-    "Cinq soirs par semaine, La Brassée ouvre sa scène. Entrée libre, chapeau, et 10 % des factures du soir pour les artistes. Agenda et conditions.",
+    "Concerts, impro, jams et soirées de quartier à La Brassée, plusieurs soirs par semaine. Entrée libre, sans réservation, dès 19 h 30.",
 }
 
 // La BD Surlascène est sync 2h depuis le calendrier Apple → regen 5 min suffit
@@ -25,9 +25,11 @@ export default async function ScenePage() {
 
   return (
     <main style={{ width: '100%', background: 'var(--color-dark)' }}>
+      {/* 05/10/2026 : les soirées d'abord. Un client qui touche « Événements »
+          veut savoir ce qui joue, pas les conditions faites aux artistes. */}
       <SceneHero />
-      <SceneCommentCaMarche />
       <SceneAgenda shows={shows} />
+      <SceneCommentCaMarche />
       <SceneConditions />
     </main>
   )
