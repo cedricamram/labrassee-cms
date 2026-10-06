@@ -534,7 +534,7 @@ export default function MenuFlipbook() {
       </SwiperWrap>
 
       <Pied>
-        Menu mis à jour <strong>printemps 2026</strong> · les prix incluent les taxes.
+        Les prix incluent les taxes.
       </Pied>
 
       {zoom !== null && PAGES[zoom] && (

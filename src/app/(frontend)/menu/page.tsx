@@ -6,7 +6,7 @@ import Menu from '@/frontend/pages/Menu'
 export const metadata: Metadata = {
   title: 'Le menu — La Brassée',
   description:
-    "Ce qu'on sert à La Brassée. Cafés, plats du jour, grilled cheese, scones maison, bières d'ici, vins, cocktails. Printemps 2026.",
+    "Ce qu'on sert à La Brassée. Cafés, plats du jour, grilled cheese, scones maison, bières d'ici, vins, cocktails. Les prix incluent les taxes.",
 }
 
 // Le menu V2 lit `src/frontend/data/menu_v2.json` (statique, build-time) —
