@@ -20,7 +20,8 @@ const Section = styled.section`
   background: var(--color-dark);
 
   @media (max-width: 768px) {
-    padding: calc(var(--header-height) + 16px) 16px 56px;
+    /* L'en-tête fixe fait 56 px sur téléphone (Header.jsx), pas --header-height. */
+    padding: 84px 16px 56px;
   }
 `
 
