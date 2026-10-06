@@ -35,7 +35,7 @@ export default async function FrontendLayout(props: { children: React.ReactNode 
   const businessInfo = await getBusinessInfoData()
 
   return (
-    <html lang="fr-CA" className="app-loading">
+    <html lang="fr-CA">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" type="image/png" sizes="32x32" href="/images/brand/icon-cafe-32.png?v=3" />
@@ -73,7 +73,7 @@ export default async function FrontendLayout(props: { children: React.ReactNode 
           <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css" />
         </noscript>
       </head>
-      <body className="app-loading">
+      <body>
         <StyledComponentsRegistry>
           <FrontendShell businessInfo={businessInfo}>{children}</FrontendShell>
         </StyledComponentsRegistry>
