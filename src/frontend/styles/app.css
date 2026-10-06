@@ -1,3 +1,21 @@
+/* Repli ajusté pour la DIN condensée (2026-10-04).
+   Tant que Typekit n'a pas répondu, le navigateur rend une police système ~33 %
+   plus large que la DIN : la barre d'onglets passe de 340 px à 473 px sur un
+   iPhone de 375 px et se fait couper aux deux bouts. C'est l'état que Cédric a
+   vu le 03/10 (« les onglets sont durs à lire »). Cette police de repli occupe
+   la même largeur que la vraie : la mise en page ne saute plus (mesuré : 2 px
+   d'écart au lieu de 133). Banc : ~/labrassee-ops/mesures-site/banc-onglets.html
+   Le rapport 67 % vient de la mesure de « VIENS TE FAIRE VOIR » à 14 px —
+   94,75 px en DIN contre 141,97 px en police système. */
+@font-face {
+  font-family: "din-repli-ajuste";
+  src: local("Helvetica Neue"), local("Arial"), local("Liberation Sans");
+  size-adjust: 67%;
+  ascent-override: 150%;
+  descent-override: 38%;
+  line-gap-override: 0%;
+}
+
 :root {
   /* Colors */
   --color-brand: #f7d135;
@@ -9,8 +27,8 @@
   --color-insta: #f14179;
   
   /* Typography */
-  --font-din: "din-condensed-variable", "Arial Narrow", sans-serif;
-  --font-din-condensed: "din-condensed-variable", "Arial Narrow", sans-serif;
+  --font-din: "din-condensed-variable", "din-repli-ajuste", "Arial Narrow", sans-serif;
+  --font-din-condensed: "din-condensed-variable", "din-repli-ajuste", "Arial Narrow", sans-serif;
   --font-acumin: "acumin-pro", sans-serif;
   
   /* Spacing */

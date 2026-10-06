@@ -76,15 +76,18 @@ const LoadingProgress = styled(motion.div)`
 `;
 
 const LoadingScreen = ({ minDuration = 800 }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  // Plus d'écran noir à l'arrivée (05/10/2026) : la page est déjà rendue côté
+  // serveur, le client la voit tout de suite. Le chargeur ne sert plus qu'aux
+  // changements de page lents (au-delà de ROUTE_SHOW_DELAY).
+  const [isVisible, setIsVisible] = useState(false);
   const [progress, setProgress] = useState(INITIAL_PROGRESS);
   const [mounted, setMounted] = useState(false);
   const [cycleStartedAt, setCycleStartedAt] = useState(() => Date.now());
   const [cycleMinDuration, setCycleMinDuration] = useState(minDuration);
 
   const progressRef = useRef(INITIAL_PROGRESS);
-  const pendingCountRef = useRef(1);
-  const isVisibleRef = useRef(true);
+  const pendingCountRef = useRef(0);
+  const isVisibleRef = useRef(false);
   const routeRevealTimerRef = useRef(null);
 
   useEffect(() => {
@@ -113,27 +116,6 @@ const LoadingScreen = ({ minDuration = 800 }) => {
       routeRevealTimerRef.current = null;
     }
   }, []);
-
-  useEffect(() => {
-    if (!mounted) {
-      return undefined;
-    }
-
-    if (document.readyState === 'complete') {
-      pendingCountRef.current = 0;
-      return undefined;
-    }
-
-    const handleWindowLoaded = () => {
-      pendingCountRef.current = Math.max(0, pendingCountRef.current - 1);
-    };
-
-    window.addEventListener('load', handleWindowLoaded, { once: true });
-
-    return () => {
-      window.removeEventListener('load', handleWindowLoaded);
-    };
-  }, [mounted]);
 
   useEffect(() => {
     if (!mounted) {

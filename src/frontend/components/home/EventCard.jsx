@@ -103,6 +103,24 @@ const DayBadge = styled.div`
   }
 `;
 
+// Bandeau public posé en base (concerts.bandeau) : « En attente de confirmation »,
+// « Complet »… Il vit dans la zone du titre, en bas : jamais sur le visage de
+// l'artiste (le 05/10, en haut de la carte, il cachait les yeux de Tiffany).
+const Bandeau = styled.div`
+  align-self: flex-start;
+  background: var(--color-brand);
+  color: var(--color-dark);
+  font-family: var(--font-din);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 5px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+`;
+
 const GenreBadge = styled.div`
   position: absolute;
   top: 12px;
@@ -331,6 +349,7 @@ const EventCard = ({ event, index }) => {
 
       {/* Overlay texte standard en bas */}
       <TextOverlay>
+        {event.bandeau && <Bandeau>{event.bandeau}</Bandeau>}
         <EventTitle>{event.title}</EventTitle>
         <EventDate>{formatDateTime(event.date, event.time)}</EventDate>
         <EventViewCount concertKey={concertKey} />
