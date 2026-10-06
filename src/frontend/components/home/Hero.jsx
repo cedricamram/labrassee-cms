@@ -32,6 +32,8 @@ const PHOTOS_SCENE = [
   { src: '/images/landing/scene-1.jpg', position: '50% 62%' },
   { src: '/images/landing/scene-2.jpg', position: '50% 70%' },
   { src: '/images/landing/scene-5.jpg', position: '50% 55%' },
+  { src: '/images/landing/scene-3.jpg', position: '50% 40%' },
+  { src: '/images/landing/scene-4.jpg', position: '50% 40%' },
 ];
 
 const BackgroundImage = styled.img`
