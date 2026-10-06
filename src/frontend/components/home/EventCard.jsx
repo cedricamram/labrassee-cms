@@ -104,29 +104,21 @@ const DayBadge = styled.div`
 `;
 
 // Bandeau public posé en base (concerts.bandeau) : « En attente de confirmation »,
-// « Complet »… Bande pleine largeur sous les badges, lisible d'un coup d'œil.
+// « Complet »… Il vit dans la zone du titre, en bas : jamais sur le visage de
+// l'artiste (le 05/10, en haut de la carte, il cachait les yeux de Tiffany).
 const Bandeau = styled.div`
-  position: absolute;
-  top: 46px;
-  left: 0;
-  right: 0;
-  background: rgba(10, 9, 7, 0.86);
-  border-top: 1px solid rgba(247, 209, 53, 0.55);
-  border-bottom: 1px solid rgba(247, 209, 53, 0.55);
-  color: var(--color-brand);
+  align-self: flex-start;
+  background: var(--color-brand);
+  color: var(--color-dark);
   font-family: var(--font-din);
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-size: 14px;
-  font-weight: 600;
-  text-align: center;
-  padding: 7px 10px;
-  z-index: 3;
-
-  @media (max-width: 768px) {
-    top: 40px;
-    font-size: 13px;
-  }
+  letter-spacing: 1px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 5px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
 `;
 
 const GenreBadge = styled.div`
@@ -352,13 +344,12 @@ const EventCard = ({ event, index }) => {
         </DayBadge>
       )}
 
-      {event.bandeau && <Bandeau>{event.bandeau}</Bandeau>}
-
       {/* Badge genre musical (Jazz, Jam, Karaoké, Vernissage…) */}
       {event.genre && <GenreBadge>{event.genre}</GenreBadge>}
 
       {/* Overlay texte standard en bas */}
       <TextOverlay>
+        {event.bandeau && <Bandeau>{event.bandeau}</Bandeau>}
         <EventTitle>{event.title}</EventTitle>
         <EventDate>{formatDateTime(event.date, event.time)}</EventDate>
         <EventViewCount concertKey={concertKey} />
