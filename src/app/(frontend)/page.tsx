@@ -13,7 +13,7 @@ export default async function HomePage() {
   ReactDOM.preload('/images/landing/scene-2.jpg', {
     as: 'image',
     imageSrcSet: '/images/landing/scene-2-m.jpg 900w, /images/landing/scene-2.jpg 1600w',
-    imageSizes: '100vw',
+    imageSizes: '(max-width: 700px) 300px, 100vw',
     fetchPriority: 'high',
   })
 
