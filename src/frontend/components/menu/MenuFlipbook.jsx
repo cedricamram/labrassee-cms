@@ -61,6 +61,21 @@ const Aide = styled.p`
   color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
   margin: 0;
+
+  /* Deux consignes, une seule visible : « flèches clavier » ne veut rien dire sur un
+     téléphone (vu sur iPhone, 05/10). Le choix se fait en CSS — pas de test de
+     navigateur côté JS, donc rien à hydrater et jamais de mismatch. */
+  .aide-tactile {
+    display: none;
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .aide-clavier {
+      display: none;
+    }
+    .aide-tactile {
+      display: inline;
+    }
+  }
 `
 
 const SwiperWrap = styled.div`
@@ -381,7 +396,10 @@ export default function MenuFlipbook() {
         <Titre>
           Feuillette <span className="accent">tout ça</span>
         </Titre>
-        <Aide>Drag · flèches clavier ← → · clique sur la page pour zoomer</Aide>
+        <Aide>
+          <span className="aide-clavier">Drag · flèches clavier ← → · clique sur la page pour zoomer</span>
+          <span className="aide-tactile">Glisse pour tourner la page · touche la page pour zoomer</span>
+        </Aide>
       </Hero>
 
       <SwiperWrap>
