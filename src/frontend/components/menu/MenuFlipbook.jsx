@@ -83,6 +83,21 @@ const Aide = styled.p`
 // Un menu en cours de refonte : le menu en ligne est encore celui du printemps. Demande de Cédric
 // (05/10/2026, 23h49, verbatim) : « un truc qui dit qu'on travaille fort sur le menu automne hiver
 // mais que pour l'instant c'est ça ». Aucun prix, aucune promesse de date : on dit ce qui est vrai.
+// Sur un cellulaire (375 px), les pages-images sont dures à lire d'un coup d'œil : on offre la
+// version texte tout de suite, sans rien retirer aux gens qui aiment feuilleter.
+const LienTexte = styled.a`
+  display: none;
+  margin: 12px auto 0;
+  color: var(--color-brand, #f7d135);
+  font-size: 15px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  @media (max-width: 680px), (hover: none) and (pointer: coarse) {
+    display: block;
+    width: fit-content;
+  }
+`
+
 const Avis = styled.p`
   margin: 18px auto 0;
   max-width: 520px;
@@ -423,6 +438,9 @@ export default function MenuFlipbook() {
           <span className="aide-clavier">Drag · flèches clavier ← → · clique sur la page pour zoomer</span>
           <span className="aide-tactile">Glisse pour tourner la page · touche la page pour zoomer</span>
         </Aide>
+        <LienTexte href="#menu-texte">
+          Les lettres sont trop petites ? Lis le menu en texte
+        </LienTexte>
         <Avis>
           <strong>On travaille fort sur le menu d&apos;automne-hiver.</strong> En attendant, voici celui
           d&apos;en ce moment. Un doute sur ce qu&apos;on sert aujourd&apos;hui ? Demande-nous au comptoir.

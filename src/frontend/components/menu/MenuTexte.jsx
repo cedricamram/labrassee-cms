@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import styled from 'styled-components'
 
@@ -203,9 +203,22 @@ const MenuTexte = () => {
   const bc = MENU_BOISSONS_CHAUDES
   const platsDuJour = MENU_SALE.sections[0]
 
+  const repli = useRef(null)
+
+  // Le lien « Lire le menu en texte » (sous le feuilletage) pointe ici : on ouvre le
+  // repli à l'arrivée, sinon la personne tombe sur une poignée fermée.
+  useEffect(() => {
+    const ouvrirSiAncre = () => {
+      if (window.location.hash === '#menu-texte' && repli.current) repli.current.open = true
+    }
+    ouvrirSiAncre()
+    window.addEventListener('hashchange', ouvrirSiAncre)
+    return () => window.removeEventListener('hashchange', ouvrirSiAncre)
+  }, [])
+
   return (
-    <Bloc>
-      <Repli>
+    <Bloc id="menu-texte">
+      <Repli ref={repli}>
         <Poignee>Le menu en toutes lettres</Poignee>
         <Colonnes>
         <Partie>{bc.titre}</Partie>
@@ -305,7 +318,7 @@ const MenuTexte = () => {
 
         <Pied>
           Le menu papier fait foi. Si quelque chose diffère, c&apos;est lui qui
-          a raison — venez nous le dire, on corrigera.
+          a raison — viens nous le dire, on corrigera.
         </Pied>
         </Colonnes>
       </Repli>
