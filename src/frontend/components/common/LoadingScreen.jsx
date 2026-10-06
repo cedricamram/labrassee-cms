@@ -201,11 +201,21 @@ const LoadingScreen = ({ minDuration = 800 }) => {
   }, [cycleMinDuration, cycleStartedAt, isVisible]);
 
   useEffect(() => {
-    if (!mounted || !isVisible) {
+    if (!mounted) {
       return undefined;
     }
 
     const { body, documentElement } = document;
+
+    if (!isVisible) {
+      // Filet (06/10/2026) : depuis le 05/10 le chargeur ne démarre plus à l'arrivée, donc
+      // le nettoyage ci-dessous ne s'exécutait jamais et la page restait verrouillée
+      // (plus de défilement au doigt). Rien n'est verrouillé tant que le chargeur est caché.
+      body.classList.remove('app-loading');
+      documentElement.classList.remove('app-loading');
+      return undefined;
+    }
+
     const lockScrollY = window.scrollY;
 
     const preventScroll = (event) => {
