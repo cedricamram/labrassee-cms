@@ -27,7 +27,7 @@ const BackgroundImage = styled.img`
   height: 100%;
   object-fit: cover;
   /* Bibliothèque et salon : on garde l'enseigne et les livres dans le cadre. */
-  object-position: 50% 32%;
+  object-position: 50% 12%;
   z-index: 0;
 `;
 
@@ -35,8 +35,9 @@ const GradientOverlay = styled.div`
   position: absolute;
   width: 100vw;
   height: 100%;
-  background: linear-gradient(to bottom, 
-    rgba(0, 0, 0, 0) 0%, 
+  background: linear-gradient(to bottom,
+    rgba(16, 15, 9, 0.15) 0%,
+    rgba(16, 15, 9, 0.35) 40%,
     rgba(16, 15, 9, 0.3) 60%, 
     rgba(16, 15, 9, 0.8) 85%, 
     var(--color-dark) 100%
