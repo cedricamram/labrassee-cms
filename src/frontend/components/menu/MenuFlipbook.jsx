@@ -78,6 +78,27 @@ const Aide = styled.p`
   }
 `
 
+// Un menu en cours de refonte : le menu en ligne est encore celui du printemps. Demande de Cédric
+// (05/10/2026, 23h49, verbatim) : « un truc qui dit qu'on travaille fort sur le menu automne hiver
+// mais que pour l'instant c'est ça ». Aucun prix, aucune promesse de date : on dit ce qui est vrai.
+const Avis = styled.p`
+  margin: 18px auto 0;
+  max-width: 520px;
+  padding: 12px 16px;
+  border: 1px solid rgba(247, 209, 53, 0.45);
+  border-radius: 12px;
+  background: rgba(247, 209, 53, 0.08);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: center;
+
+  strong {
+    color: var(--color-brand, #f7d135);
+    font-weight: 600;
+  }
+`
+
 const SwiperWrap = styled.div`
   position: relative;
   width: 100%;
@@ -400,6 +421,10 @@ export default function MenuFlipbook() {
           <span className="aide-clavier">Drag · flèches clavier ← → · clique sur la page pour zoomer</span>
           <span className="aide-tactile">Glisse pour tourner la page · touche la page pour zoomer</span>
         </Aide>
+        <Avis>
+          <strong>On travaille fort sur le menu d&apos;automne-hiver.</strong> En attendant, voici le menu
+          actuel. Une question sur ce qu&apos;on sert aujourd&apos;hui ? Demande-nous au comptoir.
+        </Avis>
       </Hero>
 
       <SwiperWrap>
