@@ -549,14 +549,22 @@ function fusionnerEtDedoublonner(
   const surlasceneFiltrees = surlasceneEvents.filter(
     (e) => !datesPayload.has(e.date.slice(0, 10)),
   )
-  // Le bandeau vit dans la base Surlascène : on le reporte sur la fiche Payload
-  // du même jour, sinon il disparaîtrait au dédoublonnage.
-  const bandeauParDate = new Map(
-    surlasceneEvents.filter((e) => e.bandeau).map((e) => [e.date.slice(0, 10), e.bandeau]),
-  )
-  const payloadAvecBandeau = payloadEvents.map((e) =>
-    bandeauParDate.has(e.date.slice(0, 10)) ? { ...e, bandeau: bandeauParDate.get(e.date.slice(0, 10)) } : e,
-  )
+  // Le même soir existe souvent des deux côtés. La fiche Payload garde sa place,
+  // mais deux choses viennent de la base Surlascène :
+  //  - le bandeau (« En attente de confirmation »…) ;
+  //  - l'IMAGE (05/10/2026). La couverture Payload est aspirée de Facebook ou
+  //    d'Eventbrite et vaut parfois l'aplat orange par défaut d'Eventbrite
+  //    (La Touche Manouche 10/10, Karaoké 16/10). La base, elle, est vérifiée.
+  const surlasceneParDate = new Map(surlasceneEvents.map((e) => [e.date.slice(0, 10), e]))
+  const payloadAvecBandeau = payloadEvents.map((e) => {
+    const s = surlasceneParDate.get(e.date.slice(0, 10))
+    if (!s) return e
+    return {
+      ...e,
+      bandeau: s.bandeau || e.bandeau || null,
+      image: s.image || e.image,
+    }
+  })
   const fusion = [...payloadAvecBandeau, ...surlasceneFiltrees]
   fusion.sort((a, b) => a.date.localeCompare(b.date))
   return fusion

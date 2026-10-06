@@ -80,6 +80,7 @@ type RawConcertRow = {
   bandeau?: string | null
   fb_event_url: string | null
   cover_image_url: string | null
+  cover_safe_url?: string | null
   concerts_artistes?: Array<{ ordre: number; artistes_scene: SurlasceneArtiste }>
 }
 
@@ -104,7 +105,10 @@ const concertToEvent = (row: RawConcertRow): FrontendEvent => {
   // Priorité image card :
   // 1. cover_image_url (image de l'event Facebook aspirée → spécifique à ce show)
   // 2. photo HD artiste depuis l'EPK
-  const photoFull = row.cover_image_url || surlasceneImageUrl(photoPath)
+  // 05/10/2026 : la version « safe » d'abord. Elle est passée au détecteur
+  // d'aplat orange et allégée (55 à 220 Ko), là où l'originale pèse parfois
+  // plusieurs Mo (Trio du Quartier : 6,9 Mo, 30 s de chargement au téléphone).
+  const photoFull = row.cover_safe_url || row.cover_image_url || surlasceneImageUrl(photoPath)
   const titre = artiste?.nom_artiste || row.titre_show || 'À confirmer'
   // Heure formatée "19h30"
   const hr = row.heure_debut?.slice(0, 5).replace(':', 'h') || null
