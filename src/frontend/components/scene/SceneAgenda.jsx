@@ -600,7 +600,7 @@ export default function SceneAgenda({ shows = [] }) {
               )}
               <div className="corps">
                 <div className="type">
-                  {s.statut === 'annule' ? <span className="badge-annule">Annulé</span> : genre}
+                  {s.statut === 'annule' ? <span className="badge-annule">Annulé</span> : s.bandeau ? <span className="badge-annule">{s.bandeau}</span> : genre}
                 </div>
                 <h3>{s.titre_show || nom}</h3>
                 <div className="desc">{desc}</div>

@@ -103,6 +103,32 @@ const DayBadge = styled.div`
   }
 `;
 
+// Bandeau public posé en base (concerts.bandeau) : « En attente de confirmation »,
+// « Complet »… Bande pleine largeur sous les badges, lisible d'un coup d'œil.
+const Bandeau = styled.div`
+  position: absolute;
+  top: 46px;
+  left: 0;
+  right: 0;
+  background: rgba(10, 9, 7, 0.86);
+  border-top: 1px solid rgba(247, 209, 53, 0.55);
+  border-bottom: 1px solid rgba(247, 209, 53, 0.55);
+  color: var(--color-brand);
+  font-family: var(--font-din);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  padding: 7px 10px;
+  z-index: 3;
+
+  @media (max-width: 768px) {
+    top: 40px;
+    font-size: 13px;
+  }
+`;
+
 const GenreBadge = styled.div`
   position: absolute;
   top: 12px;
@@ -325,6 +351,8 @@ const EventCard = ({ event, index }) => {
           {dayBadge.prefix ? <>{dayBadge.prefix} <strong>{dayBadge.day}</strong></> : <strong>{dayBadge.day}</strong>}
         </DayBadge>
       )}
+
+      {event.bandeau && <Bandeau>{event.bandeau}</Bandeau>}
 
       {/* Badge genre musical (Jazz, Jam, Karaoké, Vernissage…) */}
       {event.genre && <GenreBadge>{event.genre}</GenreBadge>}

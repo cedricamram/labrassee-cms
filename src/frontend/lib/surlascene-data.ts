@@ -76,6 +76,8 @@ type RawConcertRow = {
   titre_show: string | null
   description_publique: string | null
   statut: string
+  // Bandeau public facultatif (« En attente de confirmation », « Complet »…), posé en base.
+  bandeau?: string | null
   fb_event_url: string | null
   cover_image_url: string | null
   concerts_artistes?: Array<{ ordre: number; artistes_scene: SurlasceneArtiste }>
@@ -132,6 +134,7 @@ const concertToEvent = (row: RawConcertRow): FrontendEvent => {
     description: undefined,
     // Extensions Surlascène (lues optionnellement par EventCard)
     surlasceneShowId: row.id,
+    bandeau: row.bandeau || null,
     surlasceneSource: 'surlascene',
     surlasceneArtisteId: artiste?.id || null,
     surlasceneArtiste: artiste,
@@ -158,7 +161,7 @@ export const getUpcomingSurlasceneEvents = cache(
   async (limit = 30): Promise<FrontendEvent[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,bandeau,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
@@ -178,7 +181,7 @@ export const getRecentSurlasceneEvents = cache(
   async (limit = 1): Promise<FrontendEvent[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,bandeau,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,spotify_url,bandcamp_url,soundcloud_url,youtube_url,photo_artiste_path,photos_hd_paths))',
     )
     // Fetch desc puis on reverse pour avoir l'ordre chronologique côté retour
     const path =
@@ -205,6 +208,8 @@ export type SurlasceneShowDetail = {
   titre_show: string | null
   description_publique: string | null
   statut: string
+  // Bandeau public facultatif (« En attente de confirmation », « Complet »…), posé en base.
+  bandeau?: string | null
   artiste: SurlasceneArtiste | null
   // Couverture Facebook de l'event Payload correspondant (matché par date).
   // Renseigné par getSceneAgendaShows() côté payload-data. Permet à
@@ -225,6 +230,8 @@ type RawConcertDetailRow = {
   titre_show: string | null
   description_publique: string | null
   statut: string
+  // Bandeau public facultatif (« En attente de confirmation », « Complet »…), posé en base.
+  bandeau?: string | null
   fb_event_url: string | null
   cover_image_url: string | null
   concerts_artistes?: Array<{ ordre: number; artistes_scene: SurlasceneArtiste }>
@@ -234,7 +241,7 @@ export const getUpcomingShowDetails = cache(
   async (limit = 40): Promise<SurlasceneShowDetail[]> => {
     const today = todayMontrealISO()
     const select = encodeURIComponent(
-      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
+      'id,date_show,heure_debut,heure_fin,heure_soundcheck,type_show,titre_show,description_publique,statut,bandeau,cover_image_url,cover_safe_url,fb_event_url,bandsintown_url,eventbrite_url,lavitrine_url,cultmtl_url,cree_le,maj_le,concerts_artistes(ordre,artistes_scene(id,nom_artiste,genre,bio,permanence,recurrence_notes,heure_debut_speciale,site_web,instagram,facebook,spotify_url,bandcamp_url,soundcloud_url,youtube_url,vimeo_url,photo_artiste_path,photos_hd_paths,duree_set_minutes,nb_personnes_scene))',
     )
     const path =
       `/rest/v1/concerts?select=${select}&date_show=gte.${today}` +
@@ -254,6 +261,7 @@ export const getUpcomingShowDetails = cache(
         titre_show: r.titre_show,
         description_publique: r.description_publique,
         statut: r.statut,
+        bandeau: r.bandeau || null,
         artiste: arts[0]?.artistes_scene || null,
         // Annulé : l'affiche avec le bandeau ANNULÉ (cover_safe_url) prime sur l'originale.
         coverImage:

@@ -22,6 +22,8 @@ export type FrontendEvent = {
   title: string
   // Genre musical / type d'event affiché sur la vignette (Jazz, Jam, Karaoké…)
   genre?: string | null
+  // Bandeau public facultatif posé en base (concerts.bandeau), ex. « En attente de confirmation ».
+  bandeau?: string | null
   // --- Extensions Surlascène (présentes seulement pour les events lus depuis
   // la BD Supabase Surlascène, ignorées par les cards Payload events) ---
   surlasceneSource?: 'surlascene'
@@ -547,7 +549,15 @@ function fusionnerEtDedoublonner(
   const surlasceneFiltrees = surlasceneEvents.filter(
     (e) => !datesPayload.has(e.date.slice(0, 10)),
   )
-  const fusion = [...payloadEvents, ...surlasceneFiltrees]
+  // Le bandeau vit dans la base Surlascène : on le reporte sur la fiche Payload
+  // du même jour, sinon il disparaîtrait au dédoublonnage.
+  const bandeauParDate = new Map(
+    surlasceneEvents.filter((e) => e.bandeau).map((e) => [e.date.slice(0, 10), e.bandeau]),
+  )
+  const payloadAvecBandeau = payloadEvents.map((e) =>
+    bandeauParDate.has(e.date.slice(0, 10)) ? { ...e, bandeau: bandeauParDate.get(e.date.slice(0, 10)) } : e,
+  )
+  const fusion = [...payloadAvecBandeau, ...surlasceneFiltrees]
   fusion.sort((a, b) => a.date.localeCompare(b.date))
   return fusion
 }
