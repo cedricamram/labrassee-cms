@@ -228,7 +228,6 @@ const FAMILLES_THE = [
     famille: 'Les inclassables',
     thes: [
       { nom: 'Se Zhong', prix: '17,00 $' },
-      { nom: "Wulong Fleur d'Oranger", prix: '22,00 $' },
     ],
   },
 ]
