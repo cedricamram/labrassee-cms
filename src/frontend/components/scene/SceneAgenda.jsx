@@ -155,11 +155,12 @@ const Feature = styled.article`
 `
 
 const PhotoHD = styled.div`
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   border-radius: 22px;
-  background-size: cover;
-  background-position: center;
   background-color: #0a0905;
   border: 2px solid rgba(247, 209, 53, 0.3);
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
@@ -169,6 +170,23 @@ const PhotoHD = styled.div`
   font-family: var(--font-din);
   color: rgba(205, 196, 157, 0.6);
   font-size: 86px;
+
+  /* Artistes ENTIERS (06/10/2026) : la photo est affichée en entier (contain) sur un fond
+     flou de la même image, jamais recadrée. */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    z-index: -1;
+    background: var(--photo, none) center / cover no-repeat;
+    filter: blur(16px) brightness(0.55);
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
 `
 
 const InfosFeat = styled.div`
@@ -264,11 +282,12 @@ const Carte = styled.article`
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.15),
     0 8px 32px rgba(0, 0, 0, 0.4);
+  position: relative;
   padding: 20px 28px;
   border-radius: 20px;
   margin-bottom: 18px;
   display: grid;
-  grid-template-columns: 100px 90px 1fr auto;
+  grid-template-columns: 100px 180px 1fr auto;
   gap: 20px;
   align-items: center;
   cursor: pointer;
@@ -280,9 +299,22 @@ const Carte = styled.article`
   }
 
   @media (max-width: 700px) {
-    grid-template-columns: 80px 70px 1fr;
+    grid-template-columns: 1fr;
     gap: 14px;
     padding: 16px;
+
+    /* La photo passe en haut, pleine largeur ; la pastille de date se pose en coin dessus. */
+    .date-bloc {
+      position: absolute;
+      top: 26px;
+      left: 26px;
+      z-index: 2;
+      padding: 6px 12px;
+    }
+    .jour-num {
+      font-size: 26px;
+      margin: 2px 0;
+    }
   }
 
   .date-bloc {
@@ -315,11 +347,12 @@ const Carte = styled.article`
     color: rgba(255, 255, 255, 0.85);
   }
   .photo-mini {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    width: 180px;
+    aspect-ratio: 4 / 3;
+    border-radius: 14px;
     background-color: #0a0905;
     border: 2px solid rgba(247, 209, 53, 0.3);
     display: flex;
@@ -327,12 +360,25 @@ const Carte = styled.article`
     justify-content: center;
     color: rgba(205, 196, 157, 0.6);
     font-family: var(--font-din);
-    font-size: 28px;
+    font-size: 40px;
 
     @media (max-width: 700px) {
-      width: 70px;
-      height: 70px;
+      width: 100%;
     }
+  }
+  .photo-mini::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    z-index: -1;
+    background: var(--photo, none) center / cover no-repeat;
+    filter: blur(16px) brightness(0.55);
+  }
+  .photo-mini img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
   }
   &.annule {
     cursor: default;
@@ -522,7 +568,9 @@ export default function SceneAgenda({ shows = [] }) {
         {a && (
           <Feature onClick={() => setSelectedShow(first)}>
             {photoFeat ? (
-              <PhotoHD style={{ backgroundImage: `url('${photoFeat}')` }} />
+              <PhotoHD style={{ '--photo': `url('${photoFeat}')` }}>
+                <img src={photoFeat} alt="" />
+              </PhotoHD>
             ) : (
               <PhotoHD>{premiereLettre(a.nom_artiste)}</PhotoHD>
             )}
@@ -604,7 +652,9 @@ export default function SceneAgenda({ shows = [] }) {
                 <div className="mois">{MOIS_FR[dd.getMonth()]}</div>
               </div>
               {photo ? (
-                <div className="photo-mini" style={{ backgroundImage: `url('${photo}')` }} />
+                <div className="photo-mini" style={{ '--photo': `url('${photo}')` }}>
+                  <img src={photo} alt="" loading="lazy" />
+                </div>
               ) : (
                 <div className="photo-mini">{premiereLettre(nom)}</div>
               )}
