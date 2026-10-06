@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { LQIP_SCENE_2 } from '@/frontend/data/lqip-scene-2';
 
 const HeroSection = styled.section`
   min-height: 85vh;
@@ -197,8 +198,21 @@ const Hero = () => {
   const [photo, setPhoto] = useState(null);
   const [chargee, setChargee] = useState(false);
   useEffect(() => {
-    const tiree = PHOTOS_SCENE[Math.floor(Math.random() * PHOTOS_SCENE.length)];
-    if (tiree !== PHOTO_DEPART) setPhoto(tiree);
+    // Réseau lent ou économie de données : on garde la photo de départ, une seule requête d'image
+    // (Apollon, 06/10/2026 : la 2e photo ralentissait la première en 3G). Sinon : seulement APRÈS
+    // l'événement load, pour ne rien disputer à la photo de départ.
+    const c = typeof navigator !== 'undefined' ? navigator.connection : null;
+    if (c && (c.saveData || /^(slow-2g|2g|3g)$/.test(c.effectiveType || ''))) return undefined;
+    const tirer = () => {
+      const tiree = PHOTOS_SCENE[Math.floor(Math.random() * PHOTOS_SCENE.length)];
+      if (tiree !== PHOTO_DEPART) setPhoto(tiree);
+    };
+    if (document.readyState === 'complete') {
+      tirer();
+      return undefined;
+    }
+    window.addEventListener('load', tirer, { once: true });
+    return () => window.removeEventListener('load', tirer);
   }, []);
 
   const titleVariants = {
@@ -247,7 +261,13 @@ const Hero = () => {
   };
 
   return (
-    <HeroSection>
+    <HeroSection
+      style={{
+        backgroundImage: `url('${LQIP_SCENE_2}')`,
+        backgroundSize: 'cover',
+        backgroundPosition: PHOTO_DEPART.position,
+      }}
+    >
       <BackgroundImage
         src={srcPhoto(PHOTO_DEPART)}
         srcSet={srcSetPhoto(PHOTO_DEPART)}
