@@ -28,13 +28,24 @@ const HeroSection = styled.section`
 // l'inscrire ici avec le point à garder dans le cadre.
 // Cadrages testés à 375 px (05/10/2026) : les visages des artistes passent
 // AU-DESSUS du titre « Entre voisins », jamais dessous.
+// Chaque photo existe en deux tailles : -m.jpg (100-175 Ko) pour le téléphone,
+// .jpg (190-280 Ko) au-delà.
 const PHOTOS_SCENE = [
-  { src: '/images/landing/scene-1.jpg', position: '50% 62%' },
-  { src: '/images/landing/scene-2.jpg', position: '50% 70%' },
-  { src: '/images/landing/scene-5.jpg', position: '50% 55%' },
-  { src: '/images/landing/scene-3.jpg', position: '50% 52%' },
-  { src: '/images/landing/scene-4.jpg', position: '50% 30%' },
+  { nom: 'scene-1', position: '50% 74%' },
+  { nom: 'scene-2', position: '50% 70%' },
+  { nom: 'scene-5', position: '50% 55%' },
+  { nom: 'scene-3', position: '50% 52%' },
+  { nom: 'scene-4', position: '50% 30%' },
 ];
+
+// Photo rendue par le serveur : elle part avec la page, sans attendre le tirage.
+// Le haut de l'accueil n'est donc jamais un aplat noir, même sur un réseau lent
+// (constat d'Athéna, 05/10 23 h 40 : fond noir ~37 s).
+const PHOTO_DEPART = PHOTOS_SCENE[1];
+
+const srcPhoto = (p) => `/images/landing/${p.nom}.jpg`;
+const srcSetPhoto = (p) =>
+  `/images/landing/${p.nom}-m.jpg 900w, /images/landing/${p.nom}.jpg 1600w`;
 
 const BackgroundImage = styled.img`
   position: absolute;
@@ -42,10 +53,13 @@ const BackgroundImage = styled.img`
   height: 100%;
   object-fit: cover;
   z-index: 0;
-  opacity: 0;
-  transition: opacity 0.6s ease;
 
-  &.visible {
+  /* La photo tirée au hasard se pose sur celle de départ, en fondu, une fois chargée. */
+  &.tiree {
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  &.tiree.visible {
     opacity: 1;
   }
 `;
@@ -70,9 +84,56 @@ const HeroContent = styled(motion.div)`
   text-align: center;
   flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin-top: calc(var(--header-height) + 20px);
+`;
+
+// Signature au-dessus du titre (Cédric, 05/10/2026 23 h 43 : « faudrait quand même
+// qu'on voie que c'est La Brassée sur la page d'accueil »). Picto en trait jaune,
+// sans fond, jamais le rond plein nommé (sa règle du 11/08).
+const Signature = styled(motion.div)`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+
+  .nom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-din);
+    color: var(--color-white);
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  }
+
+  .nom img {
+    width: 34px;
+    height: 34px;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.6));
+  }
+
+  .ou {
+    font-family: var(--font-din);
+    color: rgba(232, 228, 216, 0.9);
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  }
+
+  @media (max-width: 480px) {
+    margin-bottom: 10px;
+    .nom { font-size: 17px; letter-spacing: 5px; }
+    .nom img { width: 28px; height: 28px; }
+    .ou { font-size: 10.5px; letter-spacing: 2px; }
+  }
 `;
 
 const HeroTitle = styled(motion.h1)`
@@ -88,7 +149,7 @@ const HeroTitle = styled(motion.h1)`
   }
   
   @media (max-width: 480px) {
-    font-size: 19vw;
+    font-size: 16vw;
   }
 `;
 
@@ -136,7 +197,8 @@ const Hero = () => {
   const [photo, setPhoto] = useState(null);
   const [chargee, setChargee] = useState(false);
   useEffect(() => {
-    setPhoto(PHOTOS_SCENE[Math.floor(Math.random() * PHOTOS_SCENE.length)]);
+    const tiree = PHOTOS_SCENE[Math.floor(Math.random() * PHOTOS_SCENE.length)];
+    if (tiree !== PHOTO_DEPART) setPhoto(tiree);
   }, []);
 
   const titleVariants = {
@@ -186,19 +248,39 @@ const Hero = () => {
 
   return (
     <HeroSection>
+      <BackgroundImage
+        src={srcPhoto(PHOTO_DEPART)}
+        srcSet={srcSetPhoto(PHOTO_DEPART)}
+        sizes="100vw"
+        alt=""
+        fetchPriority="high"
+        style={{ objectPosition: PHOTO_DEPART.position }}
+      />
       {photo && (
         <BackgroundImage
-          src={photo.src}
+          src={srcPhoto(photo)}
+          srcSet={srcSetPhoto(photo)}
+          sizes="100vw"
           alt=""
-          fetchPriority="high"
           style={{ objectPosition: photo.position }}
-          className={chargee ? 'visible' : undefined}
+          className={chargee ? 'tiree visible' : 'tiree'}
           onLoad={() => setChargee(true)}
         />
       )}
       <GradientOverlay />
       
       <HeroContent>
+        <Signature
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <div className="nom">
+            <img src="/images/brand/picto_outlined_jaune.svg" alt="" />
+            La Brassée
+          </div>
+          <div className="ou">Café de quartier · Rosemont–La Petite-Patrie</div>
+        </Signature>
         <HeroTitle
           initial="hidden"
           animate="visible"
