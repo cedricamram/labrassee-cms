@@ -9,10 +9,12 @@ import { Navigation, Keyboard } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 
-// Les 8 pages du menu V2 (printemps 2026) — copiées dans /public/images/menu-v2/
+// Les pages du menu V2 — copiées dans /public/images/menu-v2/
+// 06/10/2026, Cédric (« enlève la ») : la page « NOUVEAU — PRINTEMPS 2026 — la pêche à l'honneur » est RETIRÉE
+// du menu en ligne (c'était un menu de saison, on est en octobre). Le fichier nouveau.png reste dans le dépôt
+// (pas supprimé) : pour la remettre, remettre la ligne `{ id: 'nouveau', … }` en tête de la liste.
 // Chaque entrée : { id, label (chip nav), titre (overlay coin), bg (couleur teinte fond) }
 const PAGES = [
-  { id: 'nouveau',          label: 'Nouveau',        titre: 'Nouveautés du moment', bg: '#e8895e' },
   { id: 'boissons_chaudes', label: 'Boissons chaudes', titre: 'Cafés · thés · lattes', bg: '#c49860' },
   { id: 'boissons_froides', label: 'Boissons froides', titre: 'Rafraîchissements · saisonniers', bg: '#88a8c8' },
   { id: 'sale',             label: 'Côté salé',      titre: 'Plats · grilled cheese · quiches · nachos', bg: '#a89968' },
