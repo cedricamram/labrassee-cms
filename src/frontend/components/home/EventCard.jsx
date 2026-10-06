@@ -330,7 +330,10 @@ const EventCard = ({ event, index }) => {
         <EventImage
           src={event.image}
           alt={event.title}
-          loading="eager"
+          // Seules les deux premières cartes (celles qu'on voit sans défiler) se chargent d'emblée ;
+          // React précharge d'office toute image non « lazy » — 7 couvertures de 1,7 Mo au total
+          // se battaient avec la photo d'intérieur au démarrage (mesuré 05/10).
+          loading={typeof index === 'number' && index < 2 ? 'eager' : 'lazy'}
           decoding="async"
         />
       ) : (

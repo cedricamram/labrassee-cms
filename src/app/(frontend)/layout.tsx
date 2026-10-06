@@ -41,15 +41,37 @@ export default async function FrontendLayout(props: { children: React.ReactNode 
         <link rel="icon" type="image/png" sizes="32x32" href="/images/brand/icon-cafe-32.png?v=3" />
         <link rel="icon" type="image/png" sizes="512x512" href="/images/brand/icon-cafe-512.png?v=3" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" />
-        <link rel="stylesheet" href="https://use.typekit.net/ovt4lgv.css" />
+        {/* Trois feuilles de style EXTERNES (Typekit, Font Awesome ~102 Ko, Themify) : en
+            rendu-bloquant, le téléphone n'affichait RIEN tant qu'elles n'étaient pas
+            revenues (mesuré 05/10 : cdnjs ~0,8 s de plus sur le chemin critique, depuis
+            un wifi — pire sur LTE). On les charge sans bloquer : media="print" jusqu'à
+            l'arrivée, puis « all ». Contrepartie assumée : le texte s'affiche d'abord dans
+            la police de repli et les icônes arrivent un instant après. <noscript> : sans
+            JavaScript, elles se chargent normalement. */}
+        <link rel="stylesheet" href="https://use.typekit.net/ovt4lgv.css" media="print" data-async-css="" />
         <link
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
           rel="stylesheet"
+          media="print"
+          data-async-css=""
         />
         <link
           href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css"
           rel="stylesheet"
+          media="print"
+          data-async-css=""
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "document.querySelectorAll('link[data-async-css]').forEach(function(l){function ok(){l.media='all'}if(l.sheet){ok()}else{l.addEventListener('load',ok);l.addEventListener('error',ok)}})",
+          }}
+        />
+        <noscript>
+          <link rel="stylesheet" href="https://use.typekit.net/ovt4lgv.css" />
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css" />
+        </noscript>
       </head>
       <body className="app-loading">
         <StyledComponentsRegistry>
