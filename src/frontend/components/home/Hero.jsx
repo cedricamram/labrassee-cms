@@ -44,6 +44,10 @@ const PHOTOS_SCENE = [
 // (constat d'Athéna, 05/10 23 h 40 : fond noir ~37 s).
 const PHOTO_DEPART = PHOTOS_SCENE[1];
 
+// Cellulaire : on demande la version 900 w (146 Ko) même en écran 3x ; le dégradé sombre masque la perte
+// (Apollon, 06/10/2026). Même valeur dans le préchargement de la page d'accueil.
+export const SIZES_DEPART = '(max-width: 700px) 300px, 100vw';
+
 const srcPhoto = (p) => `/images/landing/${p.nom}.jpg`;
 const srcSetPhoto = (p) =>
   `/images/landing/${p.nom}-m.jpg 900w, /images/landing/${p.nom}.jpg 1600w`;
@@ -271,7 +275,7 @@ const Hero = () => {
       <BackgroundImage
         src={srcPhoto(PHOTO_DEPART)}
         srcSet={srcSetPhoto(PHOTO_DEPART)}
-        sizes="100vw"
+        sizes={SIZES_DEPART}
         alt=""
         fetchPriority="high"
         style={{ objectPosition: PHOTO_DEPART.position }}
