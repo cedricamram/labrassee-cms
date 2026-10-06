@@ -12,9 +12,12 @@ const HeroSection = styled.section`
   align-items: center;
   padding: 0 0 40px 0;
 
+  /* Téléphone : héros court, pour que les prochains événements soient
+     visibles sans défiler (retour de Cédric, 03/10/2026). */
   @media (max-width: 768px) {
-    min-height: 52vh;
-    padding: 0 0 20px 0;
+    min-height: 40vh;
+    min-height: 40svh;
+    padding: 0 0 8px 0;
   }
 `;
 
@@ -23,7 +26,8 @@ const BackgroundImage = styled.img`
   width: 100vw;
   height: 100%;
   object-fit: cover;
-  object-position: 70% 70%;
+  /* Bibliothèque et salon : on garde l'enseigne et les livres dans le cadre. */
+  object-position: 50% 32%;
   z-index: 0;
 `;
 
@@ -64,7 +68,7 @@ const HeroTitle = styled(motion.h1)`
   }
   
   @media (max-width: 480px) {
-    font-size: 22vw;
+    font-size: 19vw;
   }
 `;
 
@@ -78,6 +82,10 @@ const ScrollIndicator = styled(motion.div)`
   z-index: 2;
   cursor: pointer;
   padding-bottom: 40px;
+
+  @media (max-width: 768px) {
+    padding-bottom: 12px;
+  }
 `;
 
 const ScrollText = styled(motion.span)`
@@ -151,8 +159,9 @@ const Hero = () => {
   return (
     <HeroSection>
       <BackgroundImage 
-        src="/images/landing/311881317_532571722207461_4819818638383209062_n.jpg" 
+        src="/images/landing/interieur-bibliotheque-salon.jpg"
         alt=""
+        fetchPriority="high"
       />
       <GradientOverlay />
       
