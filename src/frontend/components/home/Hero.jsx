@@ -31,7 +31,7 @@ const HeroSection = styled.section`
 // Chaque photo existe en deux tailles : -m.jpg (100-175 Ko) pour le téléphone,
 // .jpg (190-280 Ko) au-delà.
 const PHOTOS_SCENE = [
-  { nom: 'scene-1', position: '50% 62%' },
+  { nom: 'scene-1', position: '50% 74%' },
   { nom: 'scene-2', position: '50% 70%' },
   { nom: 'scene-5', position: '50% 55%' },
   { nom: 'scene-3', position: '50% 52%' },
