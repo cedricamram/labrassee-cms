@@ -96,22 +96,6 @@ const Desc = styled.div`
   }
 `
 
-const Pied = styled.div`
-  text-align: center;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 14px;
-  max-width: 620px;
-  margin: 0 auto;
-  padding: 16px 22px;
-  border: 1px dashed rgba(247, 209, 53, 0.3);
-  border-radius: 16px;
-  background: rgba(247, 209, 53, 0.03);
-
-  strong {
-    color: var(--color-brand);
-  }
-`
-
 export default function SceneCommentCaMarche() {
   return (
     <Section id="comment">
@@ -154,11 +138,6 @@ export default function SceneCommentCaMarche() {
             </Desc>
           </Carte>
         </Grille>
-
-        <Pied>
-          Plus une <strong>consommation offerte par artiste</strong> (boire et manger
-          pendant la prep) — parce qu'on aime bien recevoir.
-        </Pied>
       </Container>
     </Section>
   )

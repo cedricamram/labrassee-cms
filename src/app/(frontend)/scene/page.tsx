@@ -1,10 +1,8 @@
 import React from 'react'
 import type { Metadata } from 'next'
 
-import SceneHero from '@/frontend/components/scene/SceneHero'
 import SceneCommentCaMarche from '@/frontend/components/scene/SceneCommentCaMarche'
 import SceneAgenda from '@/frontend/components/scene/SceneAgenda'
-import SceneConditions from '@/frontend/components/scene/SceneConditions'
 import { getSceneAgendaShows } from '@/frontend/lib/payload-data'
 
 export const metadata: Metadata = {
@@ -25,12 +23,12 @@ export default async function ScenePage() {
 
   return (
     <main style={{ width: '100%', background: 'var(--color-dark)' }}>
-      {/* 05/10/2026 : les soirées d'abord. Un client qui touche « Événements »
-          veut savoir ce qui joue, pas les conditions faites aux artistes. */}
-      <SceneHero />
+      {/* 05/10/2026, Cédric : « elle doit parler aux gens qui veulent connaître la
+          programmation. pas aux artistes ». L'agenda est le premier écran. Le
+          discours aux artistes (en-tête, conditions, candidature) vit dans
+          l'onglet « Viens te faire voir » (/proposer). */}
       <SceneAgenda shows={shows} />
       <SceneCommentCaMarche />
-      <SceneConditions />
     </main>
   )
 }

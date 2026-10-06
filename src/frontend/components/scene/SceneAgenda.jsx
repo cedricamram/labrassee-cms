@@ -12,9 +12,16 @@ import SceneArtisteModal from './SceneArtisteModal'
 
 /** @typedef {import('../../lib/surlascene-data').SurlasceneShowDetail} SurlasceneShowDetail */
 
+// 05/10/2026 : l'agenda est le PREMIER écran de /scene (Cédric : « elle doit parler
+// aux gens qui veulent connaître la programmation. pas aux artistes »). D'où la
+// marge sous l'en-tête fixe, et un haut de section court sur téléphone.
 const Section = styled.section`
-  padding: 80px 24px;
+  padding: calc(var(--header-height) + 40px) 24px 80px;
   background: var(--color-dark);
+
+  @media (max-width: 768px) {
+    padding: calc(var(--header-height) + 16px) 16px 56px;
+  }
 `
 
 const Container = styled.div`
@@ -50,6 +57,10 @@ const Intro = styled.p`
   max-width: 640px;
   margin: 0 auto 40px;
   font-size: 16px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 20px;
+  }
 `
 
 const Vide = styled.div`
@@ -441,17 +452,15 @@ export default function SceneAgenda({ shows = [] }) {
     return (
       <Section id="agenda">
         <Container>
-          <Label>Agenda</Label>
+          <Label>La Brassée · Programmation</Label>
           <Titre>
-            Les <span className="u">prochains spectacles</span>
+            Les <span className="u">événements</span>
           </Titre>
           <Intro>
-            Cinq concerts par semaine (lundi, mardi, jeudi, vendredi, samedi). Entrée
-            libre. Premier arrivé, mieux placé.
+            Entrée libre, sans réservation, dès 19 h 30. Premier arrivé, mieux placé.
           </Intro>
           <Vide>
-            L'agenda du moment se précise. Reviens bientôt — ou écris à Cédric pour
-            proposer ta date.
+            L'agenda du moment se précise. Reviens bientôt.
           </Vide>
         </Container>
       </Section>
@@ -476,13 +485,13 @@ export default function SceneAgenda({ shows = [] }) {
   return (
     <Section id="agenda">
       <Container>
-        <Label>Agenda</Label>
-        <Titre>
-          Les <span className="u">prochains spectacles</span>
+        <Label>La Brassée · Programmation</Label>
+        <Titre as="h1">
+          Les <span className="u">événements</span>
         </Titre>
         <Intro>
-          Cinq concerts par semaine (lundi, mardi, jeudi, vendredi, samedi). Entrée
-          libre. Public en participation volontaire.
+          Entrée libre, sans réservation : tu pousses la porte, tu t'installes, et ça
+          commence à 19 h 30. Premier arrivé, mieux placé.
         </Intro>
 
         {first && a && (
