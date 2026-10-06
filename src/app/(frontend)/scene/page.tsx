@@ -8,7 +8,7 @@ import { getSceneAgendaShows } from '@/frontend/lib/payload-data'
 export const metadata: Metadata = {
   title: 'Les événements — La Brassée',
   description:
-    "Concerts, impro et soirées de quartier à La Brassée, plusieurs soirs par semaine. Entrée libre, sans réservation, dès 19 h 30.",
+    "Concerts, impro, jams et soirées de quartier à La Brassée, plusieurs soirs par semaine. Entrée libre, sans réservation, dès 19 h 30.",
 }
 
 // La BD Surlascène est sync 2h depuis le calendrier Apple → regen 5 min suffit
