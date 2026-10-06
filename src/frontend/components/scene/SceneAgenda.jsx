@@ -499,7 +499,7 @@ export default function SceneAgenda({ shows = [] }) {
           <CountdownBloc>
             <div className="gauche">
               <div className="label-cd">Prochain spectacle</div>
-              <div className="titre-cd">{a.nom_artiste}</div>
+              <div className="titre-cd">{first.titre_show || a.nom_artiste}</div>
               <div className="meta-cd">{dateTxt}</div>
             </div>
             <div className="timer">
