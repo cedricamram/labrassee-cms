@@ -422,8 +422,8 @@ export default function MenuFlipbook() {
           <span className="aide-tactile">Glisse pour tourner la page · touche la page pour zoomer</span>
         </Aide>
         <Avis>
-          <strong>On travaille fort sur le menu d&apos;automne-hiver.</strong> En attendant, voici le menu
-          actuel. Une question sur ce qu&apos;on sert aujourd&apos;hui ? Demande-nous au comptoir.
+          <strong>On travaille fort sur le menu d&apos;automne-hiver.</strong> En attendant, voici celui de
+          l&apos;été. Un doute sur ce qu&apos;on sert aujourd&apos;hui ? Demande-nous au comptoir.
         </Avis>
       </Hero>
 
