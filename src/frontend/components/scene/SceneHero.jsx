@@ -19,6 +19,12 @@ const HeroSection = styled.section`
     var(--color-dark);
   text-align: center;
   overflow: hidden;
+
+  /* Téléphone : un en-tête court, pour que les soirées arrivent vite sous le pouce. */
+  @media (max-width: 768px) {
+    min-height: 0;
+    padding: calc(var(--header-height) + 36px) 20px 28px;
+  }
 `
 
 const Spot = styled.div`
@@ -147,17 +153,16 @@ export default function SceneHero() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.5 }}
       >
-        Cinq soirs par semaine, La Brassée ouvre sa scène à des artistes qui veulent
-        jouer pour de vrai. Sans billetterie, sans cachet figé. La salle écoute, met
-        au chapeau, et la maison ajoute 10 % sur les factures du soir — 100 % pour
-        les artistes. Soundcheck 18 h 30, premier set 19 h 30.
+        Concerts, impro, jams et soirées de quartier, plusieurs soirs par semaine.
+        Entrée libre, sans réservation : tu pousses la porte, tu t'installes, et ça
+        commence à 19 h 30.
       </Pitch>
       <CTAs>
         <Btn href="#agenda" className="primaire">
-          Voir le prochain spectacle
+          Voir les prochaines soirées
         </Btn>
         <Btn href="/proposer" className="secondaire">
-          Proposer ma candidature
+          Tu es artiste ? Propose ta soirée
         </Btn>
       </CTAs>
     </HeroSection>
