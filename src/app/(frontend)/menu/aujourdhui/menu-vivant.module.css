@@ -68,6 +68,9 @@
 .pied { margin-top: 32px; color: var(--color-accent, #cdc49d); font-size: 0.9rem; text-align: center; line-height: 1.5; }
 .vide { text-align: center; margin-top: 24px; line-height: 1.5; }
 .vide a { color: var(--color-brand, #f7d135); }
+/* Zone tactile ≥ 44 px (le lien en ligne ne fait que ~18 px) : pseudo-élément invisible, aucun changement visuel ni de mise en page. */
+.vide a { position: relative; }
+.vide a::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 44px; transform: translateY(-50%); }
 /* v2 — structure du menu papier (29/09) : blocs, encadrés, groupes. Simple, comme la carte. */
 .bloc { margin-top: 14px; }
 .blocTitre { font-family: var(--font-din, 'Arial Narrow', sans-serif); font-size: 1.25rem; color: var(--color-white, #f1efe4); margin: 10px 0 2px; letter-spacing: 0.02em; }
