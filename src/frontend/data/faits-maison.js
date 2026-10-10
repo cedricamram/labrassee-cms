@@ -52,7 +52,7 @@ export function indexSemaineMontreal(dateISO) {
 export const RECITS = [
   {
     sujet: 'buanderie',
-    titre: 'On lave aussi votre linge',
+    titre: 'On lave aussi ton linge',
     phrase: 'Nos machines ne sont plus jeunes. On les répare plutôt que de les remplacer.',
     suite:
       'Elles ont vu passer des années de linge — et des garde-robes entières, du bébé à l’adulte. Lavage 2,50 $ à 3,50 $, séchage 25 sous.',
@@ -69,59 +69,59 @@ export const RECITS = [
     titre: 'Plus de sept cents soirées depuis 2021',
     phrase: 'Notre scène n’est pas un à-côté.',
     suite:
-      'Concerts, jazz, choro, poésie, impro, karaoké, micro ouvert. Les soirs de concert, dix pour cent de votre facture vont directement à l’artiste.',
+      'Concerts, jazz, choro, poésie, impro, karaoké, micro ouvert. Les soirs de concert, dix pour cent de ta facture vont directement à l’artiste.',
   },
   {
     sujet: 'cafe',
     titre: 'Une seule ferme, un seul café',
-    phrase: 'Celui qu’on vous sert est celui qu’on vous vend.',
+    phrase: 'Celui qu’on te sert est celui qu’on te vend.',
     suite:
-      'Le colombien Las Rosas, 19 $ les 300 g — pas de taxes sur le café en vrac, et on vous le moud devant vous.',
+      'Le colombien Las Rosas, 19 $ les 300 g — pas de taxes sur le café en vrac, et on te le moud devant toi.',
   },
   {
     sujet: 'service',
-    titre: 'Asseyez-vous, on vient à vous',
+    titre: 'Assieds-toi, on vient à toi',
     phrase: 'Pas de file au comptoir, pas de plateau à rapporter.',
     suite:
-      'On prend votre commande à table et on vous l’apporte. Même une canette : on l’ouvre devant vous et on la verse.',
+      'On prend ta commande à table et on te l’apporte. Même une canette : on l’ouvre devant toi et on la verse.',
   },
   {
     sujet: 'vege',
     titre: 'Végane et sans gluten, tous les jours',
-    phrase: 'Il y a toujours quelque chose pour vous, sans avoir à demander.',
+    phrase: 'Il y a toujours quelque chose pour toi, sans avoir à demander.',
     suite:
       'Brownie végane sans gluten, muffins véganes, salade végane, une option végé sur presque chaque plat du jour et trois quiches sur quatre.',
   },
   {
     sujet: 'the',
     titre: 'Trente-deux thés, vendus au poids',
-    phrase: 'Du grammage que vous voulez.',
+    phrase: 'Du grammage que tu veux.',
     suite:
-      'Noirs, verts, blancs, matchas, sans théine — choisis avec Un Amour des Thés, à Montréal. Repartez avec ce que vous venez de boire.',
+      'Noirs, verts, blancs, matchas, sans théine — choisis avec Un Amour des Thés, à Montréal. Repars avec ce que tu viens de boire.',
   },
   {
     sujet: 'lufa',
-    titre: 'Votre panier Lufa vous attend ici',
+    titre: 'Ton panier Lufa t’attend ici',
     phrase: 'On est ouverts sept jours sur sept.',
     suite:
-      'Votre panier vous attend quand ça vous adonne, pas quand ça adonne à un horaire.',
+      'Ton panier t’attend quand ça t’adonne, pas quand ça adonne à un horaire.',
   },
 ]
 
 export const CHIFFRES = [
   { sujet: 'vege', chiffre: '0 $', legende: 'de supplément sur les laits végétaux' },
-  { sujet: 'tasse', chiffre: '40 ¢', legende: 'de moins si vous apportez votre tasse' },
+  { sujet: 'tasse', chiffre: '40 ¢', legende: 'de moins si tu apportes ta tasse' },
   { sujet: 'the', chiffre: '32', legende: 'thés et tisanes vendus au poids' },
   { sujet: 'lufa', chiffre: '7 / 7', legende: 'point de cueillette Lufa' },
-  { sujet: 'service', chiffre: 'À table', legende: 'on prend la commande et on vous sert' },
+  { sujet: 'service', chiffre: 'À table', legende: 'on prend la commande et on te sert' },
   { sujet: 'vege', chiffre: 'Végé', legende: 'végane et sans gluten, tous les jours' },
   { sujet: 'scene', chiffre: '731', legende: 'soirées de spectacle depuis 2021' },
   { sujet: 'cafe', chiffre: '19 $', legende: 'les 300 g de café colombien, sans taxes' },
   { sujet: 'buanderie', chiffre: '2,50 $', legende: 'la brassée, à notre buanderie' },
   { sujet: 'maison', chiffre: '100 %', legende: 'de nos pâtisseries sont faites ici' },
-  { sujet: 'scene', chiffre: '10 %', legende: 'de votre facture à l’artiste, les soirs de concert' },
+  { sujet: 'scene', chiffre: '10 %', legende: 'de ta facture à l’artiste, les soirs de concert' },
   { sujet: 'buanderie', chiffre: '25 ¢', legende: 'le séchage, pour quatre minutes' },
-  { sujet: 'cafe', chiffre: 'Moulu', legende: 'devant vous, au grain que vous voulez' },
+  { sujet: 'cafe', chiffre: 'Moulu', legende: 'devant toi, au grain que tu veux' },
 ]
 
 // Deux récits par semaine — c'est la taille des paires ci-dessous.

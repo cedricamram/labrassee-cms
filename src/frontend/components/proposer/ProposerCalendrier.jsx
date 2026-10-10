@@ -409,12 +409,12 @@ function urlDepot(type, iso) {
 function tagPour(statut, vernissageRole) {
   switch (statut) {
     case 'libre': return null
-    case 'libre_expo': return 'expo ?'
-    case 'libre_pages': return 'auteur ?'
+    case 'libre_expo': return 'libre'
+    case 'libre_pages': return 'libre'
     case 'libre_expo_attente': return null
     case 'impro': return null // deprecated, plus émis
     case 'reservee': return 'résa'
-    case 'bookee': return 'booké'
+    case 'bookee': return 'pris'
     case 'bookee_perm': return null // récurrence éditoriale : pas de tag
     case 'reservee_expo':
       return vernissageRole === 'accrochage' ? 'acc.' : 'vern.'
@@ -582,9 +582,9 @@ export default function ProposerCalendrier({ mois = [] }) {
                   // Tooltips génériques uniquement — on ne révèle pas le nom des shows
                   const titleHover =
                     j.statut === 'bookee'
-                      ? 'Date bookée (concert)'
+                      ? 'Date prise (concert)'
                       : j.statut === 'bookee_perm'
-                        ? (j.dow === 1 ? 'Lundi : soirée Impro (récurrence éditoriale)' : 'Date bookée (récurrence éditoriale)')
+                        ? (j.dow === 1 ? 'Lundi : soirée impro (récurrente)' : 'Date prise (soirée récurrente)')
                         : j.statut === 'reservee'
                           ? 'Date réservée — concert en attente de confirmation'
                           : j.statut === 'bookee_expo'
@@ -596,7 +596,7 @@ export default function ProposerCalendrier({ mois = [] }) {
                                 ? 'Dim AM : décrochage / accrochage Sur nos murs (en attente)'
                                 : 'Dim : vernissage Sur nos murs · 5 à 7 (en attente)')
                             : j.statut === 'impro'
-                              ? 'Lundi : soirée Impro (récurrence éditoriale)'
+                              ? 'Lundi : soirée impro (récurrente)'
                               : j.statut === 'libre_expo'
                                 ? 'Dimanche libre — clique pour proposer une expo Sur nos murs'
                                 : j.statut === 'libre_pages'
