@@ -68,14 +68,14 @@ const partenaires = [
     nom: 'Rosemont',
     role: 'Spiritueux',
     description:
-      'Des spiritueux qui portent le nom de notre quartier. Leur tequila entre dans nos cocktails.',
+      'Des spiritueux qui portent le nom de notre quartier. Leur rhum, leur whisky et leur gin entrent dans nos cocktails.',
   },
   {
     slug: 'madison-park',
     nom: 'Madison Park',
     role: 'Gins',
     description:
-      'Leur London Dry et leur gin à la bergamote sont sur notre carte de cocktails.',
+      'Distillerie 1769, à LaSalle. Leur London Dry et leur gin à la bergamote sont sur notre carte de cocktails.',
   },
 ]
 
