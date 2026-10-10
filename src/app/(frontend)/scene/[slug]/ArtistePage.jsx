@@ -1,0 +1,917 @@
+'use client'
+
+import React, { useState } from 'react'
+import styled from 'styled-components'
+import { motion } from 'framer-motion'
+
+/**
+ * @typedef {import('../../../../frontend/lib/surlascene-artiste').FicheArtiste} FicheArtiste
+ * @typedef {import('../../../../frontend/lib/surlascene-artiste').ConcertPublic} ConcertPublic
+ */
+
+// ─────────────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────────────
+
+const JOURS_FR = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
+const MOIS_FR = [
+  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
+]
+
+/** Formate 'YYYY-MM-DD' → 'vendredi 30 mai 2025'. */
+function formatDate(iso) {
+  const d = new Date(iso + 'T12:00:00')
+  return `${JOURS_FR[d.getDay()]} ${d.getDate()} ${MOIS_FR[d.getMonth()]} ${d.getFullYear()}`
+}
+
+/** Formate '19:30:00' → '19h30'. */
+function formatHeure(heure) {
+  if (!heure) return null
+  return heure.slice(0, 5).replace(':', 'h')
+}
+
+/** S'assure qu'une URL a bien un protocole. */
+function safeUrl(url) {
+  if (!url) return null
+  return url.startsWith('http') ? url : 'https://' + url
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// STYLED COMPONENTS
+// ─────────────────────────────────────────────────────────────────────
+
+const Page = styled.div`
+  width: 100%;
+  background: #100f09;
+  color: #fff;
+  min-height: 100vh;
+`
+
+/* ── HERO ── */
+
+const Hero = styled(motion.section)`
+  position: relative;
+  width: 100%;
+  min-height: 70vh;
+  display: flex;
+  align-items: flex-end;
+  padding: 100px 24px 60px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #100f09;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(16, 15, 9, 0.2) 0%,
+      rgba(16, 15, 9, 0.55) 55%,
+      rgba(16, 15, 9, 0.95) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+  }
+`
+
+const HeroBg = styled.div`
+  position: absolute;
+  inset: 0;
+  background-image: ${(p) => (p.$src ? `url('${p.$src}')` : 'none')};
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  z-index: 0;
+  filter: blur(1px) brightness(0.65);
+  transform: scale(1.04);
+`
+
+const HeroContent = styled.div`
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+`
+
+const Eyebrow = styled.div`
+  font-family: var(--font-din);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #f7d135;
+  margin-bottom: 16px;
+
+  @media (max-width: 640px) {
+    font-size: 11px;
+    letter-spacing: 2px;
+  }
+`
+
+const NomArtiste = styled.h1`
+  font-family: var(--font-din);
+  font-size: clamp(42px, 8vw, 110px);
+  font-weight: 200;
+  letter-spacing: -2px;
+  color: #ffffff;
+  margin: 0 0 16px;
+  line-height: 0.95;
+
+  @media (max-width: 640px) {
+    letter-spacing: -1px;
+  }
+`
+
+const Genre = styled.div`
+  font-family: var(--font-din);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 24px;
+`
+
+const MetaBadges = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+`
+
+const Badge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(247, 209, 53, 0.12);
+  border: 1px solid rgba(247, 209, 53, 0.3);
+  border-radius: 999px;
+  font-family: var(--font-din);
+  font-size: 12px;
+  color: #f7d135;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+`
+
+/* ── CORPS ── */
+
+const Container = styled.div`
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 24px 100px;
+`
+
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 60px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+`
+
+const MainCol = styled.div`display: flex; flex-direction: column; gap: 60px;`
+
+const SideCol = styled.div`display: flex; flex-direction: column; gap: 40px;`
+
+/* ── BIO ── */
+
+const SectionTitle = styled.h2`
+  font-family: var(--font-din);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 20px;
+`
+
+const BioText = styled.p`
+  font-family: var(--font-lato, 'Lato', sans-serif);
+  font-size: 16px;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+  white-space: pre-line;
+`
+
+/* ── GALERIE ── */
+
+const Galerie = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+`
+
+const GalerieImg = styled(motion.img)`
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #1a1810;
+  transition: opacity 0.2s;
+
+  &:hover { opacity: 0.85; }
+`
+
+/* ── VIDÉO ── */
+
+const VideoGrid = styled.div`
+  display: grid;
+  grid-template-columns: ${(p) => (p.$single ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))')};
+  gap: 14px;
+`
+
+/* Cadre vidéo : s'adapte à l'orientation RÉELLE de la vidéo (portrait ou paysage)
+   pour ne jamais rogner le visage de l'artiste. Défaut 16/9 tant que les
+   métadonnées ne sont pas chargées ; les vidéos portrait sont bornées en largeur
+   et centrées pour garder une taille raisonnable dans la grille. */
+const VideoFrameWrap = styled.div`
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: ${(p) => p.$ratio || '16 / 9'};
+  ${(p) => p.$portrait && 'max-width: 340px; margin-inline: auto;'}
+  background: #1a1810;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+`
+
+const PlayOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
+  opacity: ${(p) => (p.$hidden ? 0 : 1)};
+  transition: opacity 0.25s;
+
+  .btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #f7d135;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 30px rgba(247, 209, 53, 0.5);
+  }
+  .btn::after {
+    content: '';
+    border-left: 22px solid #100f09;
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    margin-left: 5px;
+  }
+`
+
+const VCap = styled.div`
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: 30px 18px 12px;
+  font-family: var(--font-din);
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #f1efe4;
+  background: linear-gradient(to top, rgba(8, 7, 4, 0.92), rgba(8, 7, 4, 0));
+  pointer-events: none;
+`
+
+const SoundHint = styled.div`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 3;
+  font-family: var(--font-din);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(8, 7, 4, 0.6);
+  padding: 5px 10px;
+  border-radius: 6px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`
+
+const Ribbon = styled.span`
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  font-family: var(--font-din);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: #f7d135;
+  color: #100f09;
+  padding: 6px 12px;
+  border-radius: 5px;
+  pointer-events: none;
+`
+
+/* Bloc bénéfice : vidéo + objectif côte à côte */
+const BenefitGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #15130c;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(247, 209, 53, 0.18);
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+
+  ${VideoFrameWrap} {
+    border-radius: 0;
+    box-shadow: none;
+  }
+`
+
+const ObjPanel = styled.div`
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`
+
+const ObjCause = styled.div`
+  font-family: var(--font-din);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.15;
+  margin-bottom: 12px;
+  color: #f1efe4;
+
+  em {
+    color: #f7d135;
+    font-style: normal;
+  }
+`
+
+const ObjText = styled.p`
+  font-family: var(--font-lato, 'Lato', sans-serif);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 0 14px;
+  white-space: pre-line;
+`
+
+const CtaRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+`
+
+const CtaBtn = styled.a`
+  font-family: var(--font-din);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 11px 16px;
+  border-radius: 7px;
+
+  &.don {
+    background: #f7d135;
+    color: #100f09;
+  }
+  &.billet {
+    background: transparent;
+    color: #f7d135;
+    border: 1px solid rgba(247, 209, 53, 0.5);
+  }
+`
+
+/* ── LIGHTBOX ── */
+
+const LightboxOverlay = styled(motion.div)`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  cursor: zoom-out;
+`
+
+const LightboxImg = styled.img`
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 4px;
+`
+
+/* ── LIENS SOCIAUX ── */
+
+const LiensBloc = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+`
+
+const LienItem = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  text-decoration: none;
+  font-family: var(--font-din);
+  font-size: 14px;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover {
+    background: rgba(247, 209, 53, 0.08);
+    border-color: rgba(247, 209, 53, 0.4);
+    color: #f7d135;
+  }
+
+  .icon { font-size: 18px; opacity: 0.8; flex-shrink: 0; }
+  .label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+`
+
+/* ── CONCERTS ── */
+
+const ConcertListe = styled.div`display: flex; flex-direction: column; gap: 12px;`
+
+const ConcertCard = styled.a`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  text-decoration: none;
+  color: #fff;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover {
+    background: rgba(247, 209, 53, 0.07);
+    border-color: rgba(247, 209, 53, 0.35);
+  }
+
+  &.passe {
+    opacity: 0.55;
+    &:hover { opacity: 0.75; }
+  }
+`
+
+const ConcertDate = styled.div`
+  font-family: var(--font-din);
+  font-size: 13px;
+  font-weight: 600;
+  color: #f7d135;
+  text-transform: capitalize;
+`
+
+const ConcertTitre = styled.div`
+  font-family: var(--font-din);
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.9);
+`
+
+const ConcertHeure = styled.div`
+  font-family: var(--font-din);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+`
+
+/* Affiche de l'événement (ex. montage duo) — ratio naturel, jamais recadré. */
+const ConcertCover = styled.img`
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 10px;
+  margin-bottom: 10px;
+`
+
+/* Texte de présentation fourni pour CETTE soirée. */
+const ConcertDesc = styled.p`
+  font-family: var(--font-din);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 6px 0 0;
+  white-space: pre-line;
+`
+
+const Vide = styled.p`
+  font-family: var(--font-din);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+`
+
+/* ── RETOUR ── */
+
+const RetourLien = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-din);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+  margin-bottom: 40px;
+  transition: color 0.2s;
+
+  &:hover { color: #f7d135; }
+`
+
+// ─────────────────────────────────────────────────────────────────────
+// LECTEUR VIDÉO — lecture muette au survol, son au clic
+// ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Vignette vidéo : démarre muette au survol, active le son au clic.
+ *
+ * @param {object} props
+ * @param {string} props.src
+ * @param {string} [props.caption]
+ * @param {React.ReactNode} [props.ribbon]
+ */
+const VideoFrame = ({ src, caption, ribbon }) => {
+  const ref = React.useRef(/** @type {HTMLVideoElement | null} */ (null))
+  const [active, setActive] = useState(false)
+  const [ratio, setRatio] = useState(/** @type {number | null} */ (null))
+
+  /** Mémorise le ratio réel de la vidéo pour adapter le cadre (anti-rognage du visage). */
+  const handleMeta = () => {
+    const v = ref.current
+    if (v && v.videoWidth && v.videoHeight) setRatio(v.videoWidth / v.videoHeight)
+  }
+
+  /** Lance la lecture muette au survol. */
+  const handleEnter = () => {
+    const v = ref.current
+    if (!v) return
+    if (!active) {
+      v.muted = true
+      v.play().catch(() => {})
+    }
+  }
+
+  /** Met en pause et rembobine quand on quitte (sauf si le son est activé). */
+  const handleLeave = () => {
+    const v = ref.current
+    if (!v || active) return
+    v.pause()
+    v.currentTime = 0
+  }
+
+  /** Active le son et lance la lecture au clic. */
+  const handleClick = () => {
+    const v = ref.current
+    if (!v) return
+    v.muted = false
+    v.play().catch(() => {})
+    setActive(true)
+  }
+
+  return (
+    <VideoFrameWrap
+      $ratio={ratio || undefined}
+      $portrait={ratio != null && ratio < 0.95}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      onClick={handleClick}
+    >
+      {ribbon}
+      <video ref={ref} src={src} playsInline loop preload="metadata" onLoadedMetadata={handleMeta} />
+      <PlayOverlay $hidden={active}>
+        <div className="btn" />
+      </PlayOverlay>
+      {!active && (
+        <SoundHint>
+          <i className="fas fa-volume-mute" />
+          Cliquer pour le son
+        </SoundHint>
+      )}
+      {caption && <VCap>{caption}</VCap>}
+    </VideoFrameWrap>
+  )
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// COMPOSANT
+// ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Fiche publique d'un artiste Surlascène.
+ *
+ * @param {object} props
+ * @param {FicheArtiste} props.fiche
+ */
+const ArtistePage = ({ fiche }) => {
+  const { artiste, prochaines, passees, photoUrl, galerieUrls, videosUrls, benefice } = fiche
+  const [lightboxSrc, setLightboxSrc] = useState(null)
+
+  // Lien billet : 1re date à venir avec un événement FB (si disponible).
+  const billetUrl = prochaines.find((c) => c.fb_event_url)?.fb_event_url || null
+
+  const liens = [
+    artiste.site_web && { href: safeUrl(artiste.site_web), icon: 'fas fa-globe', label: 'Site web' },
+    artiste.instagram && {
+      href: safeUrl(
+        artiste.instagram.startsWith('http') ? artiste.instagram : 'https://instagram.com/' + artiste.instagram.replace(/^@/, ''),
+      ),
+      icon: 'fab fa-instagram',
+      label: 'Instagram',
+    },
+    artiste.spotify_url && { href: safeUrl(artiste.spotify_url), icon: 'fab fa-spotify', label: 'Spotify' },
+    artiste.bandcamp_url && { href: safeUrl(artiste.bandcamp_url), icon: 'fab fa-bandcamp', label: 'Bandcamp' },
+    artiste.youtube_url && { href: safeUrl(artiste.youtube_url), icon: 'fab fa-youtube', label: 'YouTube' },
+    artiste.tiktok && {
+      href: safeUrl(
+        artiste.tiktok.startsWith('http') ? artiste.tiktok : 'https://tiktok.com/@' + artiste.tiktok.replace(/^@/, ''),
+      ),
+      icon: 'fab fa-tiktok',
+      label: 'TikTok',
+    },
+  ].filter(Boolean)
+
+  return (
+    <Page>
+      {/* HERO */}
+      <Hero initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
+        {photoUrl && <HeroBg $src={photoUrl} />}
+        <HeroContent>
+          <Eyebrow>Sur la scène de La Brassée</Eyebrow>
+          <NomArtiste>{artiste.nom_artiste}</NomArtiste>
+          {artiste.genre && <Genre>{artiste.genre}</Genre>}
+          <MetaBadges>
+            {artiste.nb_personnes_scene != null && (
+              <Badge>
+                <i className="fas fa-users" />
+                {artiste.nb_personnes_scene === 1 ? 'Solo' : `${artiste.nb_personnes_scene} musicien·nes`}
+              </Badge>
+            )}
+            {artiste.duree_set_minutes != null && (
+              <Badge>
+                <i className="fas fa-clock" />
+                {artiste.duree_set_minutes} min
+              </Badge>
+            )}
+          </MetaBadges>
+        </HeroContent>
+      </Hero>
+
+      {/* CORPS */}
+      <Container>
+        <RetourLien href="/scene">← Retour à l&apos;agenda</RetourLien>
+
+        <Grid>
+          <MainCol>
+            {/* BIO */}
+            {artiste.bio && (
+              <section>
+                <SectionTitle>À propos</SectionTitle>
+                <BioText>{artiste.bio}</BioText>
+              </section>
+            )}
+
+            {/* VIDÉO */}
+            {videosUrls.length > 0 && benefice && (
+              <section>
+                <SectionTitle>Pourquoi cette soirée</SectionTitle>
+                <BenefitGrid>
+                  <VideoFrame
+                    src={videosUrls[0]}
+                    caption="Soirée-bénéfice · les profs relèvent le défi"
+                    ribbon={<Ribbon>★ Soirée-bénéfice</Ribbon>}
+                  />
+                  <ObjPanel>
+                    <ObjCause>
+                      Une soirée <em>au profit d&apos;une cause</em>
+                    </ObjCause>
+                    {artiste.bio && <ObjText>{artiste.bio}</ObjText>}
+                    {billetUrl && (
+                      <CtaRow>
+                        <CtaBtn
+                          className="billet"
+                          href={safeUrl(billetUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Billet concert
+                        </CtaBtn>
+                      </CtaRow>
+                    )}
+                  </ObjPanel>
+                </BenefitGrid>
+              </section>
+            )}
+
+            {videosUrls.length > 0 && !benefice && (
+              <section>
+                <SectionTitle>L&apos;artiste sur scène</SectionTitle>
+                <VideoGrid $single={videosUrls.length === 1}>
+                  {videosUrls.map((url, i) => (
+                    <VideoFrame
+                      key={i}
+                      src={url}
+                      caption={i === 0 ? artiste.genre || undefined : undefined}
+                    />
+                  ))}
+                </VideoGrid>
+              </section>
+            )}
+
+            {/* GALERIE */}
+            {galerieUrls.length > 0 && (
+              <section>
+                <SectionTitle>Galerie</SectionTitle>
+                <Galerie>
+                  {galerieUrls.map((url, i) => (
+                    <GalerieImg
+                      key={i}
+                      src={url}
+                      alt={`Photo ${i + 1} — ${artiste.nom_artiste}`}
+                      loading="lazy"
+                      decoding="async"
+                      whileHover={{ scale: 1.03 }}
+                      onClick={() => setLightboxSrc(url)}
+                    />
+                  ))}
+                </Galerie>
+              </section>
+            )}
+
+            {/* PROCHAINES DATES */}
+            <section>
+              <SectionTitle>Prochaines dates à La Brassée</SectionTitle>
+              {prochaines.length === 0 ? (
+                <Vide>Aucune date à venir pour l&apos;instant.</Vide>
+              ) : (
+                <ConcertListe>
+                  {prochaines.map((c) => (
+                    <ConcertCard
+                      key={c.id}
+                      href={c.fb_event_url ? safeUrl(c.fb_event_url) : '/scene#agenda'}
+                      target={c.fb_event_url ? '_blank' : undefined}
+                      rel={c.fb_event_url ? 'noopener noreferrer' : undefined}
+                    >
+                      {c.cover_image_url && (
+                        <ConcertCover src={c.cover_image_url} alt={c.titre_show || ''} loading="lazy" />
+                      )}
+                      <ConcertDate>{formatDate(c.date_show)}</ConcertDate>
+                      {c.titre_show && <ConcertTitre>{c.titre_show}</ConcertTitre>}
+                      {c.heure_debut && (
+                        <ConcertHeure>{formatHeure(c.heure_debut)}</ConcertHeure>
+                      )}
+                      {c.description_publique && (
+                        <ConcertDesc>{c.description_publique}</ConcertDesc>
+                      )}
+                    </ConcertCard>
+                  ))}
+                </ConcertListe>
+              )}
+            </section>
+
+            {/* DATES PASSÉES */}
+            {passees.length > 0 && (
+              <section>
+                <SectionTitle>Dates passées</SectionTitle>
+                <ConcertListe>
+                  {passees.map((c) => (
+                    <ConcertCard
+                      key={c.id}
+                      as="div"
+                      className="passe"
+                    >
+                      <ConcertDate>{formatDate(c.date_show)}</ConcertDate>
+                      {c.titre_show && <ConcertTitre>{c.titre_show}</ConcertTitre>}
+                      {c.heure_debut && (
+                        <ConcertHeure>{formatHeure(c.heure_debut)}</ConcertHeure>
+                      )}
+                    </ConcertCard>
+                  ))}
+                </ConcertListe>
+              </section>
+            )}
+          </MainCol>
+
+          {/* SIDEBAR */}
+          <SideCol>
+            {/* Photo portrait dans la sidebar si pas de galerie */}
+            {photoUrl && galerieUrls.length === 0 && (
+              <img
+                src={photoUrl}
+                alt={artiste.nom_artiste}
+                style={{ width: '100%', borderRadius: '10px', objectFit: 'cover', aspectRatio: '3/4' }}
+              />
+            )}
+
+            {/* Liens */}
+            {liens.length > 0 && (
+              <div>
+                <SectionTitle>Retrouver l&apos;artiste</SectionTitle>
+                <LiensBloc>
+                  {liens.map((lien) => (
+                    <LienItem key={lien.href} href={lien.href} target="_blank" rel="noopener noreferrer">
+                      <i className={`${lien.icon} icon`} />
+                      <span className="label">{lien.label}</span>
+                      <i className="fas fa-external-link-alt" style={{ fontSize: '11px', opacity: 0.4 }} />
+                    </LienItem>
+                  ))}
+                </LiensBloc>
+              </div>
+            )}
+
+            {/* Appel à l'action — réserver */}
+            <div
+              style={{
+                padding: '20px',
+                background: 'rgba(247, 209, 53, 0.08)',
+                border: '1px solid rgba(247, 209, 53, 0.25)',
+                borderRadius: '14px',
+              }}
+            >
+              <p
+                style={{
+                  fontFamily: 'var(--font-din)',
+                  fontSize: '13px',
+                  color: 'rgba(255,255,255,0.65)',
+                  marginBottom: '12px',
+                  lineHeight: 1.5,
+                }}
+              >
+                Tu veux te produire à La Brassée ? Les artistes locaux sont les bienvenus. Entrée libre, chapeau et 10 % de la soirée.
+              </p>
+              <a
+                href="/proposer"
+                style={{
+                  display: 'inline-block',
+                  padding: '10px 18px',
+                  background: '#f7d135',
+                  color: '#100f09',
+                  borderRadius: '8px',
+                  fontFamily: 'var(--font-din)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                }}
+              >
+                Proposer mon projet
+              </a>
+            </div>
+          </SideCol>
+        </Grid>
+      </Container>
+
+      {/* LIGHTBOX */}
+      {lightboxSrc && (
+        <LightboxOverlay
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setLightboxSrc(null)}
+        >
+          <LightboxImg src={lightboxSrc} alt="Photo agrandie" onClick={(e) => e.stopPropagation()} />
+        </LightboxOverlay>
+      )}
+    </Page>
+  )
+}
+
+export default ArtistePage

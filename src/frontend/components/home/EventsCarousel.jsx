@@ -5,6 +5,8 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import EventCard from './EventCard';
 
+/** @typedef {import('../../lib/payload-data').FrontendEvent} FrontendEvent */
+
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -130,6 +132,9 @@ const StyledSwiper = styled(Swiper)`
   }
 `;
 
+/**
+ * @param {{ events?: FrontendEvent[] }} props
+ */
 const EventsCarousel = ({ events = [] }) => {
   return (
     <CarouselSection>
@@ -205,7 +210,7 @@ const EventsCarousel = ({ events = [] }) => {
             <i className="fab fa-facebook"></i>
           </InfoIcon>
           <InfoText>
-            Clique sur une affiche pour accéder à l'événement Facebook!
+            Clique sur une affiche pour voir le détail de la soirée ou l'événement Facebook.
           </InfoText>
         </InfoBlock>
       </CarouselContainer>

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { EventViewCount, trackEventView } from './EventViewCount';
 
 const CardWrapper = styled(motion.a)`
   display: block;
@@ -26,10 +27,40 @@ const EventImage = styled.img`
   display: block;
   background-color: var(--color-dark-alt);
   transition: opacity 0.2s ease-in-out;
-  
+
   &:not([src]),
   &[src=""] {
     opacity: 0.5;
+  }
+`;
+
+/* Poster de fallback pour les events SANS image (concert Surlascène dont
+   l'artiste n'a pas encore déposé de photo HD). Gradient sobre + Maïa filigrane
+   — le texte (nom + date) est géré par le TextOverlay standard en bas. */
+const FallbackPoster = styled.div`
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: #100f09;
+  background-image:
+    radial-gradient(ellipse at 30% 15%, rgba(247, 209, 53, 0.18), transparent 55%),
+    radial-gradient(ellipse at 75% 85%, rgba(247, 209, 53, 0.08), transparent 55%),
+    linear-gradient(180deg, #1a1810 0%, #100f09 100%);
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60%;
+    height: 60%;
+    transform: translate(-50%, -65%);
+    background-image: url('/picto_maia_white.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.16;
   }
 `;
 
@@ -50,8 +81,9 @@ const DayBadge = styled.div`
   position: absolute;
   top: 12px;
   left: 12px;
-  background: var(--color-brand);
-  color: var(--color-dark);
+  /* Jaune = à venir / aujourd'hui ; gris discret = événement passé ("C’ÉTAIT HIER"). */
+  background: ${(p) => (p.$past ? 'rgba(255, 255, 255, 0.14)' : 'var(--color-brand)')};
+  color: ${(p) => (p.$past ? 'rgba(255, 255, 255, 0.82)' : 'var(--color-dark)')};
   font-size: 12px;
   font-weight: 300;
   padding: 6px 12px;
@@ -68,6 +100,54 @@ const DayBadge = styled.div`
   @media (max-width: 768px) {
     font-size: 10px;
     padding: 5px 10px;
+  }
+`;
+
+// Bandeau public posé en base (concerts.bandeau) : « En attente de confirmation »,
+// « Complet »… Il vit dans la zone du titre, en bas : jamais sur le visage de
+// l'artiste (le 05/10, en haut de la carte, il cachait les yeux de Tiffany).
+const Bandeau = styled.div`
+  align-self: flex-start;
+  background: var(--color-brand);
+  color: var(--color-dark);
+  font-family: var(--font-din);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 5px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+`;
+
+const GenreBadge = styled.div`
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(16, 15, 9, 0.7);
+  border: 1px solid rgba(247, 209, 53, 0.4);
+  color: var(--color-brand);
+  font-family: var(--font-din);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+
+  @media (max-width: 768px) {
+    font-size: 9px;
+    padding: 4px 8px;
+    letter-spacing: 1px;
   }
 `;
 
@@ -93,6 +173,33 @@ const EventDate = styled.p`
     font-size: 12px;
   }
 `;
+
+// --- Dates déterministes (rendu serveur === rendu client) ------------------
+// Un événement est un JOUR civil, pas un instant précis. Payload stocke la date
+// en ISO minuit UTC ("2026-06-05T00:00:00.000Z"), Supabase en date nue
+// ("2026-06-05"). On ne lit donc QUE la portion YYYY-MM-DD, qu'on ancre à midi
+// UTC et qu'on formate en timeZone UTC : aucun décalage de fuseau possible.
+//
+// Sans ce verrou, `new Date(d).toLocaleDateString()` rendait un jour côté serveur
+// (Vercel = UTC → "vendredi 5 juin") et un autre côté client (Montréal UTC−4 →
+// "jeudi 4 juin"). Ce texte divergent déclenchait une erreur d'hydratation React
+// (#418) qui forçait un re-rendu complet → Swiper se réinitialisait et le
+// carrousel « sautait ». (Bug corrigé 2026-06-05, cf. docs/BUG_FIXES.md)
+const toCalendarDate = (dateString) =>
+  new Date(`${String(dateString).slice(0, 10)}T12:00:00Z`);
+
+// "Aujourd'hui" en date civile Montréal — calcul identique serveur/client.
+const todayMontrealYMD = () => {
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Toronto',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const parts = fmt.formatToParts(new Date());
+  const get = (t) => parts.find((p) => p.type === t)?.value || '';
+  return `${get('year')}-${get('month')}-${get('day')}`;
+};
 
 const EventCard = ({ event, index }) => {
   const cardVariants = {
@@ -121,14 +228,14 @@ const EventCard = ({ event, index }) => {
     return `https://${url}`;
   };
 
-  // Fonction pour formater la date
+  // Fonction pour formater la date (déterministe, jour civil — voir helpers ci-dessus)
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
+    return toCalendarDate(dateString).toLocaleDateString('fr-FR', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      timeZone: 'UTC',
     });
   };
 
@@ -141,60 +248,114 @@ const EventCard = ({ event, index }) => {
     return formattedDate;
   };
 
-  // Fonction pour obtenir le badge du jour si l'événement est cette semaine
+  // Badge du jour. Tout est calculé sur des dates civiles YYYY-MM-DD ancrées à
+  // midi UTC → résultat identique serveur/client (pas d'hydration warning).
+  //
+  // Règle (corrigée 2026-06-05) : on ne crie « CE JEUDI » en jaune que pour
+  // aujourd'hui et les jours À VENIR de la semaine. Un événement DÉJÀ PASSÉ
+  // (l'event d'hier qu'on garde tronqué à gauche) ne doit pas se faire passer
+  // pour un événement à venir → badge gris « C’ÉTAIT HIER » / « TERMINÉ ».
   const getDayBadge = (dateString) => {
-    const eventDate = new Date(dateString);
-    const today = new Date();
+    const eventYMD = String(dateString).slice(0, 10);
+    const todayYMD = todayMontrealYMD();
+    const days = ['DIMANCHE', 'LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI'];
 
-    // Mettre les heures à 0 pour comparer seulement les dates
-    eventDate.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
+    // Aujourd'hui → « CE [JOUR] » (jaune).
+    if (eventYMD === todayYMD) {
+      return { prefix: 'CE', day: days[toCalendarDate(eventYMD).getUTCDay()], past: false };
+    }
 
-    // Calculer le début et la fin de la semaine en cours (lundi à dimanche)
-    const dayOfWeek = today.getDay();
+    // Passé → badge gris, jamais « CE ».
+    if (eventYMD < todayYMD) {
+      const veille = toCalendarDate(todayYMD);
+      veille.setUTCDate(veille.getUTCDate() - 1);
+      const estHier = eventYMD === veille.toISOString().slice(0, 10);
+      return { prefix: null, day: estHier ? 'C’ÉTAIT HIER' : 'TERMINÉ', past: true };
+    }
+
+    // Futur : « CE [JOUR] » uniquement dans la semaine courante (lundi → dimanche),
+    // sinon pas de badge (la date complète sous la carte suffit).
+    const today = toCalendarDate(todayYMD);
+    const dayOfWeek = today.getUTCDay(); // 0 = dimanche … 6 = samedi
     const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() + mondayOffset);
-
+    startOfWeek.setUTCDate(today.getUTCDate() + mondayOffset);
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 6);
+    const isoOf = (d) => d.toISOString().slice(0, 10);
 
-    // Vérifier si l'événement est dans la semaine en cours
-    if (eventDate >= startOfWeek && eventDate <= endOfWeek) {
-      const days = ['DIMANCHE', 'LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI'];
-      const eventDayIndex = eventDate.getDay();
-      return { prefix: 'CE', day: days[eventDayIndex] };
+    if (eventYMD <= isoOf(endOfWeek)) {
+      return { prefix: 'CE', day: days[toCalendarDate(eventYMD).getUTCDay()], past: false };
     }
 
     return null;
   };
 
   const dayBadge = getDayBadge(event.date);
+  const isSurlascene = event.surlasceneSource === 'surlascene';
+  const concertKey = event.surlasceneShowId || String(event.id);
+
+  // Lien vers la fiche publique de l'artiste (par son id — jamais le token_depot)
+  const ficheArtisteHref =
+    isSurlascene && event.surlasceneArtisteId
+      ? `/scene/${event.surlasceneArtisteId}`
+      : null;
+
+  // Lien de la card :
+  // 1. event.facebookLink → onglet Facebook
+  // 2. Concert Surlascène avec token → fiche artiste
+  // 3. Concert Surlascène sans FB/token → ancre interne /scene#agenda
+  // 4. Rien → ancre #agenda
+  const linkHref = event.facebookLink
+    ? formatUrl(event.facebookLink)
+    : ficheArtisteHref
+      ? ficheArtisteHref
+      : isSurlascene
+        ? '/scene#agenda'
+        : '#';
+  const linkTarget = event.facebookLink ? '_blank' : undefined;
 
   return (
     <CardWrapper
-      href={formatUrl(event.facebookLink)}
-      target="_blank"
-      rel="noopener noreferrer"
+      href={linkHref}
+      target={linkTarget}
+      rel={linkTarget ? 'noopener noreferrer' : undefined}
       className="cursor-event"
       variants={cardVariants}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
+      onClick={() => trackEventView(concertKey)}
     >
-      <EventImage
-        src={event.image}
-        alt={event.title}
-        loading="eager"
-        decoding="async"
-      />
+      {event.image ? (
+        <EventImage
+          src={event.image}
+          alt={event.title}
+          // Seules les deux premières cartes (celles qu'on voit sans défiler) se chargent d'emblée ;
+          // React précharge d'office toute image non « lazy » — 7 couvertures de 1,7 Mo au total
+          // se battaient avec la photo d'intérieur au démarrage (mesuré 05/10).
+          loading={typeof index === 'number' && index < 2 ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      ) : (
+        <FallbackPoster />
+      )}
 
-      {/* Badge du jour pour les événements de la semaine en cours */}
-      {dayBadge && <DayBadge>{dayBadge.prefix} <strong>{dayBadge.day}</strong></DayBadge>}
+      {/* Badge du jour : « CE [JOUR] » (jaune) à venir, « HIER » (gris) si passé */}
+      {dayBadge && (
+        <DayBadge $past={dayBadge.past}>
+          {dayBadge.prefix ? <>{dayBadge.prefix} <strong>{dayBadge.day}</strong></> : <strong>{dayBadge.day}</strong>}
+        </DayBadge>
+      )}
 
-      {/* Afficher le texte overlay sur toutes les affiches */}
+      {/* Badge genre musical (Jazz, Jam, Karaoké, Vernissage…) */}
+      {event.genre && <GenreBadge>{event.genre}</GenreBadge>}
+
+      {/* Overlay texte standard en bas */}
       <TextOverlay>
+        {event.bandeau && <Bandeau>{event.bandeau}</Bandeau>}
         <EventTitle>{event.title}</EventTitle>
         <EventDate>{formatDateTime(event.date, event.time)}</EventDate>
+        <EventViewCount concertKey={concertKey} />
       </TextOverlay>
     </CardWrapper>
   );

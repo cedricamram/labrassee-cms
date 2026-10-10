@@ -76,15 +76,18 @@ const LoadingProgress = styled(motion.div)`
 `;
 
 const LoadingScreen = ({ minDuration = 800 }) => {
-  const [isVisible, setIsVisible] = useState(true);
+  // Plus d'écran noir à l'arrivée (05/10/2026) : la page est déjà rendue côté
+  // serveur, le client la voit tout de suite. Le chargeur ne sert plus qu'aux
+  // changements de page lents (au-delà de ROUTE_SHOW_DELAY).
+  const [isVisible, setIsVisible] = useState(false);
   const [progress, setProgress] = useState(INITIAL_PROGRESS);
   const [mounted, setMounted] = useState(false);
   const [cycleStartedAt, setCycleStartedAt] = useState(() => Date.now());
   const [cycleMinDuration, setCycleMinDuration] = useState(minDuration);
 
   const progressRef = useRef(INITIAL_PROGRESS);
-  const pendingCountRef = useRef(1);
-  const isVisibleRef = useRef(true);
+  const pendingCountRef = useRef(0);
+  const isVisibleRef = useRef(false);
   const routeRevealTimerRef = useRef(null);
 
   useEffect(() => {
@@ -113,27 +116,6 @@ const LoadingScreen = ({ minDuration = 800 }) => {
       routeRevealTimerRef.current = null;
     }
   }, []);
-
-  useEffect(() => {
-    if (!mounted) {
-      return undefined;
-    }
-
-    if (document.readyState === 'complete') {
-      pendingCountRef.current = 0;
-      return undefined;
-    }
-
-    const handleWindowLoaded = () => {
-      pendingCountRef.current = Math.max(0, pendingCountRef.current - 1);
-    };
-
-    window.addEventListener('load', handleWindowLoaded, { once: true });
-
-    return () => {
-      window.removeEventListener('load', handleWindowLoaded);
-    };
-  }, [mounted]);
 
   useEffect(() => {
     if (!mounted) {
@@ -219,21 +201,22 @@ const LoadingScreen = ({ minDuration = 800 }) => {
   }, [cycleMinDuration, cycleStartedAt, isVisible]);
 
   useEffect(() => {
-    if (!mounted || !isVisible) {
+    if (!mounted) {
       return undefined;
     }
 
     const { body, documentElement } = document;
+
+    if (!isVisible) {
+      // Filet (06/10/2026) : depuis le 05/10 le chargeur ne démarre plus à l'arrivée, donc
+      // le nettoyage ci-dessous ne s'exécutait jamais et la page restait verrouillée
+      // (plus de défilement au doigt). Rien n'est verrouillé tant que le chargeur est caché.
+      body.classList.remove('app-loading');
+      documentElement.classList.remove('app-loading');
+      return undefined;
+    }
+
     const lockScrollY = window.scrollY;
-    const previousBodyOverflow = body.style.overflow;
-    const previousBodyTouchAction = body.style.touchAction;
-    const previousBodyPosition = body.style.position;
-    const previousBodyTop = body.style.top;
-    const previousBodyLeft = body.style.left;
-    const previousBodyRight = body.style.right;
-    const previousBodyWidth = body.style.width;
-    const previousHtmlOverflow = documentElement.style.overflow;
-    const previousHtmlOverscroll = documentElement.style.overscrollBehavior;
 
     const preventScroll = (event) => {
       event.preventDefault();
@@ -269,23 +252,36 @@ const LoadingScreen = ({ minDuration = 800 }) => {
     window.addEventListener('keydown', preventScrollKeys, { passive: false });
     window.addEventListener('scroll', keepScrollPosition, { passive: true });
 
+    // Safe-guard : si après 5 sec le loading est toujours visible (event
+    // route-loading-done perdu, animation bloquée, etc.) on force la
+    // libération. Évite le bug iPhone « scroll mort après nav ».
+    const failsafe = setTimeout(() => {
+      setIsVisible(false);
+    }, 5000);
+
     return () => {
+      clearTimeout(failsafe);
       window.removeEventListener('wheel', preventScroll);
       window.removeEventListener('touchmove', preventScroll);
       window.removeEventListener('keydown', preventScrollKeys);
       window.removeEventListener('scroll', keepScrollPosition);
 
+      // RESET (pas restore) au cleanup. Restorer les valeurs capturées au
+      // mount provoquait un bug iPhone : en cas de re-mount du LoadingScreen
+      // pendant une navigation (App Router), les « previousBody* » capturaient
+      // les valeurs DÉJÀ bloquantes du cycle précédent, et le cleanup les
+      // restaurait → scroll resté bloqué.
       body.classList.remove('app-loading');
       documentElement.classList.remove('app-loading');
-      body.style.overflow = previousBodyOverflow;
-      body.style.touchAction = previousBodyTouchAction;
-      body.style.position = previousBodyPosition;
-      body.style.top = previousBodyTop;
-      body.style.left = previousBodyLeft;
-      body.style.right = previousBodyRight;
-      body.style.width = previousBodyWidth;
-      documentElement.style.overflow = previousHtmlOverflow;
-      documentElement.style.overscrollBehavior = previousHtmlOverscroll;
+      body.style.overflow = '';
+      body.style.touchAction = '';
+      body.style.position = '';
+      body.style.top = '';
+      body.style.left = '';
+      body.style.right = '';
+      body.style.width = '';
+      documentElement.style.overflow = '';
+      documentElement.style.overscrollBehavior = '';
       window.scrollTo(0, lockScrollY);
     };
   }, [isVisible, mounted]);

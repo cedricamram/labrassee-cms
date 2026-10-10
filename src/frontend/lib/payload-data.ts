@@ -2,8 +2,13 @@ import configPromise from '@payload-config'
 import { getPayload } from 'payload'
 import { cache } from 'react'
 
-import { getUpcomingEvents as getFallbackUpcomingEvents } from '@/frontend/data/events'
 import { businessInfo as fallbackBusinessInfo, menuCategories as fallbackMenuItems } from '@/frontend/data/menu'
+import {
+  getRecentSurlasceneEvents,
+  getUpcomingShowDetails,
+  getUpcomingSurlasceneEvents,
+  type SurlasceneShowDetail,
+} from '@/frontend/lib/surlascene-data'
 import type { BusinessInfo, Event, Media, MenuItem } from '@/payload-types'
 
 export type FrontendEvent = {
@@ -15,6 +20,34 @@ export type FrontendEvent = {
   image: string | null
   time?: string | null
   title: string
+  // Genre musical / type d'event affiché sur la vignette (Jazz, Jam, Karaoké…)
+  genre?: string | null
+  // Bandeau public facultatif posé en base (concerts.bandeau), ex. « En attente de confirmation ».
+  bandeau?: string | null
+  // --- Extensions Surlascène (présentes seulement pour les events lus depuis
+  // la BD Supabase Surlascène, ignorées par les cards Payload events) ---
+  surlasceneSource?: 'surlascene'
+  surlasceneShowId?: string
+  surlasceneArtisteId?: string | null
+  surlasceneType?: string
+  surlascenePosterPhoto?: string | null
+  surlasceneArtiste?: {
+    id: string
+    nom_artiste: string
+    genre: string | null
+    bio: string | null
+    permanence: boolean
+    recurrence_notes: string | null
+    heure_debut_speciale: string | null
+    site_web: string | null
+    instagram: string | null
+    spotify_url: string | null
+    bandcamp_url: string | null
+    soundcloud_url: string | null
+    youtube_url: string | null
+    photo_artiste_path: string | null
+    photos_hd_paths: string[] | null
+  } | null
 }
 
 export type FrontendMenuItem = {
@@ -36,12 +69,17 @@ export type FrontendBusinessInfo = {
     exhibitions?: string | null
     general?: string | null
   }
-  hours: {
-    lundi: { close?: string | null; open?: string | null }
-    'mardi-mercredi': { close?: string | null; open?: string | null }
-    'jeudi-vendredi-samedi': { close?: string | null; open?: string | null }
-    dimanche: { close?: string | null; open?: string | null }
-  }
+  // Horaires 100% dynamiques (2026-05-16) : 7 jours glissants à partir d'aujourd'hui.
+  // Chaque entrée a { key, label, open, close, isToday } et est calculée selon les
+  // events du jour spécifique. Pas d'event → fermeture 19h00. Event → début + 2h30.
+  // Le tableau est trié chronologiquement (aujourd'hui en premier).
+  hours: Array<{
+    key: string          // 'YYYY-MM-DD' (ID unique React)
+    label: string        // 'SAMEDI 16 MAI' ou 'AUJOURD'HUI'
+    open: string         // '9h00'
+    close: string        // '19h00' ou '22h00' etc.
+    isToday: boolean
+  }>
   message?: string | null
   name?: string | null
   slogan?: string | null
@@ -94,26 +132,131 @@ const toMediaURL = (media: number | Media | null | undefined, size?: MediaSizeKe
   return normalizeMediaURL(rawURL)
 }
 
+// "Aujourd'hui" en date civile Montréal. Évite le bug UTC : sur Vercel (serveur
+// en UTC), new Date().getDate() renvoyait la date UTC, ce qui décalait d'un jour
+// le découpage passé/futur des events Payload en soirée Montréal — incohérent
+// avec Surlascène (todayMontrealISO). On force America/Toronto comme partout.
 const todayISO = () => {
-  const now = new Date()
-  const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, '0')
-  const day = String(now.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Toronto',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+  const parts = fmt.formatToParts(new Date())
+  const get = (t: string) => parts.find((p) => p.type === t)?.value || ''
+  return `${get('year')}-${get('month')}-${get('day')}`
 }
 
 const formatEvent = (event: Event): FrontendEvent => {
   const imageToUse = event.image || event.facebookCover
+  // event.genre est une relation vers event-genres (avec depth>=1 = objet, sinon id)
+  const rawGenre = (event as unknown as { genre?: unknown }).genre
+  const genreTitle =
+    rawGenre && typeof rawGenre === 'object' && 'title' in rawGenre
+      ? (rawGenre as { title?: string }).title
+      : null
 
   return {
     date: event.date,
     description: undefined,
     facebookLink: event.facebookLink || null,
+    genre: genreTitle || null,
     hasOfficialPoster: !!event.image && typeof event.image === 'object',
     id: event.slug || event.id,
     image: toMediaURL(imageToUse, 'desktop') || null,
     time: event.time || null,
     title: event.title,
+  }
+}
+
+// ── Fallback covers depuis Supabase `concerts` (source de vérité EPK) ──
+// Le CMS Payload n'a souvent NI `image` NI `facebookCover` peuplé (events créés
+// hors importateur FB). Or Supabase `concerts` porte déjà `cover_safe_url` (recadrage
+// visage-safe) pour la quasi-totalité des concerts confirmés. Sans ce repli, le
+// carrousel affiche des cartes grises (signalé par Cédric 2026-07-29).
+// Projet EPK distinct de la base du CMS ; l'anon key est publique par conception
+// (rôle anon, exposée côté client — même clé que le pipeline TV labrassee-scripts).
+const CONCERTS_SUPABASE_URL =
+  process.env.CONCERTS_SUPABASE_URL || 'https://xjlpttrziisldlclhsth.supabase.co'
+const CONCERTS_ANON_KEY =
+  process.env.CONCERTS_SUPABASE_ANON_KEY ||
+  'sb_publishable_qG5XGinXYpNpGbmUyjej-Q_-eADJKcW'
+
+type ConcertCover = { titre: string; cover: string }
+
+const coverWords = (s: string) =>
+  new Set(
+    (s || '')
+      .toLowerCase()
+      .replace(/[—–\-_·•]+/g, ' ')
+      .match(/[\p{L}\p{N}]{3,}/gu) || [],
+  )
+
+const coverScore = (a: string, b: string) => {
+  const wa = coverWords(a)
+  const wb = coverWords(b)
+  if (wa.size === 0 || wb.size === 0) return 0
+  let inter = 0
+  for (const w of wa) if (wb.has(w)) inter += 1
+  return inter / (wa.size + wb.size - inter)
+}
+
+const fetchConcertCoversByDate = async (): Promise<Map<string, ConcertCover[]>> => {
+  const map = new Map<string, ConcertCover[]>()
+  try {
+    const today = todayISO()
+    const url =
+      `${CONCERTS_SUPABASE_URL}/rest/v1/concerts?date_show=gte.${today}` +
+      `&statut=eq.confirme&or=(cover_safe_url.not.is.null,cover_image_url.not.is.null)` +
+      `&select=date_show,titre_show,cover_safe_url,cover_image_url`
+    const res = await fetch(url, {
+      headers: { apikey: CONCERTS_ANON_KEY, Authorization: `Bearer ${CONCERTS_ANON_KEY}` },
+      next: { revalidate: 300 },
+    })
+    if (!res.ok) return map
+    const rows: Array<{
+      date_show: string
+      titre_show: string
+      cover_safe_url: string | null
+      cover_image_url: string | null
+    }> = await res.json()
+    for (const r of rows) {
+      const cover = r.cover_safe_url || r.cover_image_url
+      if (!cover) continue
+      const list = map.get(r.date_show) || []
+      list.push({ titre: r.titre_show || '', cover })
+      map.set(r.date_show, list)
+    }
+  } catch {
+    // Repli silencieux : sans covers Supabase, le carrousel garde son comportement actuel.
+  }
+  return map
+}
+
+// Pour chaque event sans image, tente d'attacher la cover Supabase du même jour
+// (match direct si un seul concert ce jour-là, sinon meilleur score de titre).
+const applyConcertCoverFallback = async (events: FrontendEvent[]): Promise<void> => {
+  const missing = events.filter((e) => !e.image)
+  if (missing.length === 0) return
+  const byDate = await fetchConcertCoversByDate()
+  if (byDate.size === 0) return
+  for (const ev of missing) {
+    const day = (ev.date || '').slice(0, 10)
+    const candidates = byDate.get(day)
+    if (!candidates || candidates.length === 0) continue
+    let best = candidates[0]
+    if (candidates.length > 1) {
+      let bestScore = -1
+      for (const c of candidates) {
+        const s = coverScore(ev.title, c.titre)
+        if (s > bestScore) {
+          bestScore = s
+          best = c
+        }
+      }
+    }
+    ev.image = best.cover
   }
 }
 
@@ -125,26 +268,168 @@ const formatMenuItem = (item: MenuItem): FrontendMenuItem => ({
   title: item.title,
 })
 
-const businessHours: FrontendBusinessInfo['hours'] = {
-  lundi: {
-    close: '21h30',
-    open: '9h00',
-  },
-  'mardi-mercredi': {
-    close: '19h00',
-    open: '9h00',
-  },
-  'jeudi-vendredi-samedi': {
-    close: '21h30',
-    open: '9h00',
-  },
-  dimanche: {
-    close: '19h00',
-    open: '9h00',
-  },
+const JOURS_FR_LONG = [
+  'DIMANCHE', 'LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI',
+] as const
+const MOIS_FR_LONG = [
+  'JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN',
+  'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE',
+] as const
+
+// Horaires "par défaut" si calcul dynamique échoue (fallback statique : 7 jours
+// glissants à partir d'aujourd'hui, tous fermés à 19h00)
+function buildFallbackHours(): FrontendBusinessInfo['hours'] {
+  const out: FrontendBusinessInfo['hours'] = []
+  const today = new Date()
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today)
+    d.setDate(today.getDate() + i)
+    const iso =
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-` +
+      String(d.getDate()).padStart(2, '0')
+    out.push({
+      key: iso,
+      label: `${JOURS_FR_LONG[d.getDay()]} ${d.getDate()} ${MOIS_FR_LONG[d.getMonth()]}`,
+      open: '9h00',
+      close: '19h00',
+      isToday: i === 0,
+    })
+  }
+  return out
 }
 
-const formatBusinessInfo = (info: BusinessInfo): FrontendBusinessInfo => ({
+const businessHoursDefault: FrontendBusinessInfo['hours'] = buildFallbackHours()
+
+/**
+ * Parse une heure type "19h30" ou "19:30" ou "8h00" en minutes depuis minuit.
+ * Retourne null si format inconnu.
+ */
+function parseHeureMinutes(s: string | null | undefined): number | null {
+  if (!s) return null
+  const m = String(s).match(/^(\d{1,2})[h:](\d{2})/)
+  if (!m) return null
+  return parseInt(m[1], 10) * 60 + parseInt(m[2], 10)
+}
+
+/** Formate des minutes en "19h30". */
+function formatHeureFromMinutes(min: number): string {
+  const h = Math.floor(min / 60) % 24
+  const m = min % 60
+  return `${h}h${String(m).padStart(2, '0')}`
+}
+
+/**
+ * Calcule les horaires 100% dynamiques pour les 7 prochains jours glissants
+ * (aujourd'hui + 6 suivants, en heure Montréal). Bascule auto à minuit chaque
+ * jour grâce au revalidate Next.
+ *
+ * Pour CHAQUE jour individuel :
+ *   - On cherche les events programmés ce jour précis (date_show égale)
+ *   - Si event(s) → fermeture = début du PLUS TARD + 2h30, sans jamais
+ *     descendre sous 19h00 (un événement du matin, comme un accrochage
+ *     Sur nos murs à 10h00, ne raccourcit pas la journée)
+ *   - Sinon → fermeture 19h00 par défaut
+ *
+ * Ouverture : 9h00 (statique).
+ * Source events : Payload + Surlascène fusionnés (priorité Payload).
+ */
+// Fermetures exceptionnelles (table Supabase `fermetures_exceptionnelles`, 2026-09-29) :
+// une ligne pour un jour l'emporte sur le calcul automatique. Même table lue par le cron
+// dashboard sync-google-hours, pour que le site et Google disent la même heure.
+async function fetchFermeturesExceptionnelles(): Promise<Map<string, string>> {
+  const map = new Map<string, string>()
+  try {
+    const res = await fetch(
+      `${CONCERTS_SUPABASE_URL}/rest/v1/fermetures_exceptionnelles?select=jour,fermeture&jour=gte.${todayISO()}`,
+      {
+        headers: { apikey: CONCERTS_ANON_KEY, Authorization: `Bearer ${CONCERTS_ANON_KEY}` },
+        next: { revalidate: 300 },
+      },
+    )
+    if (!res.ok) return map
+    const rows: Array<{ jour: string; fermeture: string }> = await res.json()
+    for (const r of rows) {
+      const [h, m] = r.fermeture.split(':').map(Number)
+      if (Number.isFinite(h)) map.set(r.jour, formatHeureFromMinutes(h * 60 + (m || 0)))
+    }
+  } catch {
+    /* sans la table, on retombe sur le calcul automatique */
+  }
+  return map
+}
+
+// Un événement annulé garde sa fiche publiée (titre « ANNULÉ · … ») : il ne doit plus
+// allonger la journée.
+const estAnnule = (titre?: string | null) => /^\s*ANNUL[ÉE]/i.test(titre || '')
+
+async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']> {
+  try {
+    const [payloadEvents, surlasceneEvents, exceptions] = await Promise.all([
+      getUpcomingEventsData(80),
+      getUpcomingSurlasceneEvents(80),
+      fetchFermeturesExceptionnelles(),
+    ])
+    const fusion = fusionnerEtDedoublonner(payloadEvents, surlasceneEvents)
+
+    // Index : ISO date → heure de début la PLUS TARDIVE ce jour-là (en minutes)
+    const latestStartParJour = new Map<string, number>()
+    for (const e of fusion) {
+      if (estAnnule(e.title)) continue
+      const iso = e.date.slice(0, 10)
+      const min = parseHeureMinutes(e.time)
+      if (min === null) continue
+      const prev = latestStartParJour.get(iso) ?? -1
+      if (min > prev) latestStartParJour.set(iso, min)
+    }
+
+    // Aujourd'hui en heure Montréal (YYYY-MM-DD)
+    const todayMontreal = (() => {
+      const f = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Toronto',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      })
+      const parts = f.formatToParts(new Date())
+      const get = (t: string) => parts.find((p) => p.type === t)?.value || ''
+      return `${get('year')}-${get('month')}-${get('day')}`
+    })()
+
+    const baseDate = new Date(todayMontreal + 'T00:00:00')
+    const result: FrontendBusinessInfo['hours'] = []
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(baseDate)
+      d.setDate(baseDate.getDate() + i)
+      const iso =
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-` +
+        String(d.getDate()).padStart(2, '0')
+      const latestMin = latestStartParJour.get(iso)
+      const FERMETURE_DEFAUT_MIN = 19 * 60
+      const close =
+        exceptions.get(iso) ??
+        (latestMin !== undefined
+          ? formatHeureFromMinutes(Math.max(latestMin + 150, FERMETURE_DEFAUT_MIN))
+          : '19h00')
+      const jourLabel = JOURS_FR_LONG[d.getDay()]
+      const dateLabel = `${d.getDate()} ${MOIS_FR_LONG[d.getMonth()]}`
+      result.push({
+        key: iso,
+        label: i === 0 ? `AUJOURD'HUI · ${jourLabel} ${dateLabel}` : `${jourLabel} ${dateLabel}`,
+        open: '9h00',
+        close,
+        isToday: i === 0,
+      })
+    }
+    return result
+  } catch {
+    return businessHoursDefault
+  }
+}
+
+const formatBusinessInfo = (
+  info: BusinessInfo,
+  hoursOverride?: FrontendBusinessInfo['hours'],
+): FrontendBusinessInfo => ({
   address: {
     googleMapsLink: info.address?.googleMapsLink,
     neighborhood: info.address?.neighborhood,
@@ -155,7 +440,7 @@ const formatBusinessInfo = (info: BusinessInfo): FrontendBusinessInfo => ({
     exhibitions: info.contact?.exhibitions,
     general: info.contact?.general,
   },
-  hours: businessHours,
+  hours: hoursOverride || businessHoursDefault,
   message: info.message,
   name: info.name,
   slogan: info.slogan,
@@ -168,17 +453,42 @@ const formatBusinessInfo = (info: BusinessInfo): FrontendBusinessInfo => ({
 })
 
 export const getBusinessInfoData = cache(async (): Promise<FrontendBusinessInfo> => {
+  const horairesDynamiques = await calculerHorairesSemaine()
   try {
     const payload = await getPayloadClient()
     const info = await payload.findGlobal({
       slug: 'business-info',
     })
 
-    return formatBusinessInfo(info)
+    return formatBusinessInfo(info, horairesDynamiques)
   } catch {
-    return fallbackBusinessInfo as FrontendBusinessInfo
+    const { hours: _legacyHours, ...fallbackInfo } = fallbackBusinessInfo
+    return {
+      ...fallbackInfo,
+      hours: horairesDynamiques,
+    }
   }
 })
+
+/**
+ * Proxy vers la prod API Payload (labrassee.cafe) — utilisé en fallback quand
+ * le Payload local crash (typiquement en dev sans `.env.local` configuré avec
+ * PAYLOAD_SECRET). Retourne les events au format Event natif, prêts pour
+ * formatEvent. Évite de retomber sur src/frontend/data/events.js dont les dates
+ * sont figées en 2025.
+ */
+async function fetchProdEventsAPI(qs: string): Promise<Event[]> {
+  try {
+    const res = await fetch(`https://labrassee.cafe/api/events?${qs}`, {
+      next: { revalidate: 300, tags: ['payload-events-proxy'] },
+    })
+    if (!res.ok) return []
+    const data = await res.json()
+    return (data?.docs || []) as Event[]
+  } catch {
+    return []
+  }
+}
 
 export const getUpcomingEventsData = cache(async (limit = 50): Promise<FrontendEvent[]> => {
   try {
@@ -197,19 +507,270 @@ export const getUpcomingEventsData = cache(async (limit = 50): Promise<FrontendE
       },
     })
 
-    return response.docs.map(formatEvent)
+    const events = response.docs.map(formatEvent)
+    await applyConcertCoverFallback(events)
+    return events
   } catch {
-    return getFallbackUpcomingEvents().slice(0, limit).map((event) => ({
-      date: event.date,
-      facebookLink: event.facebookLink || null,
-      hasOfficialPoster: true,
-      id: event.id,
-      image: event.image || null,
-      time: event.time || null,
-      title: event.title,
-    }))
+    // Fallback : proxy prod API (images Facebook officielles incluses via
+    // facebookCover), au lieu du fichier statique events.js (dates 2025).
+    const today = todayISO()
+    const qs = new URLSearchParams({
+      limit: String(limit),
+      depth: '1',
+      sort: 'date',
+      'where[status][equals]': 'published',
+      'where[date][greater_than_equal]': today,
+    }).toString()
+    const docs = await fetchProdEventsAPI(qs)
+    return docs.map(formatEvent)
   }
 })
+
+/**
+ * Fusion Payload events + concerts Surlascène, avec dédoublonnage par date.
+ *
+ * Stratégie « phase de transition » (gravée par Cédric 2026-05-16) :
+ *   - Tant qu'un artiste n'a pas déposé son EPK, l'event Facebook créé manuellement
+ *     dans Payload reste la SOURCE de la vignette (affiche FB + infos).
+ *   - Dès qu'un dépôt EPK arrive, la vignette est régénérée automatiquement à
+ *     partir du dépôt (photo HD + bio + liens) ET les events FB/Insta sont
+ *     auto-générés à partir de cette même source.
+ *   - À terme (Phase 2 = 100 % dépôts) : plus de saisie manuelle.
+ *
+ * Règle de dédoublonnage : si une date donnée a BOTH un event Payload AND un
+ * concert Surlascène → on GARDE Payload (priorité 1) et on SKIP le Surlascène.
+ * Sinon on garde ce qu'on a (Payload-only ou Surlascène-only).
+ */
+function fusionnerEtDedoublonner(
+  payloadEvents: FrontendEvent[],
+  surlasceneEvents: FrontendEvent[],
+): FrontendEvent[] {
+  const datesPayload = new Set(payloadEvents.map((e) => e.date.slice(0, 10)))
+  const surlasceneFiltrees = surlasceneEvents.filter(
+    (e) => !datesPayload.has(e.date.slice(0, 10)),
+  )
+  // Le même soir existe souvent des deux côtés. La fiche Payload garde sa place,
+  // mais deux choses viennent de la base Surlascène :
+  //  - le bandeau (« En attente de confirmation »…) ;
+  //  - l'IMAGE (05/10/2026). La couverture Payload est aspirée de Facebook ou
+  //    d'Eventbrite et vaut parfois l'aplat orange par défaut d'Eventbrite
+  //    (La Touche Manouche 10/10, Karaoké 16/10). La base, elle, est vérifiée.
+  const surlasceneParDate = new Map(surlasceneEvents.map((e) => [e.date.slice(0, 10), e]))
+  const payloadAvecBandeau = payloadEvents.map((e) => {
+    const s = surlasceneParDate.get(e.date.slice(0, 10))
+    if (!s) return e
+    return {
+      ...e,
+      bandeau: s.bandeau || e.bandeau || null,
+      image: s.image || e.image,
+    }
+  })
+  const fusion = [...payloadAvecBandeau, ...surlasceneFiltrees]
+  fusion.sort((a, b) => a.date.localeCompare(b.date))
+  return fusion
+}
+
+export const getMergedUpcomingEvents = cache(
+  async (limit = 50): Promise<FrontendEvent[]> => {
+    const [payloadEvents, surlasceneEvents] = await Promise.all([
+      getUpcomingEventsData(limit),
+      getUpcomingSurlasceneEvents(limit),
+    ])
+    const fusion = fusionnerEtDedoublonner(payloadEvents, surlasceneEvents)
+    return fusion.slice(0, limit)
+  },
+)
+
+/**
+ * Calcule l'ISO date YYYY-MM-DD du lundi et du dimanche de la semaine actuelle
+ * (en heure Montréal). La semaine commence lundi, finit dimanche.
+ *
+ * Utilisé par la home pour afficher uniquement les événements de la semaine
+ * en cours (pas un carousel infini).
+ */
+function getSemaineCouranteISO(): { lundi: string; dimanche: string } {
+  // On récupère "aujourd'hui" en heure Montréal via Intl.DateTimeFormat
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Toronto',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    weekday: 'short',
+  })
+  const parts = fmt.formatToParts(new Date())
+  const get = (t: string) => parts.find((p) => p.type === t)?.value || ''
+  const todayISO = `${get('year')}-${get('month')}-${get('day')}`
+  const weekdayShort = get('weekday') // 'Mon', 'Tue', etc.
+
+  const weekdayMap: Record<string, number> = {
+    Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7,
+  }
+  const dow = weekdayMap[weekdayShort] || 1
+
+  // Calc lundi en partant de "today" - (dow - 1) jours
+  const todayDate = new Date(todayISO + 'T00:00:00')
+  const lundiDate = new Date(todayDate)
+  lundiDate.setDate(todayDate.getDate() - (dow - 1))
+  const dimancheDate = new Date(lundiDate)
+  dimancheDate.setDate(lundiDate.getDate() + 6)
+
+  const isoOf = (d: Date) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const j = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${j}`
+  }
+  return { lundi: isoOf(lundiDate), dimanche: isoOf(dimancheDate) }
+}
+
+/**
+ * Récupère uniquement les événements (Payload + Surlascène) de la semaine en cours
+ * (lundi → dimanche, heure Montréal). Inclut vernissages et tout type d'event Payload.
+ *
+ * Si la semaine est terminée mais qu'on est dimanche soir, on bascule
+ * automatiquement sur la suivante via getSemaineCouranteISO le lundi 00h Montréal.
+ */
+export const getEventsCetteSemaine = cache(async (): Promise<FrontendEvent[]> => {
+  const { lundi, dimanche } = getSemaineCouranteISO()
+  const [payloadEvents, surlasceneEvents] = await Promise.all([
+    getUpcomingEventsData(50),
+    getUpcomingSurlasceneEvents(50),
+  ])
+  // Dédoublonnage par date (priorité event Payload sur concert Surlascène)
+  const fusion = fusionnerEtDedoublonner(payloadEvents, surlasceneEvents)
+  return fusion.filter((e) => e.date >= lundi && e.date <= dimanche)
+})
+
+/**
+ * Récupère les N prochains événements (Payload + Surlascène), en incluant celui
+ * d'aujourd'hui s'il existe. Dédoublonnage par date avec priorité Payload (phase
+ * de transition : si un event Payload existe pour une date, il prend le
+ * pas sur le concert Surlascène pour cette date).
+ *
+ * Utilisé par la home pour la section "Les prochains événements".
+ */
+export const getProchainsEvents = cache(async (n = 5): Promise<FrontendEvent[]> => {
+  const [payloadEvents, surlasceneEvents] = await Promise.all([
+    getUpcomingEventsData(Math.max(n * 3, 20)),
+    getUpcomingSurlasceneEvents(Math.max(n * 3, 20)),
+  ])
+  const fusion = fusionnerEtDedoublonner(payloadEvents, surlasceneEvents)
+  return fusion.slice(0, n)
+})
+
+/**
+ * Récupère les shows Surlascène (agenda /scene) enrichis avec :
+ *   - coverImage : l'affiche Facebook tirée du Payload event correspondant
+ *     (matché par date). Si pas d'event Payload pour cette date → null,
+ *     SceneAgenda retombe sur la photo artiste, puis sur l'initiale.
+ *   - facebookLink : l'URL de l'event Facebook (clic sur la card → onglet FB)
+ *
+ * Stratégie de transition : tant qu'un concert Surlascène n'a pas son event
+ * Facebook créé côté Payload, on affiche la photo artiste ou
+ * un fallback. Dès qu'il a son event FB → l'affiche officielle prend le dessus.
+ */
+export const getSceneAgendaShows = cache(
+  async (limit = 40): Promise<SurlasceneShowDetail[]> => {
+    const [shows, payloadEvents] = await Promise.all([
+      getUpcomingShowDetails(limit),
+      getUpcomingEventsData(Math.max(limit, 50)),
+    ])
+    // Index Payload events par date YYYY-MM-DD → image + facebookLink
+    const payloadByDate = new Map<string, { image: string | null; facebookLink: string | null }>()
+    for (const e of payloadEvents) {
+      const k = e.date.slice(0, 10)
+      // Garde le premier (= le plus tôt en heure si plusieurs ce jour) avec image
+      if (!payloadByDate.has(k)) {
+        payloadByDate.set(k, { image: e.image || null, facebookLink: e.facebookLink || null })
+      } else if (e.image && !payloadByDate.get(k)!.image) {
+        // Si on n'a pas encore d'image pour cette date, prend celle-ci
+        payloadByDate.set(k, { image: e.image, facebookLink: e.facebookLink || null })
+      }
+    }
+    return shows.map((s) => {
+      const matched = payloadByDate.get(s.date_show.slice(0, 10))
+      // Priorité Supabase (= source de vérité live, alimentée par bulk
+      // aspiration FB ou updates manuels) > Payload (CMS catch-all en retard).
+      // Si Supabase a déjà rempli coverImage/facebookLink dans
+      // getUpcomingShowDetails, on les garde. Sinon, Payload sert de fallback.
+      return {
+        ...s,
+        coverImage: s.coverImage || matched?.image || null,
+        facebookLink: s.facebookLink || matched?.facebookLink || null,
+      }
+    })
+  },
+)
+
+/**
+ * Récupère les events Payload récents (date < today), ordre chronologique
+ * (plus ancien d'abord). Sert au carousel spotlight pour montrer l'event
+ * d'hier tronqué à gauche du focus.
+ */
+export const getRecentPayloadEvents = cache(async (n = 1): Promise<FrontendEvent[]> => {
+  try {
+    const payload = await getPayloadClient()
+    const today = todayISO()
+    const response = await payload.find({
+      collection: 'events',
+      depth: 1,
+      limit: n,
+      overrideAccess: false,
+      sort: '-date',
+      where: {
+        and: [
+          { status: { equals: 'published' } },
+          { date: { less_than: today } },
+        ],
+      },
+    })
+    return response.docs.map(formatEvent).reverse()
+  } catch {
+    // Fallback proxy prod API
+    const today = todayISO()
+    const qs = new URLSearchParams({
+      limit: String(n),
+      depth: '1',
+      sort: '-date',
+      'where[status][equals]': 'published',
+      'where[date][less_than]': today,
+    }).toString()
+    const docs = await fetchProdEventsAPI(qs)
+    return docs.map(formatEvent).reverse()
+  }
+})
+
+/**
+ * Carousel home (stratégie spotlight 2026-05-16) : N events passés + M events futurs,
+ * concaténés en ordre chronologique. L'index initial pointe sur le premier event
+ * futur (today ou prochain à venir) → c'est lui qui sera affiché en focus central.
+ *
+ * Le carousel défile dans les deux sens : utilisateur peut revenir sur l'event passé.
+ */
+export const getEventsCarousel = cache(
+  async (nPasses = 1, nFuturs = 5): Promise<{ events: FrontendEvent[]; initialIndex: number }> => {
+    const [futurs, passesPayload, passesSurlascene] = await Promise.all([
+      getProchainsEvents(nFuturs),
+      getRecentPayloadEvents(nPasses * 2),
+      getRecentSurlasceneEvents(nPasses * 2),
+    ])
+    // Fusion + dédoublonnage des passés (priorité Payload).
+    // 2026-09-29 : la stratégie du 16/05 dit « 1 event passé (HIER) ». Sans borne,
+    // le plus récent passé restait en tête des « prochains événements » pendant des
+    // jours (Philippe Massé Trio du 26/09, encore là le 28, badge « TERMINÉ »).
+    // On ne garde donc que ce qui date d'hier (Montréal) ; sinon, aucun passé.
+    const hier = new Date(todayISO() + 'T12:00:00Z')
+    hier.setUTCDate(hier.getUTCDate() - 1)
+    const hierISO = hier.toISOString().slice(0, 10)
+    const passesAll = fusionnerEtDedoublonner(passesPayload, passesSurlascene).filter(
+      (e) => e.date.slice(0, 10) >= hierISO,
+    )
+    // On garde les nPasses les plus récents (qui sont à la fin après tri chrono)
+    const passes = passesAll.slice(Math.max(0, passesAll.length - nPasses))
+    const events = [...passes, ...futurs]
+    return { events, initialIndex: passes.length }
+  },
+)
 
 export const getMenuItemsData = cache(async (): Promise<FrontendMenuItem[]> => {
   try {

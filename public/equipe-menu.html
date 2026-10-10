@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Le menu, en coulisses — La Brassée</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Page interne pour l'équipe (Apollon, 02/10/2026) — charte : noir chaud, jaune Maïa, crème, or. */
+  :root {
+    --fond: #0a0907; --carte: #17140f; --creme: #e8e4d8; --or: #cdc49d; --jaune: #f7d135; --filet: #2c2720;
+    --titre: 'Oswald', 'Arial Narrow', sans-serif; --texte: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--fond); color: var(--creme); font: 400 17px/1.55 var(--texte); }
+  .page { max-width: 1080px; margin: 0 auto; padding-inline: 18px; padding-block: calc(24px + env(safe-area-inset-top, 0px)) calc(48px + env(safe-area-inset-bottom, 0px)); }
+  header { display: flex; align-items: center; gap: 16px; }
+  header svg { width: 64px; height: 64px; flex: none; }
+  header svg .cls-1 { stroke: var(--jaune); stroke-width: 6px; }
+  h1 { font: 700 clamp(30px, 7vw, 46px)/1.05 var(--titre); text-transform: uppercase; letter-spacing: .5px; margin: 0; text-wrap: balance; }
+  .sous { color: var(--or); font-size: 15px; margin: 4px 0 0; }
+  .bandeau { margin: 22px 0 18px; background: var(--jaune); color: #0a0907; border-radius: 12px; padding: 14px 16px; font-weight: 700; }
+  .intro { max-width: 62ch; }
+  .intro p { margin: 0 0 12px; }
+  h2 { font: 700 clamp(24px, 5.4vw, 32px)/1.1 var(--titre); text-transform: uppercase; margin: 40px 0 6px; padding-top: 18px; border-top: 3px solid var(--jaune); text-wrap: balance; }
+  .aide { color: var(--or); margin: 0 0 16px; font-size: 15px; }
+  .grille { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  @media (min-width: 760px) { .grille { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  figure { margin: 0; min-width: 0; }
+  figure a { display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,.5); }
+  figure a:focus-visible { outline: 3px solid var(--jaune); outline-offset: 3px; }
+  figure img { display: block; width: 100%; height: auto; }
+  figcaption { font-size: 14px; color: var(--or); margin-top: 6px; text-align: center; }
+  .piste { background: var(--carte); border: 1px solid var(--filet); border-radius: 14px; padding: 16px; margin-top: 16px; }
+  .piste .niveau { display: inline-block; background: var(--jaune); color: #0a0907; font: 700 13px/1 var(--texte); text-transform: uppercase; letter-spacing: .6px; padding: 6px 10px; border-radius: 999px; }
+  .piste h3 { font: 700 24px/1.15 var(--titre); text-transform: uppercase; margin: 10px 0 4px; }
+  .piste p { margin: 0 0 14px; max-width: 62ch; }
+  .duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 720px; }
+  footer { margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--filet); color: var(--or); }
+  footer strong { color: var(--creme); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <svg role="img" aria-label="La Brassée" xmlns="http://www.w3.org/2000/svg" id="Layer_1" data-name="Layer 1" viewBox="0 0 235.02 235.08"><defs><style>.cls-1{fill:none;stroke:#fff;stroke-miterlimit:10;}</style></defs><path class="cls-1" d="M117.59.5c65,.09,117.51,53.2,116.93,118A117,117,0,1,1,117.59.5Zm56.69,205.89-.63.27c-.53.13-1.12.27-1.65.45-16.27,5.64-32.9,7.7-49.84,3.8A79.77,79.77,0,0,1,78,184.47a57.34,57.34,0,0,1-13.09-27.11,20.46,20.46,0,1,0-37.33,15.06,105,105,0,0,0,17.88,21.82C70.62,217,100,226.42,133.72,221.67a101.75,101.75,0,0,0,38.9-14.21c.36-.26.72-.58,1.08-.89l.72-.27-.09-.05.09,0Zm3.23-14.66c-3.09.9-6.19,1.84-9.28,2.6a59.22,59.22,0,0,1-23.53.94,58.52,58.52,0,0,1-34.42-18.55,54.89,54.89,0,0,1-13.35-24.29c-1.12-4.66-6.5-8.25-11.3-7.62a10.45,10.45,0,0,0-9.18,11.65,8.47,8.47,0,0,0,.31,1.53,45.35,45.35,0,0,0,4.62,11.47,57.92,57.92,0,0,0,17.47,18.82,69.34,69.34,0,0,0,40.43,13,86.44,86.44,0,0,0,17.93-1.88,81.93,81.93,0,0,0,19.45-6.77,3.19,3.19,0,0,0,.85-.9l.4.05v-.09ZM69.77,141.27c.36-.36.67-.72,1-1.08,6-6.05,13.23-8.38,21.52-6.18,8.47,2.24,13.85,7.8,16,16.36a20.05,20.05,0,0,0,.76,2.46,46.54,46.54,0,0,0,11.78,18.11c11.3,10.66,24.7,15.06,40,13a77.52,77.52,0,0,0,35.67-14.7A62.87,62.87,0,0,0,220.62,135c2.92-10.13,2.78-20.48,1.48-30.79a102.24,102.24,0,0,0-10.58-34.28c-11-21.34-27.33-37.34-49-47.64a103.25,103.25,0,0,0-58-9.33A101.18,101.18,0,0,0,70.44,23.22,105.56,105.56,0,0,0,12,113.89a102.68,102.68,0,0,0,2,24.24c.58,2.87,1.35,5.65,2.11,8.83,5.82-10.08,14-16.09,25.36-17.25S62.19,132.75,69.77,141.27Z" transform="translate(0 0)"></path></svg>
+    <div>
+      <h1>Le menu, en coulisses</h1>
+      <p class="sous">Pour l'équipe de La Brassée · version de travail du 2 octobre 2026</p>
+    </div>
+  </header>
+
+  <p class="bandeau">Rien de ce qui est ici n'est en vigueur. Au comptoir, on suit toujours la caisse et le menu actuel.</p>
+
+  <div class="intro">
+    <p>Allô la gang ! Cédric m'a demandé de vous montrer où en est le nouveau menu papier. Voici le travail que je lui ai présenté ce soir.</p>
+    <p>Rien n'est imprimé, rien n'est décidé : c'est Cédric qui choisira la suite.</p>
+  </div>
+
+  <h2>La carte d'automne, version de travail</h2>
+  <p class="aide">Les huit pages telles qu'elles sont aujourd'hui. Touche une page pour la voir en grand.</p>
+  <div class="grille">
+    <figure><a href="/equipe-menu/carte-nouveau.jpg"><img src="/equipe-menu/carte-nouveau.jpg" alt="Page Nouveau, version de travail" loading="lazy" width="1100" height="1700"></a><figcaption>Nouveau</figcaption></figure>
+    <figure><a href="/equipe-menu/carte-boissons_chaudes.jpg"><img src="/equipe-menu/carte-boissons_chaudes.jpg" alt="Page Nos boissons chaudes, version de travail" loading="lazy" width="1100" height="1700"></a><figcaption>Boissons chaudes</figcaption></figure>
+    <figure><a href="/equipe-menu/carte-boissons_froides.jpg"><img src="/equipe-menu/carte-boissons_froides.jpg" alt="Page Nos boissons froides, version de travail" loading="lazy" width="1100" height="1700"></a><figcaption>Boissons froides</figcaption></figure>
+    <figure><a href="/equipe-menu/carte-sale.jpg"><img src="/equipe-menu/carte-sale.jpg" alt="Page Côté salé, version de travail" loading="lazy" width="1100" height="1700"></a><figcaption>Côté salé</figcaption></figure>
+    <figure><a href="/equipe-menu/carte-sucre.jpg"><img src="/equipe-menu/carte-sucre.jpg" alt="Page Côté sucré, version de travail" loading="lazy" width="1100" height="1700"></a><figcaption>Côté sucré</figcaption></figure>
+    <figure><a href="/equipe-menu/carte-biere_vin.jpg"><img src="/equipe-menu/carte-biere_vin.jpg" alt="Page Bières et vin, version de travail" loading="lazy" width="1100" height="1700"></a><figcaption>Bières et vin</figcaption></figure>
+    <figure><a href="/equipe-menu/carte-cocktails.jpg"><img src="/equipe-menu/carte-cocktails.jpg" alt="Page Nos cocktails, version de travail" loading="lazy" width="1100" height="1700"></a><figcaption>Cocktails</figcaption></figure>
+    <figure><a href="/equipe-menu/carte-qui_on_est.jpg"><img src="/equipe-menu/carte-qui_on_est.jpg" alt="Page Qui on est, version de travail" loading="lazy" width="1100" height="1700"></a><figcaption>Qui on est</figcaption></figure>
+  </div>
+
+  <h2>Et si le menu changeait de look ?</h2>
+  <p class="aide">Quatre pistes, de « un peu différent » à « trop différent ». Chacune est montrée sur deux pages, avec les mêmes produits et les mêmes prix. Ce sont des essais.</p>
+
+  <section class="piste">
+    <span class="niveau">Un peu différent</span>
+    <h3>La même, en plus calme</h3>
+    <p>La carte qu'on connaît, avec moins de bruit : un seul style de bulle, des lignes fines, plus d'air.</p>
+    <div class="duo">
+      <figure><a href="/equipe-menu/piste-calme-1.jpg"><img src="/equipe-menu/piste-calme-1.jpg" alt="Piste « la même, en plus calme », page Boissons chaudes" loading="lazy" width="1100" height="1700"></a><figcaption>Boissons chaudes</figcaption></figure>
+      <figure><a href="/equipe-menu/piste-calme-2.jpg"><img src="/equipe-menu/piste-calme-2.jpg" alt="Piste « la même, en plus calme », page Côté sucré" loading="lazy" width="1100" height="1700"></a><figcaption>Côté sucré</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="piste">
+    <span class="niveau">Différent</span>
+    <h3>Le cahier ligné</h3>
+    <p>La carte écrite sur une feuille de cartable : lignes bleues, marge rouge, petits dessins et un surligneur.</p>
+    <div class="duo">
+      <figure><a href="/equipe-menu/piste-cahier-1.jpg"><img src="/equipe-menu/piste-cahier-1.jpg" alt="Piste « le cahier ligné », page Boissons chaudes" loading="lazy" width="1100" height="1700"></a><figcaption>Boissons chaudes</figcaption></figure>
+      <figure><a href="/equipe-menu/piste-cahier-2.jpg"><img src="/equipe-menu/piste-cahier-2.jpg" alt="Piste « le cahier ligné », page Côté sucré" loading="lazy" width="1100" height="1700"></a><figcaption>Côté sucré</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="piste">
+    <span class="niveau">Très différent</span>
+    <h3>Le journal du quartier</h3>
+    <p>Chaque page comme la une d'un petit journal de quartier : gros titres, rubriques, prix au bout des pointillés.</p>
+    <div class="duo">
+      <figure><a href="/equipe-menu/piste-journal-1.jpg"><img src="/equipe-menu/piste-journal-1.jpg" alt="Piste « le journal du quartier », page Boissons chaudes" loading="lazy" width="1100" height="1700"></a><figcaption>Boissons chaudes</figcaption></figure>
+      <figure><a href="/equipe-menu/piste-journal-2.jpg"><img src="/equipe-menu/piste-journal-2.jpg" alt="Piste « le journal du quartier », page Côté sucré" loading="lazy" width="1100" height="1700"></a><figcaption>Côté sucré</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="piste">
+    <span class="niveau">Trop différent</span>
+    <h3>Le menu qui te jase</h3>
+    <p>La page comme une jasette au comptoir : les questions du client dans des bulles jaunes, les réponses sont le menu.</p>
+    <div class="duo">
+      <figure><a href="/equipe-menu/piste-jasette-1.jpg"><img src="/equipe-menu/piste-jasette-1.jpg" alt="Piste « le menu qui te jase », page Boissons chaudes" loading="lazy" width="1100" height="1700"></a><figcaption>Boissons chaudes</figcaption></figure>
+      <figure><a href="/equipe-menu/piste-jasette-2.jpg"><img src="/equipe-menu/piste-jasette-2.jpg" alt="Piste « le menu qui te jase », page Côté sucré" loading="lazy" width="1100" height="1700"></a><figcaption>Côté sucré</figcaption></figure>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Apollon</strong>, au marketing de La Brassée.</p>
+  </footer>
+</div>
+</body>
+</html>

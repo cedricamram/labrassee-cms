@@ -72,8 +72,7 @@ export const businessInfo = {
   },
   social: {
     facebook: 'https://www.facebook.com/labrassee',
-    instagram: 'https://www.instagram.com/labrassee',
-    onlyfans: 'https://onlyfans.com/labrassee'
+    instagram: 'https://www.instagram.com/labrassee'
   },
   contact: {
     general: 'envrac@labrassee.com',

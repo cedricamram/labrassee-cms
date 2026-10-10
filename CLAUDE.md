@@ -1,5 +1,9 @@
 # Payload CMS - Notes Projet (La Brassée)
 
+## ⏰ Fuseau horaire — INVIOLABLE (gravée 2026-05-23, primordiale sur toute autre règle de ce repo)
+
+Cédric et La Brassée sont à Montréal (America/Toronto, EDT/EST). Tu raisonnes en heure Montréal 100 % du temps. JAMAIS d'UTC, JAMAIS d'autre fuseau. Le SessionStart hook injecte un bloc `⏰ HORODATAGE MONTRÉAL` en tête de session — relire avant toute mention temporelle. SQL Supabase : `(NOW() AT TIME ZONE 'America/Toronto')::date`, JAMAIS `CURRENT_DATE`. Référence : `~/.claude/CLAUDE.md` § Fuseau horaire + `_claude/directives_agents_communes.md` § RÈGLE 0.
+
 ## Stack
 - Next.js App Router (`next@15`)
 - Payload CMS (`payload@3.40.0`)
@@ -67,6 +71,17 @@ Important:
   - Succès ou “déjà inscrit”: coche + message puis disparition barre
   - Sur mobile, la barre est rendue via portal (`document.body`) pour rester fixée en bas
 
+## Feature: Google Analytics (GA4)
+- Intégration sur le **site public uniquement** (admin Payload non tracké).
+- Package: `@next/third-parties` (composant officiel `GoogleAnalytics`).
+- Wrapper: `src/frontend/components/analytics/Analytics.tsx`
+- Injecté dans `src/app/(frontend)/layout.tsx` (`<body>`).
+- Variable d'env: `NEXT_PUBLIC_GA_ID` (format `G-XXXXXXXXXX`).
+- Actif **uniquement** si `NODE_ENV=production` ET `NEXT_PUBLIC_GA_ID` défini.
+  Sinon le composant renvoie `null` (aucun script chargé, pas de tracking en dev).
+- Suivi auto des changements de route App Router (`page_view`).
+- Doc complète: `docs/google-analytics.md` (setup, events custom, RGPD/Loi 25).
+
 ## Types Payload
 - Le fichier `src/payload-types.ts` est versionné dans git.
 - Après toute modification de collection/global:
@@ -78,6 +93,7 @@ Important:
 - `DATABASE_URI`
 - `PAYLOAD_SECRET`
 - `BLOB_READ_WRITE_TOKEN`
+- `NEXT_PUBLIC_GA_ID` (optionnel — Google Analytics, voir section dédiée)
 
 ## Problèmes fréquents
 

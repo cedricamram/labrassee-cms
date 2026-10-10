@@ -1,0 +1,457 @@
+/**
+ * Dates libres Sur la scène
+ *
+ * Calcule les soirs ouverts (lundi, mardi, jeudi, vendredi, samedi) NON bookés
+ * dans une fenêtre future. Source de vérité : `concerts.date_show` (Supabase).
+ *
+ * Préavis minimum 7 jours (les artistes ne peuvent pas proposer à 48h, on a
+ * besoin de temps pour la fan-out promo).
+ *
+ * Limite : si une permanence hebdomadaire (Bluegrass mardi, Jazz & Jam jeudi)
+ * n'a pas encore son event créé en BD, la date apparaîtra « libre ». Le
+ * sync calendrier Apple roule toutes les 2h, donc la dérive maximum est faible,
+ * mais Cédric arbitre au moment de la confirmation s'il y a un conflit non visible.
+ */
+
+import { cache } from 'react'
+
+const SUPABASE_URL = 'https://xjlpttrziisldlclhsth.supabase.co'
+const SUPABASE_ANON_KEY =
+  'sb_publishable_qG5XGinXYpNpGbmUyjej-Q_-eADJKcW'
+
+export type DateLibre = {
+  iso: string           // 'YYYY-MM-DD'
+  jourSemaine: string   // 'lundi' | 'mardi' | 'jeudi' | 'vendredi' | 'samedi'
+  jourSemaineCourt: string // 'lun' | 'mar' | 'jeu' | 'ven' | 'sam'
+  jourMois: number      // 1..31
+  moisLong: string      // 'juin'
+  moisCourt: string     // 'juin'
+  annee: number
+  cleMois: string       // 'YYYY-MM' (pour grouper)
+  libelleMois: string   // 'Juin 2026' (pour afficher)
+}
+
+const JOURS_LONG = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi']
+const JOURS_COURT = ['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam']
+const MOIS_LONG = [
+  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
+]
+
+// Soirs où La Brassée ouvre sa scène (5 fois/semaine) : lun, mar, jeu, ven, sam
+const SOIRS_OUVERTS = new Set([1, 2, 4, 5, 6])
+const PREAVIS_JOURS = 7
+const HORIZON_DEFAUT_JOURS = 120
+
+// Soirée Impro permanente : tous les lundis du 25 mai au 24 août 2026 inclus.
+// Pendant cette plage, le lundi est forcé en vert (`bookee_perm`) MÊME en
+// juillet/août (qui sinon n'ouvriraient que ven/sam pour la scène).
+const IMPRO_DEBUT = '2026-05-25'
+const IMPRO_FIN = '2026-08-24'
+
+export const getDatesLibresScene = cache(
+  async (joursHorizon = HORIZON_DEFAUT_JOURS): Promise<DateLibre[]> => {
+    // 1. Fetch toutes les dates de concerts planifiés/confirmés dans l'horizon
+    const today = new Date()
+    const todayISO = today.toISOString().slice(0, 10)
+    const url =
+      SUPABASE_URL +
+      '/rest/v1/concerts?select=date_show&statut=in.(planifie,confirme)' +
+      `&date_show=gte.${todayISO}&limit=500`
+
+    const bookes = new Set<string>()
+    try {
+      const res = await fetch(url, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+        },
+        next: { revalidate: 300, tags: ['surlascene', 'dates-libres'] },
+      })
+      if (res.ok) {
+        const rows: { date_show: string }[] = await res.json()
+        for (const r of rows) bookes.add(r.date_show)
+      }
+    } catch (e) {
+      console.error('[dates-libres] fetch concerts fail', e)
+    }
+
+    // 2. Génère les dates lun/mar/jeu/ven/sam dans (today + préavis, today + horizon)
+    const minDate = new Date(today)
+    minDate.setDate(minDate.getDate() + PREAVIS_JOURS)
+    minDate.setHours(0, 0, 0, 0)
+
+    const maxDate = new Date(today)
+    maxDate.setDate(maxDate.getDate() + joursHorizon)
+    maxDate.setHours(0, 0, 0, 0)
+
+    const result: DateLibre[] = []
+    const cur = new Date(minDate)
+
+    while (cur <= maxDate) {
+      const dow = cur.getDay() // 0=dim, 1=lun, ..., 6=sam
+      if (SOIRS_OUVERTS.has(dow)) {
+        const iso = cur.toISOString().slice(0, 10)
+        if (!bookes.has(iso)) {
+          const moisIdx = cur.getMonth()
+          const annee = cur.getFullYear()
+          const cleMois = iso.slice(0, 7)
+          const moisLong = MOIS_LONG[moisIdx]
+          const libelleMois = moisLong.charAt(0).toUpperCase() + moisLong.slice(1) + ' ' + annee
+          result.push({
+            iso,
+            jourSemaine: JOURS_LONG[dow],
+            jourSemaineCourt: JOURS_COURT[dow],
+            jourMois: cur.getDate(),
+            moisLong,
+            moisCourt: moisLong,
+            annee,
+            cleMois,
+            libelleMois,
+          })
+        }
+      }
+      cur.setDate(cur.getDate() + 1)
+    }
+
+    return result
+  },
+)
+
+/**
+ * Helper : regroupe une liste de dates libres par clé de mois (YYYY-MM).
+ * Conserve l'ordre chronologique.
+ */
+export function grouperParMois(dates: DateLibre[]): Array<{ cleMois: string; libelle: string; dates: DateLibre[] }> {
+  const map = new Map<string, { libelle: string; dates: DateLibre[] }>()
+  for (const d of dates) {
+    const existing = map.get(d.cleMois)
+    if (existing) existing.dates.push(d)
+    else map.set(d.cleMois, { libelle: d.libelleMois, dates: [d] })
+  }
+  return Array.from(map.entries()).map(([cleMois, v]) => ({ cleMois, libelle: v.libelle, dates: v.dates }))
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Calendrier visuel (vue mois complet pour /proposer)
+// ─────────────────────────────────────────────────────────────────────────
+
+export type StatutJour =
+  | 'libre'             // soir ouvert + aucun concert → cliquable, JAUNE pointillé (Sur la scène)
+  | 'libre_expo'        // dim d'accrochage (rotation 4 sem) → cliquable, BRUN pointillé (Sur nos murs)
+  | 'libre_pages'       // dim sans vernissage → cliquable, BLEU pointillé (Sur nos pages, écrivains)
+  | 'libre_expo_attente' // (DEPRECATED) dim libre hors cadence → désormais 'libre_pages'
+  | 'impro'             // (DEPRECATED) lundi réservé Impro — désormais 'bookee_perm'
+  | 'reservee'          // concert (scène) statut='planifie' (option, attente confirmation)
+  | 'bookee'            // concert (scène) statut='confirme'
+  | 'bookee_perm'       // récurrence éditoriale confirmée (impro lundi, etc.) — vert SANS tag
+  | 'reservee_expo'     // dim expo statut='planifie' (rond orange, distinct des concerts carrés)
+  | 'bookee_expo'       // dim expo statut='confirme' (rond vert)
+  | 'reservee_pages'    // dim rencontre d'auteur·rice statut='planifie' (rond bleu creux)
+  | 'bookee_pages'      // dim rencontre d'auteur·rice statut='confirme' (rond bleu plein)
+  | 'ferme'             // soir non scène (mer + dim) ou hors préavis (< 7 jours)
+  | 'passee'            // date dans le passé
+  | 'horsmois'          // padding début/fin du mois pour avoir grille 7 colonnes
+
+export type JourCalendrier = {
+  iso: string
+  dow: number              // 0=dim, 1=lun, ..., 6=sam
+  jourMois: number         // 1..31
+  statut: StatutJour
+  eventTitre?: string | null
+  // Pour les statuts 'vernissage' : distingue le 5à7 du dim d'avant (accrochage).
+  vernissageRole?: 'vernissage' | 'accrochage'
+}
+
+export type MoisCalendrier = {
+  cleMois: string                 // YYYY-MM
+  annee: number
+  mois: number                    // 1..12
+  libelle: string                 // 'Juin 2026'
+  jours: JourCalendrier[]         // 35 ou 42 cases (5 ou 6 sem × 7 jours)
+  // (permanentsPriority supprimé le 2026-07-04 — sept-déc réouvert à tous)
+}
+
+const MOIS_LONG_LOCAL = [
+  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
+]
+
+/**
+ * Récupère le calendrier visuel sur N mois consécutifs (à partir du mois actuel).
+ * Pour chaque jour : statut visuel (libre/réservée/bookée/fermé/passée) + titre event.
+ *
+ * Règles La Brassée :
+ *   - Mer + Dim → 'ferme' (pas de scène musicale ces jours-là, sauf event spécial)
+ *   - Si event présent (vernissage dimanche par ex) → écrase 'ferme' par 'bookee'/'reservee'
+ *   - Date < today → 'passee'
+ *   - Date < today + 7j → 'ferme' (préavis minimum 7 jours)
+ *   - Sinon, soir ouvert (lun/mar/jeu/ven/sam) → 'libre'
+ */
+export const getCalendrierMois = cache(
+  async (nMois = 3): Promise<MoisCalendrier[]> => {
+    const today = new Date()
+    const todayISO = today.toISOString().slice(0, 10)
+    const preavisDate = new Date(today)
+    preavisDate.setDate(today.getDate() + 7)
+    const preavisISO = preavisDate.toISOString().slice(0, 10)
+
+    // Fetch all concerts dans les nMois prochains mois (large)
+    const limitDate = new Date(today.getFullYear(), today.getMonth() + nMois + 1, 0)
+    const limitISO = limitDate.toISOString().slice(0, 10)
+
+    // Les vernissages/accrochages/décrochages NE doivent PAS venir de cette
+    // table : ils sont dérivés de `artistes_murs` (source de vérité pour les
+    // périodes d'expo). On les exclut explicitement pour ne pas créer de
+    // collision avec des placeholders éventuels (qui apparaîtraient à tort en
+    // orange « réservé » au lieu de respecter la rotation 4 sem).
+    const url =
+      SUPABASE_URL +
+      '/rest/v1/concerts?select=date_show,statut,titre_show,type_show' +
+      `&date_show=gte.${todayISO}&date_show=lte.${limitISO}` +
+      '&statut=in.(planifie,confirme)' +
+      '&type_show=not.in.(vernissage,accrochage,decrochage)' +
+      '&limit=500'
+
+    const concertsParDate = new Map<
+      string,
+      { statut: string; titre: string | null; type: string | null }
+    >()
+    try {
+      const res = await fetch(url, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+        },
+        next: { revalidate: 300, tags: ['surlascene', 'calendrier-mois'] },
+      })
+      if (res.ok) {
+        const rows: {
+          date_show: string
+          statut: string
+          titre_show: string | null
+          type_show: string | null
+        }[] = await res.json()
+        for (const r of rows) {
+          concertsParDate.set(r.date_show, {
+            statut: r.statut,
+            titre: r.titre_show,
+            type: r.type_show,
+          })
+        }
+      }
+    } catch (e) {
+      console.error('[calendrier-mois] fetch fail', e)
+    }
+
+    // Fetch les périodes d'expo Surnosmurs qui chevauchent la fenêtre.
+    // Une expo = date_install → date_decrochage. Tous les dimanches dans cette
+    // plage doivent être marqués comme « expo en cours » (rond vert/orange)
+    // même s'ils n'ont pas de concert spécifique en BD.
+    type ExpoRange = { start: string; end: string }
+    const exposEnCours: ExpoRange[] = []
+    // Dimanches de VERNISSAGE (seul événement expo public — l'accrochage ne l'est
+    // pas, cf. Cédric). Un vernissage occupe le 5à7 du dimanche → ce dim n'est PAS
+    // ouvert aux écrivains (conflit d'horaire). Tous les autres dim couverts par une
+    // expo restent ouverts aux écrivains (les murs sont pris, pas la soirée).
+    const vernissageSundays = new Set<string>()
+    try {
+      const urlExpos =
+        SUPABASE_URL +
+        // ⚠️ `signature_acceptee` volontairement ABSENT du select : colonne hors GRANT anon,
+        // sa seule présence fait échouer la requête (42501) et le calendrier cesse alors de
+        // bloquer les dimanches occupés. La policy RLS ne renvoie que les expos signées.
+        '/rest/v1/artistes_murs?select=date_install,date_decrochage,date_vernissage' +
+        `&date_install=lte.${limitISO}&date_decrochage=gte.${todayISO}` +
+        '&date_install=not.is.null&date_decrochage=not.is.null'
+      const resExpos = await fetch(urlExpos, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+        },
+        next: { revalidate: 300, tags: ['surnosmurs', 'calendrier-mois'] },
+      })
+      if (resExpos.ok) {
+        const rows: {
+          date_install: string
+          date_decrochage: string
+          date_vernissage: string | null
+        }[] = await resExpos.json()
+        for (const r of rows) {
+          exposEnCours.push({
+            start: r.date_install,
+            end: r.date_decrochage,
+          })
+          if (r.date_vernissage) vernissageSundays.add(r.date_vernissage)
+        }
+      }
+    } catch (e) {
+      console.error('[calendrier-mois] fetch expos fail', e)
+    }
+
+    // Une expo couvre du jour d'accrochage (inclus) au jour de décrochage
+    // EXCLU : le matin du décrochage, on dépose les œuvres de l'expo suivante,
+    // donc ce dim doit redevenir libre/cliquable (pas bloqué par l'expo qui sort).
+    function expoCouvrant(iso: string): ExpoRange | null {
+      for (const e of exposEnCours) {
+        if (iso >= e.start && iso < e.end) return e
+      }
+      return null
+    }
+
+    // ─────────────────────────────────────────────────────────────────
+    // Rotation expo : 4 semaines fixes
+    //
+    // Les dim libres ne sont PAS tous cliquables. Seuls les dim "ancres"
+    // (= dim d'accrochage à +0/+4/+8/... sem du dernier décrochage connu)
+    // déclenchent une nouvelle expo. Les autres dim libres restent visibles
+    // (jaune) mais non cliquables : ils sont déjà couverts par l'expo
+    // accrochée à l'ancre précédente.
+    //
+    // Ancrage :
+    //   - S'il existe au moins une expo (passée ou en cours), l'ancre 0
+    //     = dim de décrochage le plus tardif connu (= prochain accrochage).
+    //   - Sinon, ancre 0 = premier dim ≥ today + 7 jours (préavis).
+    // ─────────────────────────────────────────────────────────────────
+    const dimAncres = new Set<string>()
+    let pivot: Date | null = null
+    if (exposEnCours.length > 0) {
+      for (const e of exposEnCours) {
+        const dec = new Date(e.end + 'T00:00:00')
+        if (!pivot || dec > pivot) pivot = dec
+      }
+    } else {
+      pivot = new Date(today)
+      pivot.setDate(pivot.getDate() + PREAVIS_JOURS)
+      while (pivot.getDay() !== 0) pivot.setDate(pivot.getDate() + 1)
+    }
+    // On génère 18 mois d'ancres (horizon large vs le calendrier 3 mois)
+    const horizonAncres = new Date(today)
+    horizonAncres.setDate(horizonAncres.getDate() + 18 * 31)
+    const curAncre = new Date(pivot!)
+    while (curAncre <= horizonAncres) {
+      dimAncres.add(curAncre.toISOString().slice(0, 10))
+      curAncre.setDate(curAncre.getDate() + 28) // exactement 4 semaines
+    }
+
+    const result: MoisCalendrier[] = []
+    for (let i = 0; i < nMois; i++) {
+      const annee = today.getFullYear() + Math.floor((today.getMonth() + i) / 12)
+      const mois = (today.getMonth() + i) % 12 // 0..11
+      const cleMois = `${annee}-${String(mois + 1).padStart(2, '0')}`
+      const libelle =
+        MOIS_LONG_LOCAL[mois].charAt(0).toUpperCase() +
+        MOIS_LONG_LOCAL[mois].slice(1) +
+        ' ' + annee
+
+      // Padding début : on commence au LUNDI précédant ou égal au 1er du mois
+      const premier = new Date(annee, mois, 1)
+      const dowPremier = premier.getDay() // 0=dim, ..., 6=sam
+      // En convention lundi=1, dimanche=7 → décalage pour grille lun-dim
+      const offsetDebut = (dowPremier + 6) % 7 // 0 si lundi, 6 si dimanche
+
+      // Fin du mois
+      const dernier = new Date(annee, mois + 1, 0).getDate()
+      const totalCells = Math.ceil((offsetDebut + dernier) / 7) * 7
+
+      const jours: JourCalendrier[] = []
+      for (let cell = 0; cell < totalCells; cell++) {
+        const dayNumInMonth = cell - offsetDebut + 1
+        if (dayNumInMonth < 1 || dayNumInMonth > dernier) {
+          jours.push({
+            iso: '',
+            dow: 0,
+            jourMois: 0,
+            statut: 'horsmois',
+          })
+          continue
+        }
+        const d = new Date(annee, mois, dayNumInMonth)
+        const iso = `${annee}-${String(mois + 1).padStart(2, '0')}-${String(dayNumInMonth).padStart(2, '0')}`
+        const dow = d.getDay()
+        const concert = concertsParDate.get(iso)
+        let statut: StatutJour
+        const eventTitre: string | null = null
+
+        // Jours ouverts selon le mois :
+        // - Juillet (7) + août (8)       : VEN + SAM uniquement (été)
+        // - Reste de l'année              : LUN, MAR, JEU, VEN, SAM (mer + dim fermés)
+        // Sept-déc réouvert à tous le 2026-07-04 (go Cédric) : les permanents
+        // ont réservé en priorité, leurs dates sont bookées donc auto-exclues.
+        const moisHum = mois + 1
+        const joursOuverts =
+          moisHum === 7 || moisHum === 8
+            ? new Set([5, 6])
+            : new Set([1, 2, 4, 5, 6])
+
+        let vernissageRole: 'vernissage' | 'accrochage' | undefined
+        // Cas particulier : si on est un DIMANCHE pendant une expo en cours
+        // (date_install ≤ iso ≤ date_decrochage), on marque le dim comme
+        // bookée/réservée expo MÊME s'il n'y a pas de concert spécifique en BD
+        // ce jour-là (sinon les dim intermédiaires apparaissent à tort comme
+        // « libre_expo »).
+        const expoCe = dow === 0 ? expoCouvrant(iso) : null
+
+        if (concert) {
+          // Vernissage / accrochage : statut expo (rond vert/orange selon
+          // confirme/planifie — cohérent avec les concerts mais en rond).
+          if (concert.type === 'vernissage' || concert.type === 'accrochage' || concert.type === 'decrochage') {
+            statut = concert.statut === 'confirme' ? 'bookee_expo' : 'reservee_expo'
+            vernissageRole = concert.type === 'vernissage' ? 'vernissage' : 'accrochage'
+          } else if (concert.type === 'auteur' || concert.type === 'litteraire') {
+            // Rencontre d'auteur·rice (5 à 7 dominical, « Sur nos pages ») → rond bleu.
+            // N'existe que si une ligne concerts porte type_show='auteur' : zéro
+            // impact tant qu'aucune rencontre n'est saisie. Réf. categorie-jour.js.
+            statut = concert.statut === 'confirme' ? 'bookee_pages' : 'reservee_pages'
+          } else {
+            statut = concert.statut === 'confirme' ? 'bookee' : 'reservee'
+          }
+        } else if (iso < todayISO) {
+          statut = 'passee'
+        } else if (dow === 0) {
+          // DIMANCHE — logique dédiée. Un dim n'est jamais un soir de scène.
+          // Trois issues cliquables + deux bloquées :
+          //   • vernissage ce dim → 5à7 public déjà pris → BRUN plein (bloqué)
+          //   • trop proche (< préavis 7j) → fermé
+          //   • ancre rotation 4 sem ET murs libres → BRUN pointillé (Sur nos murs)
+          //   • tout autre dim (même si une expo occupe les murs, la SOIRÉE est
+          //     libre) → BLEU pointillé cliquable (Sur nos pages, écrivains).
+          if (vernissageSundays.has(iso)) {
+            statut = 'bookee_expo'
+          } else if (iso < preavisISO) {
+            statut = 'ferme'
+          } else if (dimAncres.has(iso) && !expoCe) {
+            statut = 'libre_expo'
+          } else {
+            statut = 'libre_pages'
+          }
+        } else if (
+          dow === 1 &&
+          iso >= IMPRO_DEBUT &&
+          iso <= IMPRO_FIN &&
+          iso >= preavisISO
+        ) {
+          // Lundi pendant la saison Impro (25 mai → 24 août 2026 inclus).
+          // Forcé en vert même en juillet/août (qui sinon ne gardent
+          // que ven/sam pour la scène). Aucun tag : le jour = l'info.
+          statut = 'bookee_perm'
+        } else if (!joursOuverts.has(dow)) {
+          // Jour non ouvert ce mois-ci → fermé (mer, dim avec préavis pas
+          // respecté ; + lun/mar/jeu en juillet/août ; + tout le mois en sept-déc)
+          statut = 'ferme'
+        } else if (iso < preavisISO) {
+          // Préavis 7 jours minimum
+          statut = 'ferme'
+        } else {
+          statut = 'libre'
+        }
+
+        jours.push({ iso, dow, jourMois: dayNumInMonth, statut, eventTitre, vernissageRole })
+      }
+
+      // permanentsPriority retiré le 2026-07-04 : sept-déc est réouvert à tous.
+      result.push({ cleMois, annee, mois: mois + 1, libelle, jours })
+    }
+    return result
+  },
+)

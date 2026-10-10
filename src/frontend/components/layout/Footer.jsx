@@ -140,32 +140,26 @@ const CreditText = styled.span`
   }
 `;
 
-const CreditName = styled.span`
-  color: var(--color-brand);
-  font-family: var(--font-acumin);
-  font-size: 14px;
-  font-weight: bold;
-  
-  @media (max-width: 480px) {
-    font-size: 12px;
+const IacoubaCredit = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 1;
   }
 `;
 
-const CreditEmail = styled.a`
-  color: var(--color-white);
-  font-family: var(--font-acumin);
-  font-size: 12px;
-  text-decoration: none;
-  opacity: 0.8;
-  transition: color 0.3s ease;
-  
-  &:hover {
-    color: var(--color-brand);
-    opacity: 1;
-  }
-  
+const IacoubaLogo = styled.img`
+  height: 16px;
+  display: block;
+
   @media (max-width: 480px) {
-    font-size: 10px;
+    height: 14px;
   }
 `;
 
@@ -259,11 +253,15 @@ const Footer = ({ businessInfo: providedBusinessInfo }) => {
         </motion.div>
 
         <Credits variants={itemVariants}>
-          <CreditText>Site web réalisé par</CreditText>
-          <br />
-          <CreditName>Joshué Collin</CreditName>
-          <br />
-          <CreditEmail href="mailto:pro@joshuep.com">pro@joshuep.com</CreditEmail>
+          <IacoubaCredit
+            href="https://iacouba.ca"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="IAcouba — outils et automatisation"
+          >
+            <CreditText>Propulsé par</CreditText>
+            <IacoubaLogo src="/iacouba-lockup-contenu.svg" alt="IAcouba" />
+          </IacoubaCredit>
         </Credits>
       </FooterContainer>
     </FooterSection>
