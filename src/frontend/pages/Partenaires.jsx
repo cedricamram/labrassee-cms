@@ -4,69 +4,78 @@ import React from 'react'
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
 
+/*
+ * Chaque carte ci-dessous est adossée à une source vérifiable (10/10/2026, Apollon) :
+ *  · menu_v2.json, page « QUI ON EST » → section CE QU'ON DÉFEND → « PRODUITS D'ICI » :
+ *    Valens · Île aux Grues · Madison Park · Rosemont · Boréale · Beauregard
+ *  · marketing/etiquettes-vitrine-2026-09 (validé par Cédric le 28/09) : la catégorie
+ *    Pâtisserie vient de Madeleine, les quiches de Carrément Tarte
+ *  · facture Les Fermes Valens 190225 du 2026-09-30 (poulet, bœuf, bacon)
+ * Pas d'URL qui n'ait répondu au test. Les cinq partenaires inventés de la version
+ * du 24/05 (dont Fermes Lufa et La Grenouille Rouge, introuvables dans nos archives)
+ * sont retirés : une page publique ne porte pas un partenariat qu'on ne peut pas prouver.
+ */
 const partenaires = [
   {
-    slug: 'beauregard',
-    nom: 'Microbrasserie Beauregard',
-    role: 'Bières artisanales',
+    slug: 'valens',
+    nom: 'Les Fermes Valens',
+    role: 'Viandes du Québec',
     description:
-      'Brasserie indépendante de Rosemont qui élabore des bières de caractère en petites séries. On les retrouve à la pression à La Brassée.',
-    url: 'https://beauregard.beer',
-    logo: '/images/partenaires/beauregard.png',
+      'Huntingdon, en Montérégie. Le poulet, le bœuf et le bacon de notre cuisine salée arrivent de chez eux.',
+    url: 'https://fermesvalens.com',
+  },
+  {
+    slug: 'ile-aux-grues',
+    nom: "Fromagerie de l'Île-aux-Grues",
+    role: 'Fromages du Saint-Laurent',
+    description:
+      "Une fromagerie posée sur une île du fleuve. C'est son cheddar que tu trouves dans notre Cabane à sucre version sandwich.",
+    url: 'https://fromagesileauxgrues.com',
+  },
+  {
+    slug: 'madeleine',
+    nom: 'Boulangerie Madeleine',
+    role: 'Viennoiserie',
+    description:
+      "Le croissant nature sort de chez elle, et c'est le seul de la vitrine qu'on ne fait pas ici. Celui aux amandes, on le garnit nous-mêmes sur son croissant.",
+    url: 'https://patisseriemadeleine.ca',
   },
   {
     slug: 'carrement-tarte',
     nom: 'Carrément Tarte',
-    role: 'Tartes artisanales',
+    role: 'Quiches',
     description:
-      'Tartes sucrées et salées faites à la main avec des ingrédients locaux. Elles trônent chaque semaine dans notre vitrine.',
-    url: 'https://carrement-tarte.com',
-    logo: '/images/partenaires/carrement-tarte.png',
+      'Les quiches de notre vitrine viennent de chez eux. Tout le reste de la vitrine est fait maison.',
+    url: 'https://carrementtarte.com',
   },
   {
-    slug: 'madeleine',
-    nom: 'Pâtisserie Madeleine',
-    role: 'Pâtisseries & viennoiseries',
+    slug: 'beauregard',
+    nom: 'Beauregard Brasserie Distillerie',
+    role: 'Bières et spiritueux',
     description:
-      'Pâtisserie française de quartier dont les viennoiseries fraîches composent notre offre du matin.',
-    url: 'https://patisseriemadeleine.ca',
-    logo: '/images/partenaires/madeleine.png',
+      "Notre coup de cœur permanent parmi les huit fûts du moment. On garde aussi leurs canettes au frais pour l'emporter.",
   },
   {
-    slug: 'lufa',
-    nom: 'Fermes Lufa',
-    role: 'Agriculture urbaine',
+    slug: 'boreale',
+    nom: 'Boréale',
+    role: 'Bières',
     description:
-      "Pionnières de l'agriculture sur toits à Montréal. Leurs légumes frais cueillis le jour même arrivent directement dans notre cuisine.",
-    url: 'https://lufa.com',
-    logo: '/images/partenaires/lufa.png',
+      "Les Brasseurs du Nord, une des plus vieilles microbrasseries du Québec. On tient leurs bières, dont les 0 % : ici personne n'a à boire de l'alcool pour être de la soirée.",
+    url: 'https://boreale.com',
   },
   {
-    slug: 'grenouille-rouge',
-    nom: 'La Grenouille Rouge',
-    role: 'Partenaire culturel',
+    slug: 'rosemont',
+    nom: 'Rosemont',
+    role: 'Spiritueux',
     description:
-      'Un espace culturel ancré dans Rosemont qui partage notre vision : des arts vivants accessibles, portés par la communauté.',
-    url: 'https://lagrenouillerouge.com',
-    logo: '/images/partenaires/grenouille-rouge.png',
+      'Des spiritueux qui portent le nom de notre quartier. Leur tequila entre dans nos cocktails.',
   },
   {
-    slug: 'jg-rive-sud',
-    nom: 'JG Rive-Sud',
-    role: 'Distribution alimentaire',
+    slug: 'madison-park',
+    nom: 'Madison Park',
+    role: 'Gins',
     description:
-      'Distributeur régional qui approvisionne La Brassée en produits frais et épicerie fine, avec une approche axée sur les producteurs d\'ici.',
-    url: 'https://jgrivesud.com',
-    logo: '/images/partenaires/jg-rive-sud.png',
-  },
-  {
-    slug: 'fermes-valens',
-    nom: 'Fermes Valens',
-    role: 'Maraîchage local',
-    description:
-      'Ferme maraîchère qui cultive des légumes de saison avec soin. Leurs récoltes composent une bonne partie de notre cuisine.',
-    url: 'https://fermesvalens.com',
-    logo: '/images/partenaires/fermes-valens.png',
+      'Leur London Dry et leur gin à la bergamote sont sur notre carte de cocktails.',
   },
 ]
 
@@ -81,6 +90,11 @@ const Page = styled.div`
 const Hero = styled.section`
   width: 100%;
   padding: 160px 5vw 80px;
+
+  @media (max-width: 680px) {
+    padding: 104px 5vw 40px;
+  }
+
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -258,9 +272,9 @@ const Partenaires = () => {
           animate="visible"
           variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, delay: 0.5 } } }}
         >
-          Des gens du quartier, des producteurs locaux, des lieux qui partagent
-          nos valeurs. Ensemble on fait de La Brassée un endroit qui compte
-          vraiment à Rosemont.
+          Ce qu'on te sert ne sort pas de nulle part. Des fermes, une boulangerie,
+          une fromagerie, des brasseries et des distilleries du Québec. Voici
+          chez qui on achète, et ce qu'on leur prend.
         </HeroLead>
       </Hero>
 
@@ -268,7 +282,7 @@ const Partenaires = () => {
         as={motion.section}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.1 }}
+        viewport={{ once: true, amount: 0, margin: '0px 0px -10% 0px' }}
         variants={stagger}
       >
         {partenaires.map((p) => (
@@ -276,9 +290,11 @@ const Partenaires = () => {
             <CardRole>{p.role}</CardRole>
             <CardName>{p.nom}</CardName>
             <CardDesc>{p.description}</CardDesc>
-            <CardLink href={p.url} target="_blank" rel="noopener noreferrer">
-              {p.url.replace(/^https?:\/\//, '')}
-            </CardLink>
+            {p.url ? (
+              <CardLink href={p.url} target="_blank" rel="noopener noreferrer">
+                {p.url.replace(/^https?:\/\//, '')}
+              </CardLink>
+            ) : null}
           </Card>
         ))}
       </Grid>

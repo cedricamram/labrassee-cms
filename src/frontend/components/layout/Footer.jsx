@@ -140,6 +140,26 @@ const CreditText = styled.span`
   }
 `;
 
+const PartenairesLink = styled.a`
+  display: inline-block;
+  font-family: var(--font-acumin);
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-white);
+  text-decoration: none;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 10px;
+  }
+`;
+
 const IacoubaCredit = styled.a`
   display: inline-flex;
   align-items: center;
@@ -253,6 +273,8 @@ const Footer = ({ businessInfo: providedBusinessInfo }) => {
         </motion.div>
 
         <Credits variants={itemVariants}>
+          <PartenairesLink href="/partenaires">Nos partenaires</PartenairesLink>
+          <br />
           <IacoubaCredit
             href="https://iacouba.ca"
             target="_blank"
