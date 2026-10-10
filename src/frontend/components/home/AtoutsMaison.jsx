@@ -19,8 +19,9 @@ import { faitsDeLaSemaine } from '../../data/faits-maison'
 // La règle qui en sort : doser, pas basculer.
 //
 // ⚠️ GARDE-FOUS DE CONTENU (chaque ligne a coûté une correction de Cédric) :
-// · Le « 100 % » ne vaut QUE pour les PÂTISSERIES. Le salé n'est pas maison —
-//   les quiches viennent de Carrément Tarte (Saint-Michel). Ne jamais étendre.
+// · Pâtisseries maison SAUF le croissant (Cédric, 28/09 : « tout fait ici, sauf
+//   le croissant et les quiches »). Plus de « 100 % » : c'était faux (Athéna, 10/10).
+//   Le salé n'est pas maison — les quiches viennent de Carrément Tarte (Saint-Michel).
 // · Les confitures du Roti ne sont PAS maison (Cédric, 02/07).
 // · Le Roti est précuit puis congelé, grillé à la commande — jamais
 //   « cuit le matin » ni « sorti du four » (Cédric, 13/08).
