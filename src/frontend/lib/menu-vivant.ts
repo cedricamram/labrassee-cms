@@ -67,6 +67,31 @@ export async function getMenuVivant(): Promise<MenuVivant | null> {
   }
 }
 
+/**
+ * Potage du moment (12/10/2026) : le NOM seulement, et seulement s'il est au bain-marie.
+ * Porte publique étroite `potage_au_menu()` (security definer) : ni ingrédients, ni état
+ * interne, ni reste de la table. Vide → le bloc « Aujourd'hui » ne s'affiche pas.
+ */
+export async function getPotageDuJour(): Promise<string[]> {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/potage_au_menu`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: '{}',
+      next: { revalidate: 300, tags: ['menu-vivant'] },
+    })
+    if (!res.ok) return []
+    const rows = (await res.json()) as Array<{ nom?: string }>
+    return rows.map((r) => (r.nom ?? '').trim()).filter(Boolean)
+  } catch {
+    return []
+  }
+}
+
 export function prixFr(n: number): string {
   return n.toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' $'
 }

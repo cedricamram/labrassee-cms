@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Metadata } from 'next'
 
-import { casse, dateFr, getMenuVivant, prixFr, type Produit, type Section } from '@/frontend/lib/menu-vivant'
+import { casse, dateFr, getMenuVivant, getPotageDuJour, prixFr, type Produit, type Section } from '@/frontend/lib/menu-vivant'
 import s from './menu-vivant.module.css'
 
 // Projet « Menu vivant par QR » (idée de Sébastien, GO Cédric 29/09/2026).
@@ -90,7 +90,7 @@ function BlocSection({ sec }: { sec: Section }) {
 }
 
 export default async function MenuAujourdhuiPage() {
-  const menu = await getMenuVivant()
+  const [menu, potages] = await Promise.all([getMenuVivant(), getPotageDuJour()])
 
   if (!menu) {
     return (
@@ -110,6 +110,24 @@ export default async function MenuAujourdhuiPage() {
         <h1 className={s.titre}>Le menu</h1>
         <p className={s.maj}>Prix à jour au {dateFr(menu.koomi_lu_le)} · taxes incluses</p>
       </header>
+
+      {potages.length > 0 && (
+        <section className={s.section} aria-labelledby="t-aujourdhui">
+          <h2 id="t-aujourdhui" className={s.sectionTitre}>Aujourd&apos;hui</h2>
+          <div className={s.bloc}>
+            <ul className={s.liste}>
+              {potages.map((nom) => (
+                <li key={nom} className={s.produit}>
+                  <div className={s.ligne}>
+                    <span className={s.nom}>{nom}</span>
+                  </div>
+                  <p className={s.saveurs}>Le potage du moment, tant qu&apos;il en reste</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       <nav className={s.raccourcis} aria-label="Pages du menu">
         {menu.pages.map((p) => (
