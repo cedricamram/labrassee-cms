@@ -80,10 +80,10 @@ export const businessInfo = {
     exhibitions: 'Messenger FB La Brassée'
   },
   hours: {
-    'lundi': { open: '9h00', close: '21h30' },
-    'mardi-mercredi': { open: '9h00', close: '21h30' },
-    'jeudi-vendredi-samedi': { open: '9h00', close: '21h30' },
-    'dimanche': { open: '9h00', close: '21h30' }
+    'lundi': { open: '8h30', close: '20h00' },
+    'mardi-mercredi': { open: '8h30', close: '20h00' },
+    'jeudi-vendredi-samedi': { open: '8h30', close: '20h00' },
+    'dimanche': { open: '8h30', close: '19h00' }
   },
   message: "CHERCHE PAS NOTRE NUMÉRO DE TÉLÉPHONE. ON PRÉFÈRE TE RÉPONDRE SUR LES RÉSEAUX SOCIAUX!"
 };
