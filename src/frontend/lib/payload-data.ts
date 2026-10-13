@@ -71,7 +71,7 @@ export type FrontendBusinessInfo = {
   }
   // Horaires 100% dynamiques (2026-05-16) : 7 jours glissants à partir d'aujourd'hui.
   // Chaque entrée a { key, label, open, close, isToday } et est calculée selon les
-  // events du jour spécifique. Pas d'event → fermeture 19h00. Event → début + 2h30.
+  // events du jour spécifique. Pas d'event → fermeture 20h (19h le dimanche). Event → début + 2h30.
   // Le tableau est trié chronologiquement (aujourd'hui en premier).
   hours: Array<{
     key: string          // 'YYYY-MM-DD' (ID unique React)
@@ -276,6 +276,11 @@ const MOIS_FR_LONG = [
   'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE',
 ] as const
 
+// Horaire d'hiver (depuis le 13/10/2026) : ouverture 8h30 ; fermeture 20h les soirs
+// sans événement, 19h le dimanche. Les soirs de spectacle ne changent pas (début + 2h30).
+const OUVERTURE = '8h30'
+const fermetureDefautMin = (jourSemaine: number) => (jourSemaine === 0 ? 19 : 20) * 60
+
 // Horaires "par défaut" si calcul dynamique échoue (fallback statique : 7 jours
 // glissants à partir d'aujourd'hui, tous fermés à 19h00)
 function buildFallbackHours(): FrontendBusinessInfo['hours'] {
@@ -290,8 +295,8 @@ function buildFallbackHours(): FrontendBusinessInfo['hours'] {
     out.push({
       key: iso,
       label: `${JOURS_FR_LONG[d.getDay()]} ${d.getDate()} ${MOIS_FR_LONG[d.getMonth()]}`,
-      open: '9h00',
-      close: '19h00',
+      open: OUVERTURE,
+      close: formatHeureFromMinutes(fermetureDefautMin(d.getDay())),
       isToday: i === 0,
     })
   }
@@ -326,11 +331,11 @@ function formatHeureFromMinutes(min: number): string {
  * Pour CHAQUE jour individuel :
  *   - On cherche les events programmés ce jour précis (date_show égale)
  *   - Si event(s) → fermeture = début du PLUS TARD + 2h30, sans jamais
- *     descendre sous 19h00 (un événement du matin, comme un accrochage
+ *     descendre sous la fermeture par défaut (un événement du matin, comme un accrochage
  *     Sur nos murs à 10h00, ne raccourcit pas la journée)
  *   - Sinon → fermeture 19h00 par défaut
  *
- * Ouverture : 9h00 (statique).
+ * Ouverture : 8h30 (statique).
  * Source events : Payload + Surlascène fusionnés (priorité Payload).
  */
 // Fermetures exceptionnelles (table Supabase `fermetures_exceptionnelles`, 2026-09-29) :
@@ -404,18 +409,18 @@ async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']>
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-` +
         String(d.getDate()).padStart(2, '0')
       const latestMin = latestStartParJour.get(iso)
-      const FERMETURE_DEFAUT_MIN = 19 * 60
+      const FERMETURE_DEFAUT_MIN = fermetureDefautMin(d.getDay())
       const close =
         exceptions.get(iso) ??
         (latestMin !== undefined
           ? formatHeureFromMinutes(Math.max(latestMin + 150, FERMETURE_DEFAUT_MIN))
-          : '19h00')
+          : formatHeureFromMinutes(FERMETURE_DEFAUT_MIN))
       const jourLabel = JOURS_FR_LONG[d.getDay()]
       const dateLabel = `${d.getDate()} ${MOIS_FR_LONG[d.getMonth()]}`
       result.push({
         key: iso,
         label: i === 0 ? `AUJOURD'HUI · ${jourLabel} ${dateLabel}` : `${jourLabel} ${dateLabel}`,
-        open: '9h00',
+        open: OUVERTURE,
         close,
         isToday: i === 0,
       })
