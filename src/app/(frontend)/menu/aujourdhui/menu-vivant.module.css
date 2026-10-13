@@ -76,3 +76,14 @@
 .encadre p { margin: 0 0 4px; }
 .encadreTitre { font-weight: 600; color: var(--color-brand, #f7d135); }
 .encadrePrix { color: var(--color-accent, #cdc49d); font-size: 0.9rem; }
+
+/* Bloc « Aujourd'hui » : le nom du potage au bain-marie, jamais de prix. Absent quand rien n'est au bain-marie. */
+.aujourdhui {
+  margin: 4px 0 12px;
+  padding: 12px 16px;
+  border: 2px solid var(--color-brand, #f7d135);
+  border-radius: 14px;
+  text-align: center;
+}
+.aujourdhuiTitre { margin: 0; color: var(--color-accent, #cdc49d); font-size: 0.9rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.aujourdhuiNom { margin: 4px 0 0; font-size: 1.25rem; font-weight: 700; }

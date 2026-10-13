@@ -1,14 +1,14 @@
 import React from 'react'
 import type { Metadata } from 'next'
 
-import { casse, dateFr, getMenuVivant, prixFr, type Produit, type Section } from '@/frontend/lib/menu-vivant'
+import { casse, dateFr, getMenuVivant, getPotageDuMoment, prixFr, type Produit, type Section } from '@/frontend/lib/menu-vivant'
 import s from './menu-vivant.module.css'
 
 // Projet « Menu vivant par QR » (idée de Sébastien, GO Cédric 29/09/2026).
 // Le MENU PAPIER, lisible au téléphone, dont les prix suivent la caisse.
 // EN APERÇU tant que Cédric ne l’a pas validé : hors Google (noindex), absent du plan
 // du site et de la navigation. Esprit simple comme la carte actuelle (Cédric, 29/09).
-export const revalidate = 600
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Le menu du jour — La Brassée',
@@ -90,7 +90,7 @@ function BlocSection({ sec }: { sec: Section }) {
 }
 
 export default async function MenuAujourdhuiPage() {
-  const menu = await getMenuVivant()
+  const [menu, potage] = await Promise.all([getMenuVivant(), getPotageDuMoment()])
 
   if (!menu) {
     return (
@@ -110,6 +110,13 @@ export default async function MenuAujourdhuiPage() {
         <h1 className={s.titre}>Le menu</h1>
         <p className={s.maj}>Prix à jour au {dateFr(menu.koomi_lu_le)} · taxes incluses</p>
       </header>
+
+      {potage && (
+        <section className={s.aujourdhui} aria-label="Aujourd’hui">
+          <p className={s.aujourdhuiTitre}>Aujourd’hui</p>
+          <p className={s.aujourdhuiNom}>Potage : {casse(potage)}</p>
+        </section>
+      )}
 
       <nav className={s.raccourcis} aria-label="Pages du menu">
         {menu.pages.map((p) => (

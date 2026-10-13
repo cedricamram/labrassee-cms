@@ -67,6 +67,29 @@ export async function getMenuVivant(): Promise<MenuVivant | null> {
   }
 }
 
+/**
+ * Le potage au bain-marie en ce moment (NOM seulement, jamais de prix : « on ne met jamais de prix sur nos
+ * communications », Cédric 30/09). Lit la RPC publique `get_kiosk_potage`, la même que le kiosque : elle ne rend
+ * que le lot « au bain-marie » non fini. Rien au bain-marie, ou lecture impossible → null, et le bloc n'apparaît pas.
+ */
+export async function getPotageDuMoment(): Promise<string | null> {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_kiosk_potage`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}`, 'Content-Type': 'application/json' },
+      body: '{}',
+      next: { revalidate: 300, tags: ['menu-vivant'] },
+    })
+    if (!res.ok) return null
+    const lot = (await res.json()) as { nom?: string; etat?: string } | null
+    if (!lot || lot.etat !== 'bain_marie' || !lot.nom) return null
+    return lot.nom.trim() || null
+  } catch (e) {
+    console.error('[menu-vivant] potage', e)
+    return null
+  }
+}
+
 export function prixFr(n: number): string {
   return n.toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' $'
 }
