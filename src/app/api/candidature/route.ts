@@ -26,6 +26,10 @@ const rateLimitIP = new Map<string, number[]>()
 
 const CV_BUCKET = 'candidatures-cv'
 const CV_TAILLE_MAX = 5 * 1024 * 1024 // 5 Mo
+// Plancher : sous 1 Ko ce n'est pas un document, c'est un envoi vide ou tronqué.
+// Calibrage du 10/10/2026 sur 240 PDF/DOCX/JPG/PNG réels : le plus petit faisait
+// 15 363 o, soit 15x le seuil — il ne peut donc pas refuser un vrai CV.
+const CV_TAILLE_MIN = 1024 // 1 Ko
 const CV_TYPES = new Set([
   'application/pdf',
   'application/msword',
@@ -116,6 +120,19 @@ export async function POST(request: Request) {
       if (!CV_TYPES.has(fichierCv.type)) {
         return NextResponse.json(
           { erreur: 'Formats acceptés : PDF, Word, JPG ou PNG.' },
+          { status: 400 },
+        )
+      }
+      // Placé APRÈS les deux gardes ci-dessus à dessein : aucun refus existant ne change
+      // de motif, seuls des fichiers qui PASSAIENT peuvent désormais être refusés.
+      // Sans ce plancher, un envoi vide montait sans un mot (un .pdf de 22 o est deja
+      // passé le 23/08) et le candidat croyait avoir joint son CV. Le refus porte sa
+      // sortie : la candidature sans CV est acceptée, c'est déjà le cas plus bas.
+      if (fichierCv.size < CV_TAILLE_MIN) {
+        return NextResponse.json(
+          {
+            erreur: `Ton CV semble vide : ${fichierCv.size} octets seulement sont arrivés. Vérifie le fichier et réessaie — ou envoie ta candidature sans CV, c'est accepté.`,
+          },
           { status: 400 },
         )
       }
