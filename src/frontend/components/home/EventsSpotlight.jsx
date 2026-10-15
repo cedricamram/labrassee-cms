@@ -60,7 +60,7 @@ const Titre = styled.h2`
   }
 
   @media (max-width: 768px) {
-    margin: 0 0 18px;
+    margin: 0 0 8px;
     font-size: clamp(22px, 6vw, 32px);
   }
 `
@@ -72,6 +72,9 @@ const SwiperWrap = styled.div`
   .swiper {
     overflow: visible !important;
     padding: 20px 0 30px;
+    @media (max-width: 768px) {
+      padding: 4px 0 24px;
+    }
   }
 
   /* Toutes les slides : état "voisin" par défaut */
