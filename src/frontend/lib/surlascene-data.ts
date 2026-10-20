@@ -20,6 +20,25 @@ export const SUPABASE_ANON_KEY =
   'sb_publishable_qG5XGinXYpNpGbmUyjej-Q_-eADJKcW'
 export const SURLASCENE_BUCKET_URL =
   SUPABASE_URL + '/storage/v1/object/public/artistes-scene-epk/'
+/**
+ * Version réduite d'une image du stockage Supabase (transformation d'image du
+ * stockage : même image, largeur demandée, ratio conservé). Les autres URL
+ * passent telles quelles. 20/10/2026 : /scene tirait 58 Mo d'images en taille
+ * originale (la plus lourde : 17,8 Mo), 19 s de chargement sur iPhone.
+ */
+export const reduite = (url: string | null | undefined, largeur: number): string | null => {
+  if (!url) return null
+  const base = SUPABASE_URL + '/storage/v1/object/public/'
+  if (!url.startsWith(base)) return url
+  return (
+    SUPABASE_URL +
+    '/storage/v1/render/image/public/' +
+    url.slice(base.length) +
+    '?width=' +
+    largeur +
+    '&quality=75&resize=contain'
+  )
+}
 export const SURLASCENE_PUBLIC_URL = 'https://labrassee-surlascene-publique.vercel.app'
 export const SURLASCENE_DEPOT_URL = 'https://labrassee-surlascene-depot.vercel.app'
 
