@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
-import { SURLASCENE_BUCKET_URL, JOURS_LONG, MOIS_LONG } from '@/frontend/lib/surlascene-data'
+import { SURLASCENE_BUCKET_URL, JOURS_LONG, MOIS_LONG, reduite } from '@/frontend/lib/surlascene-data'
 
 const Backdrop = styled.div`
   position: fixed;
@@ -313,10 +313,11 @@ export default function SceneArtisteModal({ show, onClose }) {
 
   // Priorité image : cover montage spécifique à l'événement (cover_image_url,
   // ex. le montage duo Christine + Marie) > photo artiste de l'EPK > 1re photo HD.
-  const photo =
+  const photoBrute =
     show.coverImage ||
     photoUrl(a.photo_artiste_path) ||
     (a.photos_hd_paths && a.photos_hd_paths[0] && photoUrl(a.photos_hd_paths[0]))
+  const photo = reduite(photoBrute, 1200)
   // Le descriptif de la soirée (description_publique) prime sur la bio générique
   // de l'artiste : c'est le texte rédigé pour cet événement précis.
   const description = show.description_publique || a.bio
@@ -402,7 +403,7 @@ export default function SceneArtisteModal({ show, onClose }) {
                 {galerie.map((p) => (
                   <Photo
                     key={p}
-                    style={{ backgroundImage: `url('${photoUrl(p)}')` }}
+                    style={{ backgroundImage: `url('${reduite(photoUrl(p), 600)}')` }}
                     onClick={() => window.open(photoUrl(p), '_blank')}
                   />
                 ))}
