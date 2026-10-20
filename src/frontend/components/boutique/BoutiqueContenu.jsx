@@ -245,19 +245,19 @@ const LAITS = [
 const BoutiqueContenu = () => (
   <Page>
     <Chapeau>
-      <GrandTitre>Repartez avec</GrandTitre>
+      <GrandTitre>Repars avec</GrandTitre>
       <Intro>
-        Le café qu&apos;on vous sert, on le vend aussi — et on vous le moud
-        devant vous. Les thés, les laits&nbsp;: tout ce qu&apos;il faut pour
-        refaire chez vous ce que vous aimez ici.
+        Le café qu&apos;on te sert, on le vend aussi — et on te le moud
+        devant toi. Les thés, les laits&nbsp;: tout ce qu&apos;il faut pour
+        refaire chez toi ce que tu aimes ici.
       </Intro>
     </Chapeau>
 
     <Section>
       <Titre>Notre café en grains</Titre>
       <SousTitre>
-        Une seule ferme, un seul café. Celui qu&apos;on vous sert est celui
-        qu&apos;on vous vend.
+        Une seule ferme, un seul café. Celui qu&apos;on te sert est celui
+        qu&apos;on te vend.
       </SousTitre>
       <Liste>
         <Ligne>
@@ -281,8 +281,8 @@ const BoutiqueContenu = () => (
         <strong>Pas de taxes sur le café en vrac&nbsp;: 19&nbsp;$, c&apos;est
         19&nbsp;$.</strong>
         <br />
-        Et on vous le moud devant vous, au grain qu&apos;il vous faut — filtre,
-        espresso, piston. Dites-nous simplement comment vous le préparez.
+        Et on te le moud devant toi, au grain qu&apos;il te faut — filtre,
+        espresso, piston. Dis-nous simplement comment tu le prépares.
       </Encart>
     </Section>
 
@@ -290,7 +290,7 @@ const BoutiqueContenu = () => (
       <Titre>Thés et tisanes en vrac</Titre>
       <SousTitre>
         Trente-deux références choisies avec Un Amour des Thés, à Montréal.
-        Servis au poids — du grammage que vous voulez.
+        Servis au poids — du grammage que tu veux.
       </SousTitre>
       {FAMILLES_THE.map((groupe) => (
         <React.Fragment key={groupe.famille}>
@@ -349,7 +349,7 @@ const BoutiqueContenu = () => (
         <Ligne>
           <Nom>
             Les Zempotés
-            <Detail>190 ml — aussi en supplément sur votre croissant</Detail>
+            <Detail>190 ml — aussi en supplément sur ton croissant</Detail>
           </Nom>
           <Pointilles aria-hidden="true" />
           <Prix>—</Prix>
@@ -362,7 +362,7 @@ const BoutiqueContenu = () => (
         <Ligne>
           <Nom>
             Carte-cadeau
-            <Detail>Le montant que vous voulez</Detail>
+            <Detail>Le montant que tu veux</Detail>
           </Nom>
           <Pointilles aria-hidden="true" />
           <Prix>—</Prix>
