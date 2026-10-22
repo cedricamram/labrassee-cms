@@ -277,9 +277,11 @@ const MOIS_FR_LONG = [
 ] as const
 
 // Horaire d'hiver (depuis le 13/10/2026) : ouverture 8h30 ; fermeture 20h les soirs
-// sans événement, 19h le dimanche. Les soirs de spectacle ne changent pas (début + 2h30).
+// sans événement, 19h le dimanche. Soir de spectacle : début + 2h00. Source de vérité = la fonction
+// SQL `heures_du_jour` (base equipe) ; ce qui suit n'est que le REPLI si elle ne répond pas.
 const OUVERTURE = '8h30'
 const fermetureDefautMin = (jourSemaine: number) => (jourSemaine === 0 ? 19 : 20) * 60
+const APRES_DEBUT_MIN = 120
 
 // Horaires "par défaut" si calcul dynamique échoue (fallback statique : 7 jours
 // glissants à partir d'aujourd'hui, tous fermés à 19h00)
@@ -330,7 +332,7 @@ function formatHeureFromMinutes(min: number): string {
  *
  * Pour CHAQUE jour individuel :
  *   - On cherche les events programmés ce jour précis (date_show égale)
- *   - Si event(s) → fermeture = début du PLUS TARD + 2h30, sans jamais
+ *   - Si event(s) → fermeture = début du PLUS TARD + 2h00, sans jamais
  *     descendre sous la fermeture par défaut (un événement du matin, comme un accrochage
  *     Sur nos murs à 10h00, ne raccourcit pas la journée)
  *   - Sinon → fermeture 19h00 par défaut
@@ -363,6 +365,39 @@ async function fetchFermeturesExceptionnelles(): Promise<Map<string, string>> {
   return map
 }
 
+// Heure d'ouverture/fermeture d'un jour, calculée PAR LA BASE (fonction `heures_du_jour`,
+// 22/10/2026) : la même règle que le cron Google, la TV et le pont Apple. `debuts` = les débuts
+// d'événements que la base ne connaît pas (Payload) ; ceux de la table des concerts et la table
+// des fermetures exceptionnelles sont lus côté base. Retourne null si la base ne répond pas
+// (l'appelant retombe alors sur le calcul local).
+async function fetchHeuresDuJour(
+  iso: string,
+  debuts: number[],
+): Promise<{ open: string; close: string } | null> {
+  try {
+    const hhmmss = (min: number) =>
+      `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}:00`
+    const res = await fetch(`${CONCERTS_SUPABASE_URL}/rest/v1/rpc/heures_du_jour`, {
+      method: 'POST',
+      headers: {
+        apikey: CONCERTS_ANON_KEY,
+        Authorization: `Bearer ${CONCERTS_ANON_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ d: iso, debuts_externes: debuts.map(hhmmss) }),
+      next: { revalidate: 300 },
+    })
+    if (!res.ok) return null
+    const rows: Array<{ ouverture: string; fermeture: string }> = await res.json()
+    const o = parseHeureMinutes(rows?.[0]?.ouverture)
+    const f = parseHeureMinutes(rows?.[0]?.fermeture)
+    if (o === null || f === null) return null
+    return { open: formatHeureFromMinutes(o), close: formatHeureFromMinutes(f) }
+  } catch {
+    return null
+  }
+}
+
 // Un événement annulé garde sa fiche publiée (titre « ANNULÉ · … ») : il ne doit plus
 // allonger la journée.
 const estAnnule = (titre?: string | null) => /^\s*ANNUL[ÉE]/i.test(titre || '')
@@ -376,8 +411,10 @@ async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']>
     ])
     const fusion = fusionnerEtDedoublonner(payloadEvents, surlasceneEvents)
 
-    // Index : ISO date → heure de début la PLUS TARDIVE ce jour-là (en minutes)
+    // Index : ISO date → heure de début la PLUS TARDIVE ce jour-là (en minutes) pour le repli,
+    // et TOUS les débuts du jour pour la base.
     const latestStartParJour = new Map<string, number>()
+    const debutsParJour = new Map<string, number[]>()
     for (const e of fusion) {
       if (estAnnule(e.title)) continue
       const iso = e.date.slice(0, 10)
@@ -385,6 +422,7 @@ async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']>
       if (min === null) continue
       const prev = latestStartParJour.get(iso) ?? -1
       if (min > prev) latestStartParJour.set(iso, min)
+      debutsParJour.set(iso, [...(debutsParJour.get(iso) ?? []), min])
     }
 
     // Aujourd'hui en heure Montréal (YYYY-MM-DD)
@@ -401,26 +439,37 @@ async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']>
     })()
 
     const baseDate = new Date(todayMontreal + 'T00:00:00')
-    const result: FrontendBusinessInfo['hours'] = []
+    const jours: Array<{ i: number; d: Date; iso: string }> = []
     for (let i = 0; i < 7; i++) {
       const d = new Date(baseDate)
       d.setDate(baseDate.getDate() + i)
       const iso =
         `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-` +
         String(d.getDate()).padStart(2, '0')
+      jours.push({ i, d, iso })
+    }
+    const delaBase = await Promise.all(
+      jours.map((j) => fetchHeuresDuJour(j.iso, debutsParJour.get(j.iso) ?? [])),
+    )
+    const result: FrontendBusinessInfo['hours'] = []
+    for (const { i, d, iso } of jours) {
       const latestMin = latestStartParJour.get(iso)
       const FERMETURE_DEFAUT_MIN = fermetureDefautMin(d.getDay())
-      const close =
+      // Repli local (même règle, si la base ne répond pas pour ce jour)
+      const closeLocal =
         exceptions.get(iso) ??
         (latestMin !== undefined
-          ? formatHeureFromMinutes(Math.max(latestMin + 150, FERMETURE_DEFAUT_MIN))
+          ? formatHeureFromMinutes(Math.max(latestMin + APRES_DEBUT_MIN, FERMETURE_DEFAUT_MIN))
           : formatHeureFromMinutes(FERMETURE_DEFAUT_MIN))
+      const base = delaBase[i]
+      const close = base?.close ?? closeLocal
+      const open = base?.open ?? OUVERTURE
       const jourLabel = JOURS_FR_LONG[d.getDay()]
       const dateLabel = `${d.getDate()} ${MOIS_FR_LONG[d.getMonth()]}`
       result.push({
         key: iso,
         label: i === 0 ? `AUJOURD'HUI · ${jourLabel} ${dateLabel}` : `${jourLabel} ${dateLabel}`,
-        open: OUVERTURE,
+        open,
         close,
         isToday: i === 0,
       })
