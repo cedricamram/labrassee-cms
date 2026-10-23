@@ -280,9 +280,7 @@ const MOIS_FR_LONG = [
 // sans événement, 19h le dimanche. Soir de spectacle : FERMETURE = début + 2h30 (le service finit à + 2h00),
 // règle tranchée par Cédric le 23/10/2026. Source de vérité = la fonction SQL `heures_du_jour_v2` (base equipe) ;
 // ce qui suit n'est que le REPLI si elle ne répond pas.
-const OUVERTURE = '8h30'
-const fermetureDefautMin = (jourSemaine: number) => (jourSemaine === 0 ? 19 : 20) * 60
-const APRES_DEBUT_MIN = 150
+const A_CONFIRMER = 'à confirmer'
 
 // Horaires "par défaut" si calcul dynamique échoue (fallback statique : 7 jours
 // glissants à partir d'aujourd'hui, tous fermés à 19h00)
@@ -298,8 +296,8 @@ function buildFallbackHours(): FrontendBusinessInfo['hours'] {
     out.push({
       key: iso,
       label: `${JOURS_FR_LONG[d.getDay()]} ${d.getDate()} ${MOIS_FR_LONG[d.getMonth()]}`,
-      open: OUVERTURE,
-      close: formatHeureFromMinutes(fermetureDefautMin(d.getDay())),
+      open: A_CONFIRMER,
+      close: A_CONFIRMER,
       isToday: i === 0,
     })
   }
@@ -326,45 +324,6 @@ function formatHeureFromMinutes(min: number): string {
   return `${h}h${String(m).padStart(2, '0')}`
 }
 
-/**
- * Calcule les horaires 100% dynamiques pour les 7 prochains jours glissants
- * (aujourd'hui + 6 suivants, en heure Montréal). Bascule auto à minuit chaque
- * jour grâce au revalidate Next.
- *
- * Pour CHAQUE jour individuel :
- *   - On cherche les events programmés ce jour précis (date_show égale)
- *   - Si event(s) → fermeture = début du PLUS TARD + 2h00, sans jamais
- *     descendre sous la fermeture par défaut (un événement du matin, comme un accrochage
- *     Sur nos murs à 10h00, ne raccourcit pas la journée)
- *   - Sinon → fermeture 19h00 par défaut
- *
- * Ouverture : 8h30 (statique).
- * Source events : Payload + Surlascène fusionnés (priorité Payload).
- */
-// Fermetures exceptionnelles (table Supabase `fermetures_exceptionnelles`, 2026-09-29) :
-// une ligne pour un jour l'emporte sur le calcul automatique. Même table lue par le cron
-// dashboard sync-google-hours, pour que le site et Google disent la même heure.
-async function fetchFermeturesExceptionnelles(): Promise<Map<string, string>> {
-  const map = new Map<string, string>()
-  try {
-    const res = await fetch(
-      `${CONCERTS_SUPABASE_URL}/rest/v1/fermetures_exceptionnelles?select=jour,fermeture&jour=gte.${todayISO()}`,
-      {
-        headers: { apikey: CONCERTS_ANON_KEY, Authorization: `Bearer ${CONCERTS_ANON_KEY}` },
-        next: { revalidate: 300 },
-      },
-    )
-    if (!res.ok) return map
-    const rows: Array<{ jour: string; fermeture: string }> = await res.json()
-    for (const r of rows) {
-      const [h, m] = r.fermeture.split(':').map(Number)
-      if (Number.isFinite(h)) map.set(r.jour, formatHeureFromMinutes(h * 60 + (m || 0)))
-    }
-  } catch {
-    /* sans la table, on retombe sur le calcul automatique */
-  }
-  return map
-}
 
 // Heure d'ouverture/fermeture d'un jour, calculée PAR LA BASE (fonction `heures_du_jour_v2`, colonne `fermeture`,
 // 23/10/2026) : la même règle que le cron Google, la TV et le pont Apple. `debuts` = les débuts
@@ -405,24 +364,19 @@ const estAnnule = (titre?: string | null) => /^\s*ANNUL[ÉE]/i.test(titre || '')
 
 async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']> {
   try {
-    const [payloadEvents, surlasceneEvents, exceptions] = await Promise.all([
+    const [payloadEvents, surlasceneEvents] = await Promise.all([
       getUpcomingEventsData(80),
       getUpcomingSurlasceneEvents(80),
-      fetchFermeturesExceptionnelles(),
     ])
     const fusion = fusionnerEtDedoublonner(payloadEvents, surlasceneEvents)
 
-    // Index : ISO date → heure de début la PLUS TARDIVE ce jour-là (en minutes) pour le repli,
-    // et TOUS les débuts du jour pour la base.
-    const latestStartParJour = new Map<string, number>()
+    // Tous les débuts du jour, envoyés à la base (elle seule calcule).
     const debutsParJour = new Map<string, number[]>()
     for (const e of fusion) {
       if (estAnnule(e.title)) continue
       const iso = e.date.slice(0, 10)
       const min = parseHeureMinutes(e.time)
       if (min === null) continue
-      const prev = latestStartParJour.get(iso) ?? -1
-      if (min > prev) latestStartParJour.set(iso, min)
       debutsParJour.set(iso, [...(debutsParJour.get(iso) ?? []), min])
     }
 
@@ -454,17 +408,12 @@ async function calculerHorairesSemaine(): Promise<FrontendBusinessInfo['hours']>
     )
     const result: FrontendBusinessInfo['hours'] = []
     for (const { i, d, iso } of jours) {
-      const latestMin = latestStartParJour.get(iso)
-      const FERMETURE_DEFAUT_MIN = fermetureDefautMin(d.getDay())
-      // Repli local (même règle, si la base ne répond pas pour ce jour)
-      const closeLocal =
-        exceptions.get(iso) ??
-        (latestMin !== undefined
-          ? formatHeureFromMinutes(Math.max(latestMin + APRES_DEBUT_MIN, FERMETURE_DEFAUT_MIN))
-          : formatHeureFromMinutes(FERMETURE_DEFAUT_MIN))
+      // Une seule source (Cédric, 23/10/2026 : « il ne dont que repeter l'information que nous
+      // decidons ») : aucune heure n'est calculée ici. Si la base ne répond pas pour ce jour,
+      // le site dit « à confirmer » plutôt qu'une heure inventée.
       const base = delaBase[i]
-      const close = base?.close ?? closeLocal
-      const open = base?.open ?? OUVERTURE
+      const close = base?.close ?? A_CONFIRMER
+      const open = base?.open ?? A_CONFIRMER
       const jourLabel = JOURS_FR_LONG[d.getDay()]
       const dateLabel = `${d.getDate()} ${MOIS_FR_LONG[d.getMonth()]}`
       result.push({
