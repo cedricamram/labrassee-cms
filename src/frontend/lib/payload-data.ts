@@ -277,11 +277,12 @@ const MOIS_FR_LONG = [
 ] as const
 
 // Horaire d'hiver (depuis le 13/10/2026) : ouverture 8h30 ; fermeture 20h les soirs
-// sans événement, 19h le dimanche. Soir de spectacle : début + 2h00. Source de vérité = la fonction
-// SQL `heures_du_jour` (base equipe) ; ce qui suit n'est que le REPLI si elle ne répond pas.
+// sans événement, 19h le dimanche. Soir de spectacle : FERMETURE = début + 2h30 (le service finit à + 2h00),
+// règle tranchée par Cédric le 23/10/2026. Source de vérité = la fonction SQL `heures_du_jour_v2` (base equipe) ;
+// ce qui suit n'est que le REPLI si elle ne répond pas.
 const OUVERTURE = '8h30'
 const fermetureDefautMin = (jourSemaine: number) => (jourSemaine === 0 ? 19 : 20) * 60
-const APRES_DEBUT_MIN = 120
+const APRES_DEBUT_MIN = 150
 
 // Horaires "par défaut" si calcul dynamique échoue (fallback statique : 7 jours
 // glissants à partir d'aujourd'hui, tous fermés à 19h00)
@@ -365,8 +366,8 @@ async function fetchFermeturesExceptionnelles(): Promise<Map<string, string>> {
   return map
 }
 
-// Heure d'ouverture/fermeture d'un jour, calculée PAR LA BASE (fonction `heures_du_jour`,
-// 22/10/2026) : la même règle que le cron Google, la TV et le pont Apple. `debuts` = les débuts
+// Heure d'ouverture/fermeture d'un jour, calculée PAR LA BASE (fonction `heures_du_jour_v2`, colonne `fermeture`,
+// 23/10/2026) : la même règle que le cron Google, la TV et le pont Apple. `debuts` = les débuts
 // d'événements que la base ne connaît pas (Payload) ; ceux de la table des concerts et la table
 // des fermetures exceptionnelles sont lus côté base. Retourne null si la base ne répond pas
 // (l'appelant retombe alors sur le calcul local).
@@ -377,7 +378,7 @@ async function fetchHeuresDuJour(
   try {
     const hhmmss = (min: number) =>
       `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}:00`
-    const res = await fetch(`${CONCERTS_SUPABASE_URL}/rest/v1/rpc/heures_du_jour`, {
+    const res = await fetch(`${CONCERTS_SUPABASE_URL}/rest/v1/rpc/heures_du_jour_v2`, {
       method: 'POST',
       headers: {
         apikey: CONCERTS_ANON_KEY,
