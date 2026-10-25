@@ -15,10 +15,11 @@
 // Cédric. Les prix engagent la caisse (zone rouge).
 //
 // Garde-fous de contenu (chacun a coûté une correction) :
-// · « La plupart » de nos pâtisseries, jamais « toutes » ni « 100 % » : le croissant
-//   et le Lavoisier viennent de Madeleine. Le cheesecake est maison depuis juin
-//   (Cédric, 30/09 : « nous ne commandons plus de cheese cake chez madeleine »).
-//   Le salé vient de Carrément Tarte (Saint-Michel). Les confitures ne sont pas maison.
+// · Cédric, 25/10 19h08 : « le croissant est une viennoiserie, les pâtisseries sont 100 % maison ».
+//   Le croissant vient de Madeleine ; le Lavoisier et le croissant aux amandes sont faits ici. Le cheesecake
+//   est maison depuis juin (Cédric, 30/09 : « nous ne commandons plus de cheese cake chez madeleine »).
+//   Le salé (grilled cheese, plats du jour, potage, nachos) est maison ; seules les quiches viennent de
+//   Carrément Tarte (Saint-Michel). Les confitures ne sont pas maison.
 // · Le Roti est précuit puis congelé, grillé à la commande — jamais « cuit
 //   le matin » ni « sorti du four ».
 // · Les gâteaux entiers sont suspendus jusqu'à l'hiver (retour quand les
@@ -62,9 +63,9 @@ export const RECITS = [
   {
     sujet: 'maison',
     titre: 'Nos pâtisseries sortent de notre cuisine',
-    phrase: 'La plupart, pas toutes.',
+    phrase: 'Toutes.',
     suite:
-      'Les muffins, les scones, le gâteau aux carottes et le cheesecake à l’érable, oui. Le croissant, non. Le salé non plus : nos quiches viennent de Carrément Tarte, dans Saint-Michel. On préfère le dire.',
+      'Muffins, scones, desserts, gâteaux : tout est fait ici. Le croissant, une viennoiserie, vient de la boulangerie Madeleine. Côté salé, les grilled cheese, le potage, les nachos et les plats du jour sortent aussi de notre cuisine ; seules nos quiches viennent de Carrément Tarte, dans Saint-Michel. On préfère le dire.',
   },
   {
     sujet: 'scene',
@@ -120,7 +121,7 @@ export const CHIFFRES = [
   { sujet: 'scene', chiffre: '731', legende: 'soirées de spectacle depuis 2021' },
   { sujet: 'cafe', chiffre: '19 $', legende: 'les 300 g de café colombien, sans taxes' },
   { sujet: 'buanderie', chiffre: '2,50 $', legende: 'la brassée, à notre buanderie' },
-  { sujet: 'maison', chiffre: 'Maison', legende: 'la plupart de nos pâtisseries' },
+  { sujet: 'maison', chiffre: 'Maison', legende: 'toutes nos pâtisseries' },
   { sujet: 'scene', chiffre: '10 %', legende: 'de ta facture à l’artiste, les soirs de concert' },
   { sujet: 'buanderie', chiffre: '25 ¢', legende: 'le séchage, pour quatre minutes' },
   { sujet: 'cafe', chiffre: 'Moulu', legende: 'devant toi, au grain que tu veux' },

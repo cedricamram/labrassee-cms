@@ -37,7 +37,7 @@ const partenaires = [
     nom: 'Boulangerie Madeleine',
     role: 'Viennoiserie',
     description:
-      "Le croissant nature sort de chez elle, et c'est le seul de la vitrine qu'on ne fait pas ici. Celui aux amandes, on le garnit nous-mêmes sur son croissant.",
+      "Le croissant nature sort de chez elle ; avec les quiches, c'est ce qu'on ne fait pas ici. Celui aux amandes, on le garnit nous-mêmes sur son croissant.",
     url: 'https://patisseriemadeleine.ca',
   },
   {
@@ -45,7 +45,7 @@ const partenaires = [
     nom: 'Carrément Tarte',
     role: 'Quiches',
     description:
-      'Les quiches de notre vitrine viennent de chez eux. Tout le reste de la vitrine est fait maison.',
+      'Les quiches de notre vitrine viennent de chez eux. Le reste de la vitrine est fait maison, sauf le croissant de la boulangerie Madeleine.',
     url: 'https://carrementtarte.com',
   },
   {

@@ -555,7 +555,7 @@
       "id": "sale",
       "slug": "menu_sale",
       "title": "CÔTÉ SALÉ",
-      "subtitle": "<span class=\"sub-sm\">Plats du jour, grilled cheese, quiches & petits creux — viandes des Fermes Valens</span>",
+      "subtitle": "<span class=\"sub-sm\">Plats du jour, grilled cheese, quiches & petits creux — nos viandes (hors quiches) viennent des Fermes Valens</span>",
       "bg_color": "#4d7a2c",
       "accent": "#10200a",
       "sections": [
@@ -885,7 +885,7 @@
                 },
                 {
                   "name": "GÂTEAU AU FROMAGE",
-                  "desc": "caramel salé · Madeleine",
+                  "desc": "recette basque-québécoise",
                   "prix": 8.0
                 }
               ]
@@ -1195,7 +1195,7 @@
                 {
                   "name": "SPRITZ MAISON",
                   "format": "1,5oz",
-                  "desc": "Volaré · prosecco · pamplemousse",
+                  "desc": "Les Îles · cava · pamplemousse",
                   "prix": 13.0
                 },
                 {
