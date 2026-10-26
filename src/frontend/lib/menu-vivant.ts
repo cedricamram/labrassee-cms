@@ -117,7 +117,8 @@ export function casse(s?: string): string {
 
 /**
  * Événement du jour (V6 des cinq, 26/10/2026) : pour le bloc « Ce soir » en tête du menu.
- * Garde-fous (Éveil) : statut « confirme » seulement, jamais annulé (annule_le vide), trié par heure ;
+ * Garde-fous (Éveil) : statut « confirme » seulement (une soirée annulée ou retirée change de statut ; la colonne
+ * annule_le n'est PAS lisible par la clé publique : la filtrer donnait « permission denied »), trié par heure ;
  * date du jour EN HEURE DE MONTRÉAL. Rien (ou erreur) → la page affiche le repli « Le jour ».
  * La page se recalcule toutes les 10 min : un concert ajouté ou annulé dans la journée est suivi.
  */
@@ -127,7 +128,7 @@ export async function getEvenementDuJour(): Promise<EvenementDuJour | null> {
     const jour = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Toronto' }).format(new Date())
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/concerts?select=titre_show,heure_debut,heure_fin` +
-        `&date_show=eq.${jour}&statut=eq.confirme&annule_le=is.null&order=heure_debut.asc&limit=1`,
+        `&date_show=eq.${jour}&statut=eq.confirme&order=heure_debut.asc&limit=1`,
       {
         headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
         next: { revalidate: 600, tags: ['menu-vivant'] },
