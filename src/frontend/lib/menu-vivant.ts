@@ -49,7 +49,10 @@ export type MenuVivant = {
 
 export async function getMenuVivant(): Promise<MenuVivant | null> {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/menu_vivant?select=contenu&id=eq.1`, {
+    // APERÇU (Héphaïstos 26/10/2026) : une préversion peut lire une autre ligne (2 = menu du 02/11)
+    // par la variable MENU_VIVANT_LIGNE, posée seulement sur la branche apercu-menu-v84. Production : ligne 1.
+    const ligne = process.env.VERCEL_ENV === 'production' ? '1' : (process.env.MENU_VIVANT_LIGNE || '1')
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/menu_vivant?select=contenu&id=eq.${ligne}`, {
       headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
       next: { revalidate: 600, tags: ['menu-vivant'] },
     })

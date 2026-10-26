@@ -101,7 +101,9 @@ function BlocSection({ sec }: { sec: Section }) {
 // Forcer la pause : PAUSE_FORCEE = true. Forcer la réouverture : PAUSE_FORCEE = false et date dans le passé.
 const PAUSE_FORCEE = false
 const REOUVERTURE = new Date('2026-11-02T05:50:00-05:00')
-const MENU_AUJOURDHUI_SUSPENDU = () => PAUSE_FORCEE || Date.now() < REOUVERTURE.getTime()
+// L'aperçu (préversion de la branche apercu-menu-v84, jamais la production) ignore la pause.
+const APERCU = process.env.VERCEL_ENV !== 'production' && !!process.env.MENU_VIVANT_LIGNE
+const MENU_AUJOURDHUI_SUSPENDU = () => !APERCU && (PAUSE_FORCEE || Date.now() < REOUVERTURE.getTime())
 
 function MenuEnPause() {
   return (
