@@ -102,7 +102,7 @@ function BlocSection({ sec }: { sec: Section }) {
 const PAUSE_FORCEE = false
 const REOUVERTURE = new Date('2026-11-02T05:50:00-05:00')
 // L'aperçu (préversion de la branche apercu-menu-v84, jamais la production) ignore la pause.
-const APERCU = process.env.VERCEL_ENV !== 'production' && !!process.env.MENU_VIVANT_LIGNE
+const APERCU = process.env.VERCEL_ENV !== 'production' && process.env.VERCEL_GIT_COMMIT_REF === 'apercu-menu-v84'
 const MENU_AUJOURDHUI_SUSPENDU = () => !APERCU && (PAUSE_FORCEE || Date.now() < REOUVERTURE.getTime())
 
 function MenuEnPause() {
