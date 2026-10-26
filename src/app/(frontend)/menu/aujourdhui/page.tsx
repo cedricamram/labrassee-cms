@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import type { Metadata } from 'next'
 
 import { casse, dateFr, getMenuVivant, getPotageDuJour, prixFr, type Produit, type Section } from '@/frontend/lib/menu-vivant'
@@ -89,7 +90,50 @@ function BlocSection({ sec }: { sec: Section }) {
   )
 }
 
+
+// PAUSE (Cédric, 26/10/2026 11h53 : « Oui, en pause jusqu'au 02/11 »). Cette page (adresse du QR du
+// menu papier) publiait le menu vivant de PRINTEMPS : des prix plus bas que la caisse (poulet au
+// beurre 14,00 contre 16,50) et d'autres plus hauts. Même message que /menu (Menu.jsx, 25/10).
+// Retour arrière : MENU_AUJOURDHUI_SUSPENDU = false (ou annuler ce commit). Rien n'est supprimé ;
+// réouverture prévue le lundi 02/11 avec la base V8.4 (Héphaïstos + Apollon).
+const MENU_AUJOURDHUI_SUSPENDU = true
+
+function MenuEnPause() {
+  return (
+    <div style={{ width: '100%', background: 'var(--color-dark)' }}>
+      <section
+        style={{
+          minHeight: '100vh', boxSizing: 'border-box', display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center', maxWidth: 640, margin: '0 auto',
+          padding: '96px 24px', textAlign: 'center', color: 'var(--color-white, #f1efe4)',
+        }}
+      >
+        <img src="/picto_maia_white.svg" alt="La Brassée" width={88} height={88} style={{ marginBottom: 28, opacity: 0.95 }} />
+        <h1 style={{ fontSize: '2.2rem', marginBottom: 16 }}>Le menu est en train de changer</h1>
+        <p style={{ fontSize: '1.15rem', lineHeight: 1.6, marginBottom: 12 }}>
+          On met la carte à jour pour l’automne. Pour les prix et ce qui est servi aujourd’hui,
+          demande-nous au comptoir : tout est à jour en salle.
+        </p>
+        <p style={{ fontSize: '1.05rem', lineHeight: 1.6, opacity: 0.85, marginBottom: 28 }}>
+          Café, plats du jour, grilled cheese, scones maison, bières d’ici, vins et cocktails : on est ouvert tous les jours.
+        </p>
+        <Link
+          href="/"
+          style={{
+            color: 'var(--color-dark, #100f09)', background: 'var(--color-brand, #f7d135)', borderRadius: 999,
+            padding: '12px 28px', fontWeight: 700, textDecoration: 'none',
+          }}
+        >
+          Voir les horaires et l’accueil
+        </Link>
+      </section>
+    </div>
+  )
+}
+
 export default async function MenuAujourdhuiPage() {
+  if (MENU_AUJOURDHUI_SUSPENDU) return <MenuEnPause />
+
   const [menu, potages] = await Promise.all([getMenuVivant(), getPotageDuJour()])
 
   if (!menu) {
