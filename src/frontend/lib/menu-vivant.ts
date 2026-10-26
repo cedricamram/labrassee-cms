@@ -113,3 +113,37 @@ export function casse(s?: string): string {
   const bas = s.toLocaleLowerCase('fr-CA')
   return bas.charAt(0).toLocaleUpperCase('fr-CA') + bas.slice(1)
 }
+
+
+/**
+ * Événement du jour (V6 des cinq, 26/10/2026) : pour le bloc « Ce soir » en tête du menu.
+ * Garde-fous (Éveil) : statut « confirme » seulement, jamais annulé (annule_le vide), trié par heure ;
+ * date du jour EN HEURE DE MONTRÉAL. Rien (ou erreur) → la page affiche le repli « Le jour ».
+ * La page se recalcule toutes les 10 min : un concert ajouté ou annulé dans la journée est suivi.
+ */
+export type EvenementDuJour = { titre_show: string; heure_debut: string | null; heure_fin: string | null }
+export async function getEvenementDuJour(): Promise<EvenementDuJour | null> {
+  try {
+    const jour = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Toronto' }).format(new Date())
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/concerts?select=titre_show,heure_debut,heure_fin` +
+        `&date_show=eq.${jour}&statut=eq.confirme&annule_le=is.null&order=heure_debut.asc&limit=1`,
+      {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+        next: { revalidate: 600, tags: ['menu-vivant'] },
+      },
+    )
+    if (!res.ok) return null
+    const rows = (await res.json()) as EvenementDuJour[]
+    return rows[0] ?? null
+  } catch {
+    return null
+  }
+}
+
+/** « 19:30:00 » → « 19 h 30 » ; « 20:00:00 » → « 20 h ». */
+export function heureFr(h: string | null): string {
+  if (!h) return ''
+  const [hh, mm] = h.split(':')
+  return `${Number(hh)} h${mm && mm !== '00' ? ` ${mm}` : ''}`
+}

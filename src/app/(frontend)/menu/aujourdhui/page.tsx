@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
-import { casse, dateFr, getMenuVivant, getPotageDuJour, prixFr, type Produit, type Section } from '@/frontend/lib/menu-vivant'
+import { casse, dateFr, getEvenementDuJour, getMenuVivant, getPotageDuJour, heureFr, prixFr, type Produit, type Section } from '@/frontend/lib/menu-vivant'
 import s from './menu-vivant.module.css'
 
 // Projet « Menu vivant par QR » (idée de Sébastien, GO Cédric 29/09/2026).
@@ -141,7 +141,7 @@ function MenuEnPause() {
 export default async function MenuAujourdhuiPage() {
   if (MENU_AUJOURDHUI_SUSPENDU()) return <MenuEnPause />
 
-  const [menu, potages] = await Promise.all([getMenuVivant(), getPotageDuJour()])
+  const [menu, potages, evenement] = await Promise.all([getMenuVivant(), getPotageDuJour(), getEvenementDuJour()])
 
   if (!menu) {
     return (
@@ -161,6 +161,13 @@ export default async function MenuAujourdhuiPage() {
         <h1 className={s.titre}>Le menu</h1>
         <p className={s.maj}>Prix à jour au {dateFr(menu.koomi_lu_le)} · taxes incluses</p>
       </header>
+
+      {/* BLOC DU JOUR (V6, 26/10/2026) — câblage technique ; contenu et mise en forme : Apollon (base V8.4). */}
+      <section className={s.section} aria-labelledby="t-du-jour">
+        <h2 id="t-du-jour" className={s.sectionTitre}>
+          {evenement ? `Ce soir : ${evenement.titre_show}${evenement.heure_debut ? `, ${heureFr(evenement.heure_debut)}` : ''}` : 'Le jour'}
+        </h2>
+      </section>
 
       {potages.length > 0 && (
         <section className={s.section} aria-labelledby="t-aujourdhui">
