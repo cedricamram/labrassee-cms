@@ -94,9 +94,14 @@ function BlocSection({ sec }: { sec: Section }) {
 // PAUSE (Cédric, 26/10/2026 11h53 : « Oui, en pause jusqu'au 02/11 »). Cette page (adresse du QR du
 // menu papier) publiait le menu vivant de PRINTEMPS : des prix plus bas que la caisse (poulet au
 // beurre 14,00 contre 16,50) et d'autres plus hauts. Même message que /menu (Menu.jsx, 25/10).
-// Retour arrière : MENU_AUJOURDHUI_SUSPENDU = false (ou annuler ce commit). Rien n'est supprimé ;
+// Retour arrière : voir REOUVERTURE / PAUSE_FORCEE ci-dessous (ou annuler ce commit). Rien n'est supprimé ;
 // réouverture prévue le lundi 02/11 avec la base V8.4 (Héphaïstos + Apollon).
-const MENU_AUJOURDHUI_SUSPENDU = true
+// Réouverture AUTOMATIQUE : la page se recalcule toutes les 10 min (revalidate = 600) ; elle sort de la pause
+// le lundi 02/11/2026 à 5 h 50 (Montréal, EST = UTC-5), juste après la publication de 5 h 45 avec la base V8.4.
+// Forcer la pause : PAUSE_FORCEE = true. Forcer la réouverture : PAUSE_FORCEE = false et date dans le passé.
+const PAUSE_FORCEE = false
+const REOUVERTURE = new Date('2026-11-02T05:50:00-05:00')
+const MENU_AUJOURDHUI_SUSPENDU = () => PAUSE_FORCEE || Date.now() < REOUVERTURE.getTime()
 
 function MenuEnPause() {
   return (
@@ -132,7 +137,7 @@ function MenuEnPause() {
 }
 
 export default async function MenuAujourdhuiPage() {
-  if (MENU_AUJOURDHUI_SUSPENDU) return <MenuEnPause />
+  if (MENU_AUJOURDHUI_SUSPENDU()) return <MenuEnPause />
 
   const [menu, potages] = await Promise.all([getMenuVivant(), getPotageDuJour()])
 
