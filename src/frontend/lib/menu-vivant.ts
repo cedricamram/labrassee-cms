@@ -134,10 +134,15 @@ export async function getEvenementDuJour(): Promise<EvenementDuJour | null> {
         next: { revalidate: 600, tags: ['menu-vivant'] },
       },
     )
-    if (!res.ok) return null
+    if (!res.ok) {
+      // Trace côté serveur (journaux Vercel, invisibles du public) : un échec ne doit pas passer pour « pas d'événement ».
+      console.error('[menu-vivant] événement du jour : lecture refusée', res.status, await res.text().catch(() => ''))
+      return null
+    }
     const rows = (await res.json()) as EvenementDuJour[]
     return rows[0] ?? null
-  } catch {
+  } catch (e) {
+    console.error('[menu-vivant] événement du jour : erreur', e)
     return null
   }
 }
