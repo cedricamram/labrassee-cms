@@ -28,6 +28,10 @@ const nextConfig = {
       // murs-publique/index.html:756 pointait vers /evenements (404).
       { source: '/evenements', destination: '/scene', permanent: true },
       { source: '/murs', destination: '/expo', permanent: true },
+      // QR du menu imprimé (Hermès 29/10 12h59, feu vert) : adresse courte en majuscules pour un QR de 25 modules
+      // lisible à 1,5 cm. TEMPORAIRE exprès (307) : un QR imprimé ne se réimprime pas, sa destination doit pouvoir changer.
+      { source: '/M', destination: '/menu/aujourdhui', permanent: false },
+      { source: '/m', destination: '/menu/aujourdhui', permanent: false },
     ]
   },
 }
