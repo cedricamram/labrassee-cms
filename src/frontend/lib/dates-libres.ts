@@ -440,7 +440,8 @@ export const getCalendrierMois = cache(
         } else if (FETES_FERMEES.has(iso)) {
           // Cédric 31/10/2026 : seul le sam 26/12 reste proposé dans les fêtes.
           statut = 'ferme'
-        } else if (dow === 2 && iso >= '2026-12-23' && [3, 4].includes(Math.ceil(dayNumInMonth / 7))) {
+        } else if (iso >= '2026-12-23' && (dow === 1 || (dow === 2 && [3, 4].includes(Math.ceil(dayNumInMonth / 7))))) {
+          // Lundis : l'impro continue en 2027 (Cédric 31/10/2026 09h16).
           // Permanents 2027 non inscrits en base : bluegrass (3e mardi), jam manouche (4e mardi).
           // KAOS et la poésie : non confirmés, mardis non bloqués.
           statut = 'bookee_perm'
