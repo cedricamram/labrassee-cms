@@ -85,5 +85,5 @@ export const businessInfo = {
     'jeudi-vendredi-samedi': { open: '8h30', close: '20h00' },
     'dimanche': { open: '8h30', close: '19h00' }
   },
-  message: "CHERCHE PAS NOTRE NUMÉRO DE TÉLÉPHONE. ON PRÉFÈRE TE RÉPONDRE SUR LES RÉSEAUX SOCIAUX!"
+  message: ""
 };

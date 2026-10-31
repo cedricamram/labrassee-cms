@@ -258,9 +258,9 @@ const Footer = ({ businessInfo: providedBusinessInfo }) => {
         </WelcomeSection>
 
         <SocialSection variants={itemVariants}>
-          <SocialMessage>
-            {businessInfo?.message || 'CHERCHE PAS NOTRE NUMÉRO DE TÉLÉPHONE. ON PRÉFÈRE TE RÉPONDRE SUR LES RÉSEAUX SOCIAUX!'}
-          </SocialMessage>
+          {businessInfo?.message ? (
+            <SocialMessage>{businessInfo.message}</SocialMessage>
+          ) : null}
           <SocialLinks businessInfo={businessInfo} />
         </SocialSection>
 

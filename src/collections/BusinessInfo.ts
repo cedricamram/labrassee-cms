@@ -215,7 +215,7 @@ export const BusinessInfo: GlobalConfig = {
     {
       name: 'message',
       type: 'textarea',
-      defaultValue: 'CHERCHE PAS NOTRE NUMÉRO DE TÉLÉPHONE. ON PRÉFÈRE TE RÉPONDRE SUR LES RÉSEAUX SOCIAUX!',
+      defaultValue: '',
       admin: {
         description: 'Message personnalisé pour les clients',
         rows: 3,
