@@ -188,6 +188,8 @@ const MOIS_LONG_LOCAL = [
  *   - Date < today + 7j → 'ferme' (préavis minimum 7 jours)
  *   - Sinon, soir ouvert (lun/mar/jeu/ven/sam) → 'libre'
  */
+const FETES_FERMEES = new Set(['2026-12-24', '2026-12-25', '2026-12-31', '2027-01-01'])
+
 export const getCalendrierMois = cache(
   async (nMois = 3): Promise<MoisCalendrier[]> => {
     const today = new Date()
@@ -434,6 +436,13 @@ export const getCalendrierMois = cache(
           // Lundi pendant la saison Impro (25 mai → 24 août 2026 inclus).
           // Forcé en vert même en juillet/août (qui sinon ne gardent
           // que ven/sam pour la scène). Aucun tag : le jour = l'info.
+          statut = 'bookee_perm'
+        } else if (FETES_FERMEES.has(iso)) {
+          // Cédric 31/10/2026 : seul le sam 26/12 reste proposé dans les fêtes.
+          statut = 'ferme'
+        } else if (dow === 2 && iso >= '2026-12-23' && [3, 4].includes(Math.ceil(dayNumInMonth / 7))) {
+          // Permanents 2027 non inscrits en base : bluegrass (3e mardi), jam manouche (4e mardi).
+          // KAOS et la poésie : non confirmés, mardis non bloqués.
           statut = 'bookee_perm'
         } else if (!joursOuverts.has(dow)) {
           // Jour non ouvert ce mois-ci → fermé (mer, dim avec préavis pas
