@@ -75,7 +75,7 @@ export const businessInfo = {
     instagram: 'https://www.instagram.com/labrassee'
   },
   contact: {
-    general: 'envrac@labrassee.com',
+    general: 'contact@labrassee.cafe',
     artists: 'Messenger FB La Brassée',
     exhibitions: 'Messenger FB La Brassée'
   },
