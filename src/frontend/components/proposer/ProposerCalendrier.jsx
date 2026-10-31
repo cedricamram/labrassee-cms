@@ -408,7 +408,7 @@ function urlDepot(type, iso) {
 
 function tagPour(statut, vernissageRole) {
   switch (statut) {
-    case 'libre': return null
+    case 'libre': return 'libre' // 31/10/2026 : le mot LIBRE aussi sur les soirs de spectacle (Cédric, via Dionysos 09h11)
     case 'libre_expo': return 'libre'
     case 'libre_pages': return 'libre'
     case 'libre_expo_attente': return null
