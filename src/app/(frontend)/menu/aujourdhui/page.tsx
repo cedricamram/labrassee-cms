@@ -99,7 +99,7 @@ function BlocSection({ sec }: { sec: Section }) {
 // Réouverture AUTOMATIQUE : la page se recalcule toutes les 10 min (revalidate = 600) ; elle sort de la pause
 // le lundi 02/11/2026 à 5 h 50 (Montréal, EST = UTC-5), juste après la publication de 5 h 45 avec la base V8.4.
 // Forcer la pause : PAUSE_FORCEE = true. Forcer la réouverture : PAUSE_FORCEE = false et date dans le passé.
-const PAUSE_FORCEE = false
+const PAUSE_FORCEE = true  // 02/11 06h01 (Héphaïstos) : rouverte à 5h50 mais la publication de 5h45 a repris la base PRINTEMPS (aucune base V8.4 sur le disque) → pause remise. Rouvrir : false, une fois la base V8.4 publiée.
 const REOUVERTURE = new Date('2026-11-02T05:50:00-05:00')
 const MENU_AUJOURDHUI_SUSPENDU = () => PAUSE_FORCEE || Date.now() < REOUVERTURE.getTime()
 
