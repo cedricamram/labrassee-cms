@@ -238,7 +238,7 @@ export default function ProposerDossierTech({ dossier }) {
         </Titre>
         <Intro>
           Coche mentalement ce qui te sert · réponds à notre courriel avec ta liste.
-          Comme ça la salle est réglée pour toi avant que tu arrives au soundcheck.
+          Comme ça la salle est réglée pour toi avant que tu arrives à l'essai de son.
         </Intro>
 
         <NoteImportante>

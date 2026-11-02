@@ -151,7 +151,7 @@ const DetailsBloc = styled.details`
 // Métadonnées : titre + ordre d'affichage par clé JSON
 const SECTION_META = {
   sonorisation: { titre: '🎤 Sonorisation', ordre: 1 },
-  backline: { titre: '🎹 Backline', ordre: 2 },
+  backline: { titre: '🎹 Le matériel de la maison', ordre: 2 },
   eclairage: { titre: '💡 Éclairage', ordre: 3 },
   video: { titre: '🎥 Vidéo · captation', ordre: 4 },
   format_show: { titre: '⏰ Format du spectacle', ordre: 5 },

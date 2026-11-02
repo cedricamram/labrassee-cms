@@ -188,8 +188,10 @@ const cards = [
     titre: '🛡️ Matériel',
     desc: (
       <>
-        Tu es responsable de ton matos personnel. La Brassée fournit la sono + le
-        piano numérique Kawai ES110. Batterie et amplis : artiste apporte.
+        Tu es responsable de ton matos personnel. Instrument disponible : clavier
+        Kawai ES110. Les amplis servent de moniteurs : le son de la salle est géré
+        par le technicien son, sur la console Yamaha et les haut-parleurs installés
+        au café. Batterie : artiste apporte.
       </>
     ),
   },

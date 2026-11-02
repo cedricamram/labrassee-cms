@@ -239,7 +239,7 @@ const SECTIONS = [
     keys: ['format', 'prix_actuel', 'disponible'],
   },
   {
-    titre: '🎹 Backline',
+    titre: '🎹 Le matériel de la maison',
     keys: ['piano', 'batterie', 'ampli_guitare', 'ampli_basse'],
   },
 ]
