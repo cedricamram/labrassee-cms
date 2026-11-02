@@ -592,7 +592,7 @@ export default function SceneAgenda({ shows = [] }) {
                 </div>
               )}
               <div className="when">
-                📍 La Brassée · 2522 Beaubien Est · entrée libre · soundcheck{' '}
+                📍 La Brassée · 2522 Beaubien Est · entrée libre · essai de son{' '}
                 <strong>
                   {first.heure_soundcheck ? first.heure_soundcheck.slice(0, 5) : '1 h avant'}
                 </strong>{' '}

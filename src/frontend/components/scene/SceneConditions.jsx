@@ -127,10 +127,10 @@ const cards = [
     ),
   },
   {
-    titre: '🎤 Soundcheck + format',
+    titre: '🎤 Essai de son + format',
     desc: (
       <>
-        Soundcheck dès <strong>18 h 30</strong> avec Cédric à la console. Spectacle à{' '}
+        Essai de son dès <strong>18 h 30</strong> avec Cédric à la console. Spectacle à{' '}
         <strong>19 h 30</strong>. Format : <strong>2 sets de 45 min</strong> avec
         pause de 15 min.
       </>

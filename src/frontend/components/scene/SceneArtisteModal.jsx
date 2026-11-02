@@ -251,7 +251,7 @@ function genererIcs(show, artiste) {
   const titre = artiste?.nom_artiste || show.titre_show || 'Spectacle La Brassée'
   const desc =
     (artiste?.bio ? artiste.bio + '\\n\\n' : '') +
-    'Soundcheck dès ' +
+    'Essai de son dès ' +
     (show.heure_soundcheck ? show.heure_soundcheck.slice(0, 5) : '18:30') +
     '. Spectacle à ' +
     (show.heure_debut ? show.heure_debut.slice(0, 5) : '19:30') +
@@ -348,7 +348,7 @@ export default function SceneArtisteModal({ show, onClose }) {
           <ShowInfo>
             📅 <strong>{formatDateLong(show.date_show)}</strong> · spectacle{' '}
             {show.heure_debut ? show.heure_debut.slice(0, 5) : '19:30'}
-            {show.heure_fin && ` → ${show.heure_fin.slice(0, 5)}`} · soundcheck{' '}
+            {show.heure_fin && ` → ${show.heure_fin.slice(0, 5)}`} · essai de son{' '}
             {show.heure_soundcheck ? show.heure_soundcheck.slice(0, 5) : '1 h avant'}
             {a.duree_set_minutes ? ` · set ${a.duree_set_minutes} min` : ''}
           </ShowInfo>
