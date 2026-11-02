@@ -350,7 +350,7 @@ export default function SceneArtisteModal({ show, onClose }) {
             {show.heure_debut ? show.heure_debut.slice(0, 5) : '19:30'}
             {show.heure_fin && ` → ${show.heure_fin.slice(0, 5)}`} · essai de son{' '}
             {show.heure_soundcheck ? show.heure_soundcheck.slice(0, 5) : '1 h avant'}
-            {a.duree_set_minutes ? ` · set ${a.duree_set_minutes} min` : ''}
+            {a.duree_set_minutes ? ` · « set » ${a.duree_set_minutes} min` : ''}
           </ShowInfo>
 
           {a.permanence && a.recurrence_notes && (

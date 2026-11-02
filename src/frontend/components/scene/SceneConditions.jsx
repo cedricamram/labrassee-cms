@@ -131,7 +131,7 @@ const cards = [
     desc: (
       <>
         Essai de son dès <strong>18 h 30</strong> avec Cédric à la console. Spectacle à{' '}
-        <strong>19 h 30</strong>. Format : <strong>2 sets de 45 min</strong> avec
+        <strong>19 h 30</strong>. Format : <strong>2 « sets » de 45 min</strong> avec
         pause de 15 min.
       </>
     ),
@@ -210,7 +210,7 @@ export default function SceneConditions() {
         </Titre>
         <Intro>
           On accepte des artistes en autonomie qui aiment l'intimité d'une salle
-          ouverte. Pas besoin d'être connu, juste d'avoir un set rodé.
+          ouverte. Pas besoin d'être connu, juste d'avoir un « set » rodé.
         </Intro>
 
         <Grille>
