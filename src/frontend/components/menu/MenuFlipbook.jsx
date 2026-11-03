@@ -15,6 +15,7 @@ import 'swiper/css/navigation'
 // (pas supprimé) : pour la remettre, remettre la ligne `{ id: 'nouveau', … }` en tête de la liste.
 // Chaque entrée : { id, label (chip nav), titre (overlay coin), bg (couleur teinte fond) }
 const PAGES = [
+  { id: 'nouveau',          label: 'Nouveau',        titre: 'La carte de l\'automne', bg: '#e8b84a' },   // 03/11 : remise en tête avec l'édition V8.5 (l'ancienne page de printemps avait été retirée le 06/10)
   { id: 'boissons_chaudes', label: 'Boissons chaudes', titre: 'Cafés · thés · lattes', bg: '#c49860' },
   { id: 'boissons_froides', label: 'Boissons froides', titre: 'Rafraîchissements · saisonniers', bg: '#88a8c8' },
   { id: 'sale',             label: 'Côté salé',      titre: 'Plats · grilled cheese · quiches · nachos', bg: '#a89968' },
