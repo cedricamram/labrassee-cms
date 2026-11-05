@@ -11,7 +11,7 @@ import MenuTexte from '../components/menu/MenuTexte'
 // prix périmés) sont suspendus. Pour revenir en arrière : mettre
 // MENU_EN_LIGNE_SUSPENDU à false (ou annuler le commit). Les PNG et menu-texte.js
 // restent dans le dépôt, rien n'est supprimé.
-const MENU_EN_LIGNE_SUSPENDU = true
+const MENU_EN_LIGNE_SUSPENDU = false
 
 const MenuEnPause = () => (
   <section
