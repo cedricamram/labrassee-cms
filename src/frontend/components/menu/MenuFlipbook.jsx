@@ -9,6 +9,9 @@ import { Navigation, Keyboard } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 
+// 04/11 (Héphaïstos) : le menu d'automne-hiver (V8.5) est en ligne, le bandeau « en attendant » n'a plus lieu d'être. Remettre true pour le réafficher.
+const AVIS_TRANSITION = false
+
 // Les pages du menu V2 — copiées dans /public/images/menu-v2/
 // 06/10/2026, Cédric (« enlève la ») : la page « NOUVEAU — PRINTEMPS 2026 — la pêche à l'honneur » est RETIRÉE
 // du menu en ligne (c'était un menu de saison, on est en octobre). Le fichier nouveau.png reste dans le dépôt
@@ -442,10 +445,12 @@ export default function MenuFlipbook() {
         <LienTexte href="#menu-texte">
           Les lettres sont trop petites ? Lis le menu en texte
         </LienTexte>
-        <Avis>
-          <strong>On travaille fort sur le menu d&apos;automne-hiver.</strong> En attendant, voici celui
-          d&apos;en ce moment. Un doute sur ce qu&apos;on sert aujourd&apos;hui ? Demande-nous au comptoir.
-        </Avis>
+        {AVIS_TRANSITION && (
+          <Avis>
+            <strong>On travaille fort sur le menu d&apos;automne-hiver.</strong> En attendant, voici celui
+            d&apos;en ce moment. Un doute sur ce qu&apos;on sert aujourd&apos;hui ? Demande-nous au comptoir.
+          </Avis>
+        )}
       </Hero>
 
       <SwiperWrap>
