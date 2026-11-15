@@ -109,7 +109,7 @@ export const MENU_BOISSONS_CHAUDES = {
     titre: 'Lattés et infusions de thé',
     notes: ['Sirop de chocolat blanc sur le matcha +1,00 $.'],
     items: [
-      { nom: 'Matcha latté', detail: 'Régulier · chaï · Earl Grey · mangue — 16 oz', prix: '7,50 $' },
+      { nom: 'Matcha latte', detail: 'Régulier · chaï · Earl Grey · mangue — 16 oz', prix: '7,50 $' },
       { nom: 'London Fog', detail: '16 oz', prix: '7,50 $' },
       { nom: 'Chaï latté', detail: '16 oz', prix: '7,50 $' },
       { nom: 'Dirty chaï latté', detail: '16 oz', prix: '8,50 $' },
