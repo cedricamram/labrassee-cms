@@ -7,4 +7,5 @@
 }
 .champ::placeholder { color: var(--color-accent, #cdc49d); opacity: 0.8; }
 .liste { list-style: none; margin: 0; padding: 0; }
-.chanson { padding: 11px 2px; font-size: 1.05rem; line-height: 1.35; border-bottom: 1px solid rgba(241, 239, 228, 0.12); }
+.chanson { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 2px; font-size: 1.05rem; line-height: 1.35; border-bottom: 1px solid rgba(241, 239, 228, 0.12); }
+.paroles { flex: 0 0 auto; display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; font-size: 0.9rem; color: var(--color-brand, #f7d135); text-decoration: none; opacity: 0.9; }
