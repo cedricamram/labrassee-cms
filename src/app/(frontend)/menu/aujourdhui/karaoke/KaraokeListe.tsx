@@ -45,19 +45,7 @@ export default function KaraokeListe({ sections }: { sections: Section[] }) {
           <h2 className={s.sectionTitre}>{sec.titre.charAt(0) + sec.titre.slice(1).toLowerCase()}</h2>
           <ul className={k.liste}>
             {sec.chansons.map((c, i) => (
-              <li key={i} className={k.chanson}>
-                <span>{c}</span>
-                {/* Les paroles ne sont pas hébergées ici (droits d'auteur) : un lien vers une recherche, pour ceux qui les veulent sur leur cell. */}
-                <a
-                  className={k.paroles}
-                  href={`https://www.google.com/search?q=${encodeURIComponent(c.replace(/\s*\(.*?\)\s*$/, '') + ' paroles -site:youtube.com -site:youtu.be')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Chercher les paroles de ${c}`}
-                >
-                  paroles ↗
-                </a>
-              </li>
+              <li key={i} className={k.chanson}>{c}</li>
             ))}
           </ul>
         </section>
