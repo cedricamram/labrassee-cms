@@ -136,6 +136,18 @@ function MenuEnPause() {
   )
 }
 
+// Super karaoké du 20/11/2026 : un lien vers la liste des chansons, ce soir seulement (Cédric, 20/11 18 h 29 : « accessible par
+// ce code QR pour ce soir »). Visible du 20/11 12 h au 21/11 5 h (Montréal) ; la page /menu/aujourdhui/karaoke reste en place.
+function BanniereKaraoke() {
+  const maintenant = Date.now()
+  if (maintenant < new Date('2026-11-20T12:00:00-05:00').getTime() || maintenant > new Date('2026-11-21T05:00:00-05:00').getTime()) return null
+  return (
+    <Link href="/karaoke" className={s.puce} style={{ display: 'flex', justifyContent: 'center', margin: '4px 0 14px', fontSize: '1.1rem', fontWeight: 700, border: '2px solid var(--color-brand, #f7d135)' }}>
+      🎤 Ce soir : la liste des chansons du karaoké
+    </Link>
+  )
+}
+
 export default async function MenuAujourdhuiPage() {
   if (MENU_AUJOURDHUI_SUSPENDU()) return <MenuEnPause />
 
@@ -145,6 +157,7 @@ export default async function MenuAujourdhuiPage() {
     return (
       <main className={s.page}>
         <h1 className={s.titre}>Le menu</h1>
+        <BanniereKaraoke />
         <p className={s.vide}>
           Le menu à jour est momentanément indisponible. Tu peux consulter{' '}
           <a href="/menu">notre menu complet</a> ou demander au comptoir.
@@ -159,6 +172,8 @@ export default async function MenuAujourdhuiPage() {
         <h1 className={s.titre}>Le menu</h1>
         <p className={s.maj}>Prix à jour au {dateFr(menu.koomi_lu_le)} · taxes incluses</p>
       </header>
+
+      <BanniereKaraoke />
 
       {potages.length > 0 && (
         <section className={s.section} aria-labelledby="t-aujourdhui">
