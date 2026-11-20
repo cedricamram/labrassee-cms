@@ -50,7 +50,7 @@ export default function KaraokeListe({ sections }: { sections: Section[] }) {
                 {/* Les paroles ne sont pas hébergées ici (droits d'auteur) : un lien vers une recherche, pour ceux qui les veulent sur leur cell. */}
                 <a
                   className={k.paroles}
-                  href={`https://www.google.com/search?q=${encodeURIComponent(c.replace(/\s*\(.*?\)\s*$/, '') + ' paroles')}`}
+                  href={`https://www.google.com/search?q=${encodeURIComponent(c.replace(/\s*\(.*?\)\s*$/, '') + ' paroles -site:youtube.com -site:youtu.be')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Chercher les paroles de ${c}`}
