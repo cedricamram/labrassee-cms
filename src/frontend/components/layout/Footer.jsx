@@ -211,7 +211,7 @@ const Footer = ({ businessInfo: providedBusinessInfo }) => {
   };
 
   return (
-    <FooterSection>
+    <FooterSection id="nous-joindre" style={{ scrollMarginTop: 64 }}>
       <FooterContainer
         as={motion.div}
         initial="hidden"

@@ -23,6 +23,10 @@ const nextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: ENTETES_SECURITE }]
   },
+  // 2026-11-25 — adresse inconnue : en DERNIER recours (après pages, routes dynamiques et fichiers), la page « introuvable » en français.
+  async rewrites() {
+    return { fallback: [{ source: '/:chemin((?!_next/).*)', destination: '/introuvable' }] }
+  },
   async redirects() {
     return [
       // murs-publique/index.html:756 pointait vers /evenements (404).
@@ -32,6 +36,14 @@ const nextConfig = {
       // lisible à 1,5 cm. TEMPORAIRE exprès (307) : un QR imprimé ne se réimprime pas, sa destination doit pouvoir changer.
       { source: '/M', destination: '/menu/aujourdhui', permanent: false },
       { source: '/m', destination: '/menu/aujourdhui', permanent: false },
+      // 2026-11-25 — client mystère, impasses de contact : adresses qu'on tape ou qu'on a déjà publiées.
+      // /contact et /nous-joindre mènent au bas de page de l'accueil (adresse, heures, courriel). Temporaires : une vraie page contact peut venir.
+      { source: '/contact', destination: '/#nous-joindre', permanent: false },
+      { source: '/nous-joindre', destination: '/#nous-joindre', permanent: false },
+      // vieux QR « humeur » : humeur.labrassee.cafe renvoie vers labrassee.cafe/humeur/index.html
+      { source: '/humeur/:reste*', destination: '/', permanent: false },
+      // le paramètre du lien est gardé par Next
+      { source: '/desabonnement-newsletter', destination: '/desabonnement', permanent: true },
     ]
   },
 }
