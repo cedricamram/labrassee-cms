@@ -20,7 +20,7 @@ export const MENU_SALE = {
       accompagnement: 'Salade verte 2,50 $ · demi-potage 5,00 $',
       jours: [
         { jour: 'Lundi', viande: 'Pas de plat du jour', vege: null },
-        { jour: 'Mardi', viande: null, vege: 'Risotto (SG · VG) 12,50 $' },
+        { jour: 'Mardi', viande: 'Risotto Viande (SG) 15,00 $', vege: 'Risotto VG (SG · VG) 12,50 $' },
         { jour: 'Mercredi', viande: 'Lasagne mexicaine au bœuf (SG) 16,00 $', vege: 'Lasagne mexicaine (SG · VG) 13,00 $' },
         { jour: 'Jeudi', viande: 'Poulet au beurre (SG) 16,50 $', vege: 'Tofu au beurre (SG · VG) 13,00 $' },
         { jour: 'Vendredi', viande: 'Lasagne bœuf-ricotta 16,50 $', vege: 'Lasagne aux légumes (SG · VG) 13,00 $' },
