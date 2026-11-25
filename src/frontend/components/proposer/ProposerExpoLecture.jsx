@@ -237,7 +237,7 @@ const CARDS = [
     corps: (
       <>
         On s'occupe de tout : <strong>événement Facebook</strong>, publication
-        Instagram, infolettre, TV cuisine. Plus ton dépôt est rodé (photos d'œuvres,
+        Instagram, TV cuisine. Plus ton dépôt est rodé (photos d'œuvres,
         bio, liens), plus on a de matière pour te mettre en avant.
       </>
     ),

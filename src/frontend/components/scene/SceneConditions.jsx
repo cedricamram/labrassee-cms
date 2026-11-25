@@ -160,7 +160,7 @@ const cards = [
     desc: (
       <>
         On t'annonce sur Facebook (événement créé dès réception de ta photo +
-        descriptif), Instagram, infolettre, TV interne. Réels FB+Insta pendant le
+        descriptif), Instagram, TV interne. Réels FB+Insta pendant le
         spectacle. Droit d'image pour la promo (et 6 mois après).
       </>
     ),

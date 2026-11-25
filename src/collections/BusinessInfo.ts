@@ -107,7 +107,7 @@ export const BusinessInfo: GlobalConfig = {
           name: 'general',
           type: 'email',
           required: true,
-          defaultValue: 'contact@labrassee.cafe',
+          defaultValue: 'envrac@labrassee.com',
           admin: {
             description: 'Email général',
           },

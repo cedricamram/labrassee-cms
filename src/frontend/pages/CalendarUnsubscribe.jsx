@@ -360,7 +360,7 @@ const CalendarUnsubscribe = () => {
           </AnimatePresence>
 
           <FooterNote>
-            Tu pourras toujours te réinscrire plus tard depuis la page d’accueil si jamais tu changes d’idée.
+            Si jamais tu changes d’idée, écris-nous : on te réinscrit.
           </FooterNote>
         </Card>
       </Content>
