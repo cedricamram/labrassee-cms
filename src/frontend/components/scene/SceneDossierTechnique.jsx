@@ -194,8 +194,8 @@ export default function SceneDossierTechnique({ dossier }) {
           <Bloc>
             <Lead style={{ color: 'rgba(255,255,255,0.55)', fontStyle: 'italic' }}>
               Dossier technique en cours de finalisation. Écris à{' '}
-              <a href="mailto:contact@labrassee.cafe" style={{ color: 'var(--color-brand)' }}>
-                contact@labrassee.cafe
+              <a href="mailto:surlascene@labrassee.cafe" style={{ color: 'var(--color-brand)' }}>
+                surlascene@labrassee.cafe
               </a>{' '}
               pour la version PDF.
             </Lead>

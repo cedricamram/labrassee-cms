@@ -508,7 +508,7 @@ export default function ProposerCalendrier({ mois = [] }) {
           et le public, lui, sait déjà ce qu'il vient chercher.
         </Intro>
         <Intro>
-          Vue calendrier des 3 prochains mois. Une case <strong style={{ color: 'var(--color-white)' }}>en pointillé</strong> est libre : clique dessus
+          Vue calendrier jusqu’à la fin juillet 2027. Une case <strong style={{ color: 'var(--color-white)' }}>en pointillé</strong> est libre : clique dessus
           pour proposer ta candidature à cette date. La <strong style={{ color: 'var(--color-white)' }}>couleur dit la scène</strong> —
           <span style={{ color: '#f7d135' }}> jaune</span> pour un spectacle,
           <span style={{ color: '#e0b280' }}> brun</span> pour une expo,

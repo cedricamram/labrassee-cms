@@ -15,8 +15,11 @@ export const metadata: Metadata = {
 export const revalidate = 3600
 
 export default async function ProposerPage() {
-  // 8 mois pour aller de mai à décembre — sept→déc seront grisés
-  // (« permanents prioritaires »).
-  const moisCalendrier = await getCalendrierMois(8)
+  // Jusqu'à la fin juillet 2027 (Cédric, 25/11/2026 10h23 : « ouvre jusque juillet ») : même borne que les dépôts
+  // scène et pages et que la RPC reserver_date_scene. Calculé, pas écrit en dur : avec « 8 », le calendrier montrait
+  // des cases LIBRE que les formulaires refusaient (client mystère du 25/11).
+  const now = new Date()
+  const nMois = Math.max(3, (2027 - now.getFullYear()) * 12 + (6 - now.getMonth()) + 1)
+  const moisCalendrier = await getCalendrierMois(nMois)
   return <Proposer moisCalendrier={moisCalendrier} />
 }

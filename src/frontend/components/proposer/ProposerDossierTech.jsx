@@ -281,7 +281,7 @@ export default function ProposerDossierTech({ dossier }) {
         <Pied>
           Un besoin spécifique non listé (effet, micro particulier, format inhabituel) ?
           <br />
-          Écris à <strong>contact@labrassee.cafe</strong> — on regarde ensemble.
+          Écris à <strong>surlascene@labrassee.cafe</strong> — on regarde ensemble.
         </Pied>
       </Container>
     </Section>
