@@ -6,6 +6,13 @@ const SUPABASE_ANON_KEY =
 
 const RESEND_BASE_URL = 'https://api.resend.com'
 const FROM_ADDRESS = 'La Brassée <info@labrassee.cafe>'
+// 25/11 (client mystère) : info@labrassee.cafe n'a jamais livré un seul courriel dans une boîte lue. Une réponse de
+// l'artiste partait dans le vide : on la dirige vers une boîte qui arrive (mesuré le 25/11).
+const REPONDRE_A: Record<string, string> = {
+  scene: 'surlascene@labrassee.cafe',
+  murs: 'surnosmurs@labrassee.com',
+  pages: 'cedric@labrassee.com',
+}
 
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000 // 1 heure
 const RATE_LIMIT_MAX_PER_EMAIL = 3
@@ -17,6 +24,10 @@ const rateLimitIP = new Map<string, number[]>()
 
 const ALLOWED_ORIGINS = new Set([
   'https://scene-depot.labrassee.cafe',
+  // 25/11 (client mystère) : le calendrier /proposer ouvre le dépôt scène sur son adresse vercel.app ; refusée ici,
+  // la demande « Recevoir mon lien » mourait en silence.
+  'https://labrassee-surlascene-depot.vercel.app',
+  'https://murs-depot.labrassee.cafe',
   'https://labrassee-murs-depot.vercel.app',
   'https://labrassee-pages-depot.vercel.app',
   'http://localhost:3000',
@@ -141,6 +152,7 @@ labrassee.cafe`
           },
           body: JSON.stringify({
             from: FROM_ADDRESS,
+            reply_to: REPONDRE_A[plateforme] || 'cedric@labrassee.com',
             to: [courriel],
             subject: 'Ton dossier à La Brassée',
             html,
