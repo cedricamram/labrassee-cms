@@ -301,9 +301,13 @@ export default function SceneArtisteModal({ show, onClose }) {
     }
     document.addEventListener('keydown', handler)
     document.body.style.overflow = 'hidden'
+    // Lenis (défilement doux, bureau seulement) avale la molette : sans arrêt ni data-lenis-prevent,
+    // la fenêtre de l'événement ne défilait pas sur Mac (Cédric 25/11 20h30, Apéro Jazz du 3/12).
+    window.lenis?.stop?.()
     return () => {
       document.removeEventListener('keydown', handler)
       document.body.style.overflow = ''
+      window.lenis?.start?.()
     }
   }, [onClose])
 
@@ -328,7 +332,7 @@ export default function SceneArtisteModal({ show, onClose }) {
   const artisteUrl = a.id ? `/scene/${a.id}` : null
 
   return (
-    <Backdrop onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <Backdrop data-lenis-prevent onClick={(e) => e.target === e.currentTarget && onClose()}>
       <Carte role="dialog" aria-modal="true">
         <Ferme onClick={onClose} aria-label="Fermer">×</Ferme>
 
