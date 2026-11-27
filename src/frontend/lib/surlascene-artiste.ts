@@ -160,7 +160,7 @@ export const getArtisteParId = cache(
       `/rest/v1/concerts?select=${selectConcert}` +
       `&date_show=gte.${today}` +
       `&statut=eq.confirme` +
-      `&order=date_show.asc&limit=20`
+      `&order=date_show.asc&limit=500`
 
     const concertsAvenir = await supaFetch<ConcertPublic[]>(pathAvenir)
     const prochaines = (concertsAvenir || []).filter((c) =>
@@ -172,7 +172,7 @@ export const getArtisteParId = cache(
       `/rest/v1/concerts?select=${selectConcert}` +
       `&date_show=lt.${today}` +
       `&statut=eq.confirme` +
-      `&order=date_show.desc&limit=30`
+      `&order=date_show.desc&limit=500`
 
     const concertsPasses = await supaFetch<ConcertPublic[]>(pathPasses)
     const passees = (concertsPasses || [])
