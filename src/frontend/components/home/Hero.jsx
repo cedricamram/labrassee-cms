@@ -93,6 +93,12 @@ const HeroContent = styled(motion.div)`
   align-items: center;
   justify-content: center;
   margin-top: calc(var(--header-height) + 20px);
+
+  /* Téléphone : on remonte le bloc pour que la date du premier événement
+     entre dans le premier écran (mesuré à 375×667, 15/10/2026). */
+  @media (max-width: 768px) {
+    margin-top: calc(var(--header-height) + 4px);
+  }
 `;
 
 // Signature au-dessus du titre (Cédric, 05/10/2026 23 h 43 : « faudrait quand même
